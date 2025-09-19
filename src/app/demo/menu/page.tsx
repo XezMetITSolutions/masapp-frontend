@@ -38,8 +38,8 @@ function MenuPageContent() {
   const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
   const { settings } = useBusinessSettingsStore();
   const [showSplash, setShowSplash] = useState(false);
-  const primary = settings.branding.primaryColor;
-  const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
+  const primary = settings.branding.primaryColor || '#F97316';
+  const secondary = settings.branding.secondaryColor || settings.branding.primaryColor || '#FB923C';
   
   // Fetch menu on mount
   useEffect(() => {
