@@ -63,8 +63,8 @@ const defaultSettings: BusinessSettings = {
   branding: {
     logo: '',
     coverImage: '',
-    primaryColor: '#8B5CF6',
-    secondaryColor: '#A78BFA',
+    primaryColor: '#F97316',
+    secondaryColor: '#FB923C',
     backgroundColor: '#FFFFFF',
     accentColor: '#F3F4F6',
     theme: 'modern',
