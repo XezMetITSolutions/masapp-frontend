@@ -22,7 +22,8 @@ import {
   FaMoneyBillWave,
   FaPlus,
   FaEye,
-  FaEdit
+  FaEdit,
+  FaRocket
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';

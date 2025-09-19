@@ -18,6 +18,7 @@ import {
   FaGlobe,
   FaShieldAlt,
   FaChartLine,
+  FaInfoCircle,
   FaFilter,
   FaSearch,
   FaDownload,

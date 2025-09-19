@@ -17,8 +17,6 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
 
-  if (!isOpen) return null;
-
   const handleAddToCart = useCallback(() => {
     addItem({
       itemId: item.id,
@@ -30,6 +28,8 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
     });
     onClose();
   }, [addItem, item, quantity, notes, onClose]);
+
+  if (!isOpen) return null;
 
   const translations = {
     en: {

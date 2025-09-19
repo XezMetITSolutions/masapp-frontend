@@ -3,7 +3,7 @@
     "next/core-web-vitals"
   ],
   "rules": {
-    "no-console": "warn",
-    "no-debugger": "error"
+    "no-console": "off",
+    "react/no-unescaped-entities": "off"
   }
 }

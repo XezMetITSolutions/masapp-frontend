@@ -18,6 +18,7 @@ import {
   FaServer,
   FaGlobe,
   FaKey,
+  FaBell,
   FaLock,
   FaUnlock,
   FaEye,
