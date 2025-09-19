@@ -364,7 +364,7 @@ export const useBusinessSettingsStore = create<BusinessSettingsState>()(
         // Simulated API call
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        image.png        // Basic validation rules
+        // Basic validation rules
         const validPattern = /^[a-z0-9-]+$/;
         const isValidFormat = validPattern.test(subdomain);
         const isValidLength = subdomain.length >= 3 && subdomain.length <= 20;

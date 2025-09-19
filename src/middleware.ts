@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth';
 
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
@@ -13,7 +12,7 @@ export function middleware(request: NextRequest) {
     return handleRestaurantSubdomain(request, subdomain);
   }
   
-  // Admin sayfalarını koru
+  // Admin sayfalarını koru - Demo için direkt erişim
   if (pathname.startsWith('/admin')) {
     return NextResponse.next();
   }
@@ -25,27 +24,10 @@ export function middleware(request: NextRequest) {
       return NextResponse.next();
     }
     
-    // Token kontrolü
+    // Demo token kontrolü (business paneli için)
     const accessToken = request.cookies.get('accessToken')?.value;
     
-    if (!accessToken) {
-      return NextResponse.redirect(new URL('/business/login', request.url));
-    }
-    
-    // Demo token kontrolü (business paneli için)
-    if (accessToken === 'demo-access-token') {
-      return NextResponse.next();
-    }
-    
-    // Token doğrulama
-    const payload = verifyToken(accessToken);
-    if (!payload) {
-      console.log('Business token verification failed for route:', pathname);
-      return NextResponse.redirect(new URL('/business/login', request.url));
-    }
-    
-    // Business rolü kontrolü
-    if (!['restaurant_owner', 'restaurant_admin', 'waiter', 'kitchen', 'cashier'].includes(payload.role)) {
+    if (!accessToken || accessToken !== 'demo-access-token') {
       return NextResponse.redirect(new URL('/business/login', request.url));
     }
   }
