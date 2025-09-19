@@ -231,11 +231,6 @@ class AITranslationService {
 export const aiTranslationService = new AITranslationService();
 export default aiTranslationService;
 
-    translations: { [language: string]: string };
-    timestamp: number;
-  };
-}
-
 interface TranslationOptions {
   sourceLanguage?: string;
   targetLanguage: string;

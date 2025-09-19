@@ -520,11 +520,3 @@ export default function RestaurantApproval() {
     </Suspense>
   );
 }
-
-export default function RestaurantApproval() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <RestaurantApprovalContent />
-    </Suspense>
-  );
-}
