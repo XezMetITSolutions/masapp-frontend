@@ -13,7 +13,7 @@ import {
   FaCreditCard,
   FaCalendarAlt,
   FaMoneyBillWave,
-  FaRetry,
+  FaRedo,
   FaPaperPlane,
   FaFileAlt,
   FaHistory,
@@ -491,7 +491,7 @@ export default function PaymentErrorDetail() {
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     ) : (
                       <>
-                        <FaRetry className="mr-2" />
+                        <FaRedo className="mr-2" />
                         Yeniden Dene
                       </>
                     )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -57,7 +57,7 @@ interface RestaurantApplication {
   notes?: string;
 }
 
-export default function RestaurantApproval() {
+function RestaurantApprovalContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const restaurantId = searchParams.get('id');
@@ -510,5 +510,13 @@ export default function RestaurantApproval() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RestaurantApproval() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RestaurantApprovalContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
-import { SafeInput, SafeTextarea, SafeHTML } from './SafeHTML';
+import { SafeInput, SafeTextarea } from './SafeHTML';
+import SafeHTML from './SafeHTML';
 import { getCSRFTokenFromClient, secureFetch } from '@/lib/csrf-protection';
 
 interface SecureFormProps {
@@ -30,7 +31,7 @@ export default function SecureForm({
 
   // Form verilerini güvenli şekilde güncelle
   const handleInputChange = (name: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value
     }));

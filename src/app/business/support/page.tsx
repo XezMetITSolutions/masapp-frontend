@@ -70,7 +70,7 @@ export default function SupportPage() {
         };
         
         const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token');
+        login(demoUser, 'demo-token', 'demo-refresh-token');
       }
     }, 100);
 

@@ -509,7 +509,7 @@ export default function WaiterDashboard() {
         
         // Demo kullanıcıyı login et
         const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token');
+        login(demoUser, 'demo-token', 'demo-refresh-token');
       }
     }, 100); // Kısa bir gecikme ile
 

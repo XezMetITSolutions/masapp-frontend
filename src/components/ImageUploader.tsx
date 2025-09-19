@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { FaUpload, FaTimes, FaCheck, FaRotateLeft, FaRotateRight, FaCrop, FaMagic } from 'react-icons/fa';
+import { FaUpload, FaTimes, FaCheck, FaUndo, FaRedo, FaCrop, FaMagic } from 'react-icons/fa';
 
 interface ImageUploaderProps {
   onImageSelect: (imageBlob: Blob) => void;
@@ -205,14 +205,14 @@ export default function ImageUploader({
                       className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                       title="Sola döndür"
                     >
-                      <FaRotateLeft size={16} />
+                      <FaUndo size={16} />
                     </button>
                     <button
                       onClick={() => rotateImage('right')}
                       className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                       title="Sağa döndür"
                     >
-                      <FaRotateRight size={16} />
+                      <FaRedo size={16} />
                     </button>
                   </div>
                 </div>

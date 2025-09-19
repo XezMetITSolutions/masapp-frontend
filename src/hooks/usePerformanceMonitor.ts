@@ -74,7 +74,7 @@ export function useCoreWebVitals() {
       const observer = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         entries.forEach((entry) => {
-          console.log('FID:', entry.processingStart - entry.startTime);
+          console.log('FID:', entry.duration);
         });
       });
       observer.observe({ entryTypes: ['first-input'] });
@@ -102,7 +102,7 @@ export function useCoreWebVitals() {
 
     return () => {
       // Cleanup observers
-      observer.disconnect();
+      // Observer cleanup is handled by the individual functions
     };
   }, []);
 }

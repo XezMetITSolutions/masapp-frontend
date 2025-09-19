@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { 
   FaCreditCard, 
-  FaMoney, 
+  FaMoneyBillWave, 
   FaQrcode, 
   FaTimes, 
   FaCheck,
@@ -116,7 +116,7 @@ export default function BusinessPaymentModal({
                 const getIcon = (id: string) => {
                   switch(id) {
                     case 'card': return <FaCreditCard size={20} />;
-                    case 'bank': return <FaMoney size={20} />;
+                    case 'bank': return <FaMoneyBillWave size={20} />;
                     case 'qr': return <FaQrcode size={20} />;
                     default: return <FaCreditCard size={20} />;
                   }

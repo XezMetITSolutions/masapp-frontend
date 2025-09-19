@@ -247,21 +247,22 @@ export default function CartPage() {
     if (cartItems.length > 0) {
       // Siparişi order store'a ekle
       const orderData = {
-        id: `order_${Date.now()}`,
         tableNumber: tableNumber,
         items: cartItems.map(item => ({
-          name: item.name[language as 'tr' | 'en'] || item.name,
+          id: item.id,
+          itemId: item.itemId,
+          name: item.name,
+          price: item.price,
           quantity: item.quantity,
-          notes: '',
-          status: 'preparing'
+          notes: ''
         })),
-        status: 'preparing',
-        orderTime: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-        waitTime: 0,
-        totalAmount: total,
-        calls: [],
-        priority: 'normal',
-        guests: 2 // Demo için sabit kişi sayısı
+        status: 'preparing' as const,
+        total: total,
+        subtotal: total,
+        tipAmount: 0,
+        supportAmount: 0,
+        discount: 0,
+        couponCode: null
       };
       
       // Order store'a ekle

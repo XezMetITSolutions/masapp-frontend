@@ -18,7 +18,7 @@ import {
   FaSync,
   FaHistory,
   FaCloud,
-  FaHardDrive,
+  FaHdd,
   FaServer,
   FaShieldAlt,
   FaEye,
@@ -188,7 +188,7 @@ export default function BackupManagement() {
 
   const getLocationIcon = (location: string) => {
     switch(location) {
-      case 'local': return <FaHardDrive className="text-blue-600" />;
+      case 'local': return <FaHdd className="text-blue-600" />;
       case 'cloud': return <FaCloud className="text-green-600" />;
       case 'server': return <FaServer className="text-purple-600" />;
       default: return <FaDatabase className="text-gray-600" />;
@@ -343,7 +343,7 @@ export default function BackupManagement() {
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center">
                 <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                  <FaHardDrive className="text-purple-600" />
+                  <FaHdd className="text-purple-600" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Toplam Boyut</p>

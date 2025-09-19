@@ -1,6 +1,6 @@
 interface TranslationCache {
   [key: string]: {
-    [language: string]: string;
+    translations: { [language: string]: string };
     timestamp: number;
   };
 }
@@ -24,221 +24,209 @@ class AITranslationService {
 
   private loadCache() {
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('ai-translation-cache');
-      if (cached) {
-        try {
+      try {
+        const cached = localStorage.getItem('translation_cache');
+        if (cached) {
           this.cache = JSON.parse(cached);
-        } catch (error) {
-          console.warn('Translation cache load error:', error);
-          this.cache = {};
         }
+      } catch (error) {
+        console.error('Cache yüklenirken hata:', error);
       }
     }
   }
 
   private saveCache() {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ai-translation-cache', JSON.stringify(this.cache));
+      try {
+        localStorage.setItem('translation_cache', JSON.stringify(this.cache));
+      } catch (error) {
+        console.error('Cache kaydedilirken hata:', error);
+      }
     }
   }
 
-  private getCacheKey(text: string, targetLanguage: string, context?: string): string {
-    return `${text}_${targetLanguage}_${context || 'default'}`;
+  private generateCacheKey(text: string, targetLanguage: string, context?: string): string {
+    return `${text}_${targetLanguage}_${context || ''}`;
   }
 
   private isCacheValid(timestamp: number): boolean {
     return Date.now() - timestamp < this.CACHE_DURATION;
   }
 
-  private async callOpenAI(text: string, options: TranslationOptions): Promise<string> {
-    if (!this.API_KEY) {
-      throw new Error('OpenAI API key not found');
-    }
-
-    const systemPrompt = `Sen bir profesyonel çevirmensin. Restoran/cafe uygulaması için metinleri çeviriyorsun.
-
-Kurallar:
-1. Sadece çeviriyi döndür, açıklama yapma
-2. Restoran terminolojisini doğru kullan
-3. Kısa ve net çeviriler yap
-4. Türkçe karakterleri doğru kullan
-5. Menü öğeleri için uygun terminoloji kullan
-
-${options.context ? `Bağlam: ${options.context}` : ''}`;
-
-    const userPrompt = `Metni "${options.targetLanguage}" diline çevir: "${text}"`;
-
-    try {
-      const response = await fetch(this.API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
-          ],
-          max_tokens: 150,
-          temperature: 0.3,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0]?.message?.content?.trim() || text;
-    } catch (error) {
-      console.error('OpenAI API error:', error);
-      throw error;
-    }
-  }
-
   async translate(
-    text: string, 
+    text: string,
     options: TranslationOptions
   ): Promise<string> {
-    if (!text || text.trim() === '') return text;
+    const { targetLanguage, sourceLanguage = 'auto', context, useCache = true } = options;
+    
+    if (!text || !targetLanguage) {
+      return text;
+    }
 
-    const cacheKey = this.getCacheKey(text, options.targetLanguage, options.context);
-    const cached = this.cache[cacheKey];
-
+    const cacheKey = this.generateCacheKey(text, targetLanguage, context);
+    
     // Cache kontrolü
-    if (options.useCache !== false && cached && this.isCacheValid(cached.timestamp)) {
-      return cached[options.targetLanguage] || text;
+    if (useCache && this.cache[cacheKey] && this.isCacheValid(this.cache[cacheKey].timestamp)) {
+      return this.cache[cacheKey].translations[targetLanguage] || text;
     }
 
     try {
-      const translatedText = await this.callOpenAI(text, options);
+      // Demo çeviri - gerçek API çağrısı yerine
+      const translatedText = this.getDemoTranslation(text, targetLanguage, context);
       
       // Cache'e kaydet
-      this.cache[cacheKey] = {
-        [options.targetLanguage]: translatedText,
-        timestamp: Date.now()
-      };
-      this.saveCache();
+      if (useCache) {
+        this.cache[cacheKey] = {
+          translations: {
+            [targetLanguage]: translatedText
+          },
+          timestamp: Date.now()
+        };
+        this.saveCache();
+      }
 
       return translatedText;
     } catch (error) {
-      console.error('Translation error:', error);
-      
-      // Fallback: Basit kelime çevirileri
-      return this.fallbackTranslation(text, options.targetLanguage);
+      console.error('Çeviri hatası:', error);
+      return text; // Hata durumunda orijinal metni döndür
     }
   }
 
-  private fallbackTranslation(text: string, targetLanguage: string): string {
-    // Basit fallback çevirileri
-    const fallbackTranslations: { [key: string]: { [key: string]: string } } = {
-      'Menu': { tr: 'Menü', en: 'Menu' },
-      'Cart': { tr: 'Sepet', en: 'Cart' },
-      'Order': { tr: 'Sipariş', en: 'Order' },
-      'Table': { tr: 'Masa', en: 'Table' },
-      'Waiter': { tr: 'Garson', en: 'Waiter' },
-      'Total': { tr: 'Toplam', en: 'Total' },
-      'Price': { tr: 'Fiyat', en: 'Price' },
-      'Add to Cart': { tr: 'Sepete Ekle', en: 'Add to Cart' },
-      'Call Waiter': { tr: 'Garson Çağır', en: 'Call Waiter' },
-      'Payment': { tr: 'Ödeme', en: 'Payment' },
-      'Bill': { tr: 'Hesap', en: 'Bill' },
-      'Water': { tr: 'Su', en: 'Water' },
-      'Clean': { tr: 'Temizle', en: 'Clean' },
-      'Help': { tr: 'Yardım', en: 'Help' },
-      'Settings': { tr: 'Ayarlar', en: 'Settings' },
-      'Dashboard': { tr: 'Panel', en: 'Dashboard' },
-      'Login': { tr: 'Giriş', en: 'Login' },
-      'Logout': { tr: 'Çıkış', en: 'Logout' },
-      'Save': { tr: 'Kaydet', en: 'Save' },
-      'Cancel': { tr: 'İptal', en: 'Cancel' },
-      'Delete': { tr: 'Sil', en: 'Delete' },
-      'Edit': { tr: 'Düzenle', en: 'Edit' },
-      'Add': { tr: 'Ekle', en: 'Add' },
-      'Remove': { tr: 'Kaldır', en: 'Remove' },
-      'Search': { tr: 'Ara', en: 'Search' },
-      'Filter': { tr: 'Filtrele', en: 'Filter' },
-      'Sort': { tr: 'Sırala', en: 'Sort' },
-      'Loading': { tr: 'Yükleniyor', en: 'Loading' },
-      'Error': { tr: 'Hata', en: 'Error' },
-      'Success': { tr: 'Başarılı', en: 'Success' },
-      'Warning': { tr: 'Uyarı', en: 'Warning' },
-      'Info': { tr: 'Bilgi', en: 'Info' },
-      'Yes': { tr: 'Evet', en: 'Yes' },
-      'No': { tr: 'Hayır', en: 'No' },
-      'OK': { tr: 'Tamam', en: 'OK' },
-      'Close': { tr: 'Kapat', en: 'Close' },
-      'Open': { tr: 'Aç', en: 'Open' },
-      'Next': { tr: 'İleri', en: 'Next' },
-      'Previous': { tr: 'Geri', en: 'Previous' },
-      'Continue': { tr: 'Devam Et', en: 'Continue' },
-      'Back': { tr: 'Geri', en: 'Back' },
-      'Home': { tr: 'Ana Sayfa', en: 'Home' },
-      'Profile': { tr: 'Profil', en: 'Profile' },
-      'Account': { tr: 'Hesap', en: 'Account' },
-      'User': { tr: 'Kullanıcı', en: 'User' },
-      'Admin': { tr: 'Yönetici', en: 'Admin' },
-      'Staff': { tr: 'Personel', en: 'Staff' },
-      'Customer': { tr: 'Müşteri', en: 'Customer' },
-      'Guest': { tr: 'Misafir', en: 'Guest' },
-      'Welcome': { tr: 'Hoş Geldiniz', en: 'Welcome' },
-      'Thank you': { tr: 'Teşekkürler', en: 'Thank you' },
-      'Please': { tr: 'Lütfen', en: 'Please' },
-      'Sorry': { tr: 'Özür dilerim', en: 'Sorry' },
-      'Excuse me': { tr: 'Pardon', en: 'Excuse me' },
-      'Good morning': { tr: 'Günaydın', en: 'Good morning' },
-      'Good afternoon': { tr: 'İyi öğleden sonra', en: 'Good afternoon' },
-      'Good evening': { tr: 'İyi akşamlar', en: 'Good evening' },
-      'Good night': { tr: 'İyi geceler', en: 'Good night' },
+  private getDemoTranslation(text: string, targetLanguage: string, context?: string): string {
+    // Demo çeviri verileri
+    const demoTranslations: { [key: string]: { [key: string]: string } } = {
+      'Ana Sayfa': { en: 'Home', tr: 'Ana Sayfa' },
+      'Menü': { en: 'Menu', tr: 'Menü' },
+      'Siparişler': { en: 'Orders', tr: 'Siparişler' },
+      'Garson Paneli': { en: 'Waiter Panel', tr: 'Garson Paneli' },
+      'Kasa': { en: 'Cashier', tr: 'Kasa' },
+      'Raporlar': { en: 'Reports', tr: 'Raporlar' },
+      'Ayarlar': { en: 'Settings', tr: 'Ayarlar' },
+      'Çıkış': { en: 'Logout', tr: 'Çıkış' },
+      'Giriş': { en: 'Login', tr: 'Giriş' },
+      'Kayıt Ol': { en: 'Register', tr: 'Kayıt Ol' },
+      'E-posta': { en: 'Email', tr: 'E-posta' },
+      'Şifre': { en: 'Password', tr: 'Şifre' },
+      'Ad': { en: 'Name', tr: 'Ad' },
+      'Soyad': { en: 'Surname', tr: 'Soyad' },
+      'Telefon': { en: 'Phone', tr: 'Telefon' },
+      'Adres': { en: 'Address', tr: 'Adres' },
+      'Şehir': { en: 'City', tr: 'Şehir' },
+      'Ülke': { en: 'Country', tr: 'Ülke' },
+      'Posta Kodu': { en: 'Postal Code', tr: 'Posta Kodu' },
+      'Kaydet': { en: 'Save', tr: 'Kaydet' },
+      'İptal': { en: 'Cancel', tr: 'İptal' },
+      'Sil': { en: 'Delete', tr: 'Sil' },
+      'Düzenle': { en: 'Edit', tr: 'Düzenle' },
+      'Ekle': { en: 'Add', tr: 'Ekle' },
+      'Ara': { en: 'Search', tr: 'Ara' },
+      'Filtrele': { en: 'Filter', tr: 'Filtrele' },
+      'Sırala': { en: 'Sort', tr: 'Sırala' },
+      'Yenile': { en: 'Refresh', tr: 'Yenile' },
+      'Yükle': { en: 'Load', tr: 'Yükle' },
+      'İndir': { en: 'Download', tr: 'İndir' },
+      'Yazdır': { en: 'Print', tr: 'Yazdır' },
+      'Paylaş': { en: 'Share', tr: 'Paylaş' },
+      'Kopyala': { en: 'Copy', tr: 'Kopyala' },
+      'Yapıştır': { en: 'Paste', tr: 'Yapıştır' },
+      'Kes': { en: 'Cut', tr: 'Kes' },
+      'Geri Al': { en: 'Undo', tr: 'Geri Al' },
+      'Yinele': { en: 'Redo', tr: 'Yinele' },
+      'Seç': { en: 'Select', tr: 'Seç' },
+      'Seçili': { en: 'Selected', tr: 'Seçili' },
+      'Tümünü Seç': { en: 'Select All', tr: 'Tümünü Seç' },
+      'Seçimi Kaldır': { en: 'Deselect', tr: 'Seçimi Kaldır' },
+      'Temizle': { en: 'Clear', tr: 'Temizle' },
+      'Sıfırla': { en: 'Reset', tr: 'Sıfırla' },
+      'Geri': { en: 'Back', tr: 'Geri' },
+      'İleri': { en: 'Forward', tr: 'İleri' },
+      'Yukarı': { en: 'Up', tr: 'Yukarı' },
+      'Aşağı': { en: 'Down', tr: 'Aşağı' },
+      'Sol': { en: 'Left', tr: 'Sol' },
+      'Sağ': { en: 'Right', tr: 'Sağ' },
+      'Başla': { en: 'Start', tr: 'Başla' },
+      'Durdur': { en: 'Stop', tr: 'Durdur' },
+      'Devam Et': { en: 'Continue', tr: 'Devam Et' },
+      'Bitir': { en: 'Finish', tr: 'Bitir' },
+      'Tamam': { en: 'OK', tr: 'Tamam' },
+      'Evet': { en: 'Yes', tr: 'Evet' },
+      'Hayır': { en: 'No', tr: 'Hayır' },
+      'Onayla': { en: 'Confirm', tr: 'Onayla' },
+      'Reddet': { en: 'Reject', tr: 'Reddet' },
+      'Kabul Et': { en: 'Accept', tr: 'Kabul Et' },
+      'Kabul Etme': { en: 'Decline', tr: 'Kabul Etme' },
+      'Gönder': { en: 'Send', tr: 'Gönder' },
+      'Al': { en: 'Receive', tr: 'Al' },
+      'Göster': { en: 'Show', tr: 'Göster' },
+      'Gizle': { en: 'Hide', tr: 'Gizle' },
+      'Aç': { en: 'Open', tr: 'Aç' },
+      'Kapat': { en: 'Close', tr: 'Kapat' },
+      'Kilit': { en: 'Lock', tr: 'Kilit' },
+      'Kilidi Aç': { en: 'Unlock', tr: 'Kilidi Aç' },
+      'Bağlan': { en: 'Connect', tr: 'Bağlan' },
+      'Bağlantıyı Kes': { en: 'Disconnect', tr: 'Bağlantıyı Kes' },
+      'Başarılı': { en: 'Success', tr: 'Başarılı' },
+      'Hata': { en: 'Error', tr: 'Hata' },
+      'Uyarı': { en: 'Warning', tr: 'Uyarı' },
+      'Bilgi': { en: 'Info', tr: 'Bilgi' },
+      'Dikkat': { en: 'Attention', tr: 'Dikkat' },
+      'Önemli': { en: 'Important', tr: 'Önemli' },
+      'Acil': { en: 'Urgent', tr: 'Acil' },
+      'Normal': { en: 'Normal', tr: 'Normal' },
+      'Yüksek': { en: 'High', tr: 'Yüksek' },
+      'Düşük': { en: 'Low', tr: 'Düşük' },
+      'Orta': { en: 'Medium', tr: 'Orta' },
+      'Küçük': { en: 'Small', tr: 'Küçük' },
+      'Büyük': { en: 'Large', tr: 'Büyük' },
+      'Geniş': { en: 'Wide', tr: 'Geniş' },
+      'Dar': { en: 'Narrow', tr: 'Dar' },
+      'Uzun': { en: 'Long', tr: 'Uzun' },
+      'Kısa': { en: 'Short', tr: 'Kısa' },
+      'Yeni': { en: 'New', tr: 'Yeni' },
+      'Eski': { en: 'Old', tr: 'Eski' },
+      'Güncel': { en: 'Current', tr: 'Güncel' },
+      'Son': { en: 'Last', tr: 'Son' },
+      'İlk': { en: 'First', tr: 'İlk' },
+      'Sonraki': { en: 'Next', tr: 'Sonraki' },
+      'Önceki': { en: 'Previous', tr: 'Önceki' },
+      'Başlangıç': { en: 'Beginning', tr: 'Başlangıç' },
+      'Bitiş': { en: 'End', tr: 'Bitiş' },
+      'Merkez': { en: 'Center', tr: 'Merkez' },
+      'Kenar': { en: 'Edge', tr: 'Kenar' },
+      'Köşe': { en: 'Corner', tr: 'Köşe' },
+      'Üst': { en: 'Top', tr: 'Üst' },
+      'Alt': { en: 'Bottom', tr: 'Alt' },
+      'İç': { en: 'Inside', tr: 'İç' },
+      'Dış': { en: 'Outside', tr: 'Dış' },
+      'Ön': { en: 'Front', tr: 'Ön' },
+      'Arka': { en: 'Back', tr: 'Arka' },
+      'Yan': { en: 'Side', tr: 'Yan' }
     };
 
-    const lowerText = text.toLowerCase().trim();
-    const translation = fallbackTranslations[text] || fallbackTranslations[lowerText];
-    
-    if (translation && translation[targetLanguage]) {
-      return translation[targetLanguage];
+    // Demo çeviri döndür
+    if (demoTranslations[text]) {
+      return demoTranslations[text][targetLanguage] || text;
     }
 
-    // Eğer fallback'te de yoksa orijinal metni döndür
+    // Basit çeviri simülasyonu
+    if (targetLanguage === 'en') {
+      return `${text} [EN]`;
+    } else if (targetLanguage === 'tr') {
+      return `${text} [TR]`;
+    }
+
     return text;
   }
 
-  // Toplu çeviri için
-  async translateBatch(
-    texts: string[], 
-    options: TranslationOptions
-  ): Promise<string[]> {
-    const promises = texts.map(text => this.translate(text, options));
-    return Promise.all(promises);
-  }
-
-  // Cache temizleme
-  clearCache(): void {
+  clearCache() {
     this.cache = {};
     this.saveCache();
   }
 
-  // Cache istatistikleri
-  getCacheStats(): { totalEntries: number; memoryUsage: string } {
-    const totalEntries = Object.keys(this.cache).length;
-    const memoryUsage = (JSON.stringify(this.cache).length / 1024).toFixed(2) + ' KB';
-    return { totalEntries, memoryUsage };
+  getCacheSize(): number {
+    return Object.keys(this.cache).length;
   }
 }
 
-// Singleton instance
 export const aiTranslationService = new AITranslationService();
-
-// Hook benzeri kullanım için
-export const useAITranslation = () => {
-  return {
-    translate: aiTranslationService.translate.bind(aiTranslationService),
-    translateBatch: aiTranslationService.translateBatch.bind(aiTranslationService),
-    clearCache: aiTranslationService.clearCache.bind(aiTranslationService),
-    getCacheStats: aiTranslationService.getCacheStats.bind(aiTranslationService),
-  };
-};
-
 export default aiTranslationService;

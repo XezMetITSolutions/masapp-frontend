@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -43,7 +43,7 @@ interface UserApplication {
   };
 }
 
-export default function UserApproval() {
+function UserApprovalContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get('id');
@@ -433,5 +433,13 @@ export default function UserApproval() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function UserApproval() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserApprovalContent />
+    </Suspense>
   );
 }

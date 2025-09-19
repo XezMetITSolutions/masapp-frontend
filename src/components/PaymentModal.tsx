@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { 
   FaCreditCard, 
-  FaMoney, 
+  FaMoneyBillWave, 
   FaQrcode, 
   FaTimes, 
   FaHeart,
@@ -154,7 +154,7 @@ export default function PaymentModal({
                 }`}
                 style={paymentMethod === 'cash' ? { backgroundColor: restaurantColor, borderColor: restaurantColor } : {}}
               >
-                <FaMoney size={24} />
+                <FaMoneyBillWave size={24} />
                 <span className="text-sm font-medium">{t.cash}</span>
               </button>
               

@@ -21,7 +21,7 @@ import {
   FaTimes,
   FaClock,
   FaBan,
-  FaRetry,
+  FaRedo,
   FaPaperPlane,
   FaFileAlt,
   FaHistory
@@ -299,7 +299,7 @@ export default function PaymentErrorsManagement() {
                 onClick={() => handleBulkAction('retry')}
                 className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg flex items-center"
               >
-                <FaRetry className="mr-2" />
+                <FaRedo className="mr-2" />
                 Toplu Yeniden Dene
               </button>
               <button 
@@ -623,7 +623,7 @@ export default function PaymentErrorsManagement() {
                             title="Yeniden Dene"
                             onClick={() => handleErrorAction(error.id, 'retry')}
                           >
-                            <FaRetry className="text-sm" />
+                            <FaRedo className="text-sm" />
                           </button>
                         )}
                         <button 

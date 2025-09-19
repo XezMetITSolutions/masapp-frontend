@@ -122,7 +122,6 @@ function MenuPreviewContent({
               {group.category.image && (
                 <OptimizedImage
                   src={group.category.image}
-                  fallbackSrc={group.category.image?.startsWith('http') ? undefined : '/placeholder-food.jpg'}
                   alt={group.category.name.tr}
                   width={64}
                   height={64}
@@ -184,7 +183,6 @@ function MenuPreviewContent({
                       <div className="relative">
                         <OptimizedImage
                           src={item.image || '/placeholder-food.jpg'}
-                          fallbackSrc={'/placeholder-food.jpg'}
                           alt={item.name.tr}
                           width={800}
                           height={384}
@@ -297,7 +295,6 @@ function MenuPreviewContent({
                     <div className="flex items-center p-4 space-x-4">
                       <OptimizedImage
                         src={item.image || '/placeholder-food.jpg'}
-                        fallbackSrc={'/placeholder-food.jpg'}
                         alt={item.name.tr}
                         width={64}
                         height={64}

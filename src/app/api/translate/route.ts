@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  let text = '';
   try {
-    const { text, targetLanguage } = await request.json();
+    const body = await request.json();
+    text = body.text || '';
+    const targetLanguage = body.targetLanguage || 'en';
 
     // Demo: Simple translation simulation
     const translatedText = `${text} [translated to ${targetLanguage}]`;

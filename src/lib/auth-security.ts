@@ -12,6 +12,25 @@ export interface JWTPayload {
   exp: number;
 }
 
+// CSRF token oluşturma
+export function generateCSRFToken(): string {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// CSRF token doğrulama
+export function verifyCSRFToken(headerToken: string, cookieToken: string): boolean {
+  return headerToken === cookieToken;
+}
+
+// Rate limiting kontrolü
+export function checkRateLimit(ip: string, endpoint: string, windowMs?: number): boolean {
+  // Demo amaçlı basit rate limiting
+  // Gerçek uygulamada Redis veya başka bir cache sistemi kullanılmalıdır
+  return true; // Her zaman true döndür (demo için)
+}
+
 // Demo amaçlı basit bir token doğrulama fonksiyonu
 export function verifyToken(token: string): JWTPayload | null {
   if (token === 'demo-admin-token') {

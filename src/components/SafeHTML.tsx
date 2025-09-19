@@ -29,8 +29,7 @@ export default function SafeHTML({
       SANITIZE_DOM: true,
       KEEP_CONTENT: true,
       RETURN_DOM: false,
-      RETURN_DOM_FRAGMENT: false,
-      RETURN_DOM_IMPORT: false
+      RETURN_DOM_FRAGMENT: false
     });
   }, [content, allowedTags, allowedAttributes]);
 

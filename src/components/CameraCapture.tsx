@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { FaCamera, FaTimes, FaCheck, FaRotateLeft, FaRotateRight, FaMagic, FaSpinner } from 'react-icons/fa';
+import { FaCamera, FaTimes, FaCheck, FaUndo, FaRedo, FaMagic, FaSpinner } from 'react-icons/fa';
 import { aiImageProcessor, ImageEnhancementOptions, ProcessedImage } from '@/lib/aiImageProcessor';
 import AIImagePreview from './AIImagePreview';
 
@@ -125,7 +125,9 @@ export default function CameraCapture({
               const options: ImageEnhancementOptions = {
                 autoEnhance: true,
                 removeBackground: true,
-                ...template
+                ...template,
+                aspectRatio: 'food', // template'den gelen aspectRatio'yu override et
+                style: 'rounded' // template'den gelen style'ı override et
               };
               
               const processed = await aiImageProcessor.processImage(blob, options);
@@ -328,13 +330,13 @@ export default function CameraCapture({
                 onClick={() => rotateImage('left')}
                 className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200"
               >
-                <FaRotateLeft size={20} />
+                <FaUndo size={20} />
               </button>
               <button
                 onClick={() => rotateImage('right')}
                 className="p-3 bg-gray-100 rounded-lg hover:bg-gray-200"
               >
-                <FaRotateRight size={20} />
+                <FaRedo size={20} />
               </button>
             </div>
             

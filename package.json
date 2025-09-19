@@ -10,6 +10,9 @@
     "export": "next export"
   },
   "dependencies": {
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.4",
     "chart.js": "^4.5.0",
     "i18next": "^23.10.0",
     "lucide-react": "^0.542.0",
@@ -20,14 +23,12 @@
     "react-dom": "18.3.1",
     "react-i18next": "^14.0.5",
     "react-icons": "^5.0.1",
-    "zustand": "^4.5.7",
     "typescript": "^5.5.4",
-    "@types/node": "^20.14.9",
-    "@types/react": "^18.3.4",
-    "@types/react-dom": "^18.3.4"
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^4.41.3",
+    "@types/testing-library__jest-dom": "^5.14.9",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.5",

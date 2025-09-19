@@ -157,7 +157,8 @@ export const useNotificationStore = create<NotificationState>()(
           orderId,
           billRequestId,
           priority: 'high',
-          targetRole: ['waiter', 'cashier']
+          targetRole: ['waiter', 'cashier'],
+          isActive: true
         });
       },
       
@@ -171,7 +172,8 @@ export const useNotificationStore = create<NotificationState>()(
           orderId,
           billRequestId,
           priority: 'medium',
-          targetRole: ['waiter']
+          targetRole: ['waiter'],
+          isActive: true
         });
       },
       
@@ -184,7 +186,8 @@ export const useNotificationStore = create<NotificationState>()(
           tableNumber,
           orderId,
           priority: 'low',
-          targetRole: ['cashier', 'waiter']
+          targetRole: ['cashier', 'waiter'],
+          isActive: true
         });
       },
       
@@ -196,7 +199,8 @@ export const useNotificationStore = create<NotificationState>()(
           message: message || `Masa ${tableNumber} garson istiyor`,
           tableNumber,
           priority: 'high',
-          targetRole: ['waiter']
+          targetRole: ['waiter'],
+          isActive: true
         });
       },
       
@@ -208,7 +212,8 @@ export const useNotificationStore = create<NotificationState>()(
           message: `Masa ${tableNumber} su istiyor`,
           tableNumber,
           priority: 'medium',
-          targetRole: ['waiter']
+          targetRole: ['waiter'],
+          isActive: true
         });
       },
       
@@ -220,7 +225,8 @@ export const useNotificationStore = create<NotificationState>()(
           message: `Masa ${tableNumber} temizlenmek istiyor`,
           tableNumber,
           priority: 'low',
-          targetRole: ['waiter']
+          targetRole: ['waiter'],
+          isActive: true
         });
       },
       
@@ -233,7 +239,8 @@ export const useNotificationStore = create<NotificationState>()(
           tableNumber: newTable,
           orderId,
           priority: 'medium',
-          targetRole: ['cashier', 'waiter']
+          targetRole: ['cashier', 'waiter'],
+          isActive: true
         });
       }
     }),

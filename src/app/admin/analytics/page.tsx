@@ -9,7 +9,7 @@ import {
   FaUsers,
   FaMoneyBillWave,
   FaExclamationTriangle,
-  FaTrendingUp
+  FaArrowUp
 } from 'react-icons/fa';
 
 export default function AnalyticsDashboard() {
@@ -127,7 +127,7 @@ export default function AnalyticsDashboard() {
                 <p className="text-sm text-gray-500">Büyüme Oranı</p>
                 <div className="flex items-center">
                   <p className="text-2xl font-bold text-gray-900">12.5%</p>
-                  <FaTrendingUp className="ml-2 text-green-600" />
+                  <FaArrowUp className="ml-2 text-green-600" />
                 </div>
                 <p className="text-xs text-gray-500">Geçen aya göre</p>
               </div>

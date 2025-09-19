@@ -198,10 +198,10 @@ export default function MenuItemForm({
               Ana Görsel
             </label>
             <ImageUpload
-              value={formData.image}
-              onChange={(url) => setFormData({
+              currentImage={formData.image}
+              onImageSelect={(file, preview) => setFormData({
                 ...formData,
-                image: url
+                image: preview
               })}
               className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg"
             />

@@ -48,8 +48,8 @@ export function verifyPassword(password: string, hashedPassword: string): boolea
 }
 
 // Demo token oluşturma
-export function generateTokens(userId: string, email: string, role: UserRole, restaurantId?: string): AuthTokens {
-  const accessToken = role === 'super_admin' ? 'demo-admin-token' : 'demo-access-token';
+export function generateTokens(user: { id: string; email: string; role: UserRole; restaurantId?: string }): AuthTokens {
+  const accessToken = user.role === 'super_admin' ? 'demo-admin-token' : 'demo-access-token';
   const refreshToken = 'demo-refresh-token';
   
   return {
@@ -73,4 +73,17 @@ export function refreshToken(refreshToken: string): AuthTokens | null {
     };
   }
   return null;
+}
+
+// Email validasyonu
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+// Şifre güçlülük kontrolü
+export function isStrongPassword(password: string): boolean {
+  // En az 8 karakter, büyük harf, küçük harf, rakam ve özel karakter
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return strongPasswordRegex.test(password);
 }

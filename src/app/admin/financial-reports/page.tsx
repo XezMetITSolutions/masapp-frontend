@@ -12,8 +12,6 @@ import {
   FaBuilding,
   FaCreditCard,
   FaPercentage,
-  FaTrendingUp,
-  FaTrendingDown,
   FaFileAlt,
   FaPrint,
   FaShare,
@@ -94,8 +92,8 @@ export default function FinancialReports() {
   };
 
   const getGrowthIcon = (growth: number) => {
-    if (growth > 0) return <FaTrendingUp className="text-green-600" />;
-    if (growth < 0) return <FaTrendingDown className="text-red-600" />;
+    if (growth > 0) return <FaArrowUp className="text-green-600" />;
+    if (growth < 0) return <FaArrowDown className="text-red-600" />;
     return <FaMinus className="text-gray-600" />;
   };
 

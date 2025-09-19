@@ -17,7 +17,7 @@ import { menuData, MenuItem } from '@/data/menu-data';
 export default function CashierDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { orders: oldOrders, updateOrderStatus: oldUpdateOrderStatus } = useOrderStore();
+  const { orders: oldOrders, updateOrderStatus } = useOrderStore();
   const { clearCart } = useCartStore();
   const { 
     getBillRequestsByStatus, 
@@ -58,10 +58,9 @@ export default function CashierDashboard() {
   const [selectedTable, setSelectedTable] = useState<number>(1);
   const [currentOrderItems, setCurrentOrderItems] = useState<Array<{
     id: string;
-    name: string;
+    name: {en: string, tr: string};
     price: number;
     quantity: number;
-    category: string;
   }>>([]);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -72,12 +71,12 @@ export default function CashierDashboard() {
   
   // Gelişmiş ödeme sistemi state'leri
   const [showSplitPaymentModal, setShowSplitPaymentModal] = useState(false);
-  const [splitPayments, setSplitPayments] = useState<Array<{method: 'cash' | 'card', amount: number, items: Array<{id: string, name: string, price: number, quantity: number}>}>>([]);
+  const [splitPayments, setSplitPayments] = useState<Array<{method: 'cash' | 'card', amount: number, items: Array<{id: string, name: {en: string, tr: string}, price: number, quantity: number}>}>>([]);
   const [partialPaymentAmount, setPartialPaymentAmount] = useState(0);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<any[]>([]);
-  const [selectedItemsForPayment, setSelectedItemsForPayment] = useState<Array<{id: string, name: string, price: number, quantity: number, selected: boolean, paymentQuantity: number}>>([]);
+  const [selectedItemsForPayment, setSelectedItemsForPayment] = useState<Array<{id: string, name: {en: string, tr: string}, price: number, quantity: number, selected: boolean, paymentQuantity: number}>>([]);
   const [showItemSelection, setShowItemSelection] = useState(false);
   const [showTableTransferNotification, setShowTableTransferNotification] = useState(false);
   const [tableTransferNotification, setTableTransferNotification] = useState<any>(null);
@@ -102,9 +101,9 @@ export default function CashierDashboard() {
       id: 'order-1',
       tableNumber: 5,
       items: [
-        { id: '1', name: 'Adana Kebap', price: 85, quantity: 2, category: 'Ana Yemek', image: '', notes: '' },
-        { id: '2', name: 'Ayran', price: 8, quantity: 2, category: 'İçecek', image: '', notes: '' },
-        { id: '3', name: 'Baklava', price: 25, quantity: 1, category: 'Tatlı', image: '', notes: '' }
+        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 85, quantity: 2, notes: '' },
+        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 8, quantity: 2, notes: '' },
+        { id: '3', itemId: '3', name: { en: 'Baklava', tr: 'Baklava' }, price: 25, quantity: 1, notes: '' }
       ],
       total: 211,
       subtotal: 211,
@@ -119,8 +118,8 @@ export default function CashierDashboard() {
       id: 'order-2',
       tableNumber: 12,
       items: [
-        { id: '4', name: 'Lahmacun', price: 15, quantity: 3, category: 'Ana Yemek', image: '', notes: '' },
-        { id: '5', name: 'Çay', price: 5, quantity: 3, category: 'İçecek', image: '', notes: '' }
+        { id: '4', itemId: '4', name: { en: 'Lahmacun', tr: 'Lahmacun' }, price: 15, quantity: 3, notes: '' },
+        { id: '5', itemId: '5', name: { en: 'Tea', tr: 'Çay' }, price: 5, quantity: 3, notes: '' }
       ],
       total: 60,
       subtotal: 60,
@@ -135,9 +134,9 @@ export default function CashierDashboard() {
       id: 'order-3',
       tableNumber: 8,
       items: [
-        { id: '6', name: 'Döner', price: 45, quantity: 1, category: 'Ana Yemek', image: '', notes: '' },
-        { id: '7', name: 'Kola', price: 12, quantity: 1, category: 'İçecek', image: '', notes: '' },
-        { id: '8', name: 'Künefe', price: 30, quantity: 1, category: 'Tatlı', image: '', notes: '' }
+        { id: '6', itemId: '6', name: { en: 'Doner', tr: 'Döner' }, price: 45, quantity: 1, notes: '' },
+        { id: '7', itemId: '7', name: { en: 'Cola', tr: 'Kola' }, price: 12, quantity: 1, notes: '' },
+        { id: '8', itemId: '8', name: { en: 'Kunefe', tr: 'Künefe' }, price: 30, quantity: 1, notes: '' }
       ],
       total: 87,
       subtotal: 87,
@@ -152,8 +151,8 @@ export default function CashierDashboard() {
       id: 'order-4',
       tableNumber: 15,
       items: [
-        { id: '1', name: 'Adana Kebap', price: 65, quantity: 2, category: 'Ana Yemek', image: '', notes: '' },
-        { id: '2', name: 'Ayran', price: 8, quantity: 2, category: 'İçecek', image: '', notes: '' }
+        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 65, quantity: 2, notes: '' },
+        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 8, quantity: 2, notes: '' }
       ],
       total: 146,
       subtotal: 146,
@@ -168,8 +167,11 @@ export default function CashierDashboard() {
   ]);
 
   const filteredOrders = demoOrders.filter(order => {
-    const matchesSearch = order.tableNumber.toString().includes(searchTerm) || 
-                         order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = order.tableNumber.toString().includes(searchTerm) ||    
+                         order.items.some(item => 
+                           item.name.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           item.name.tr.toLowerCase().includes(searchTerm.toLowerCase())
+                         );
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -391,7 +393,7 @@ export default function CashierDashboard() {
         <hr>
         ${order.items.map(item => `
           <div style="display: flex; justify-content: space-between; margin: 5px 0;">
-            <span>${item.name} x${item.quantity}</span>
+            <span>${item.name.tr} x${item.quantity}</span>
             <span>${(item.price * item.quantity).toFixed(2)}₺</span>
           </div>
         `).join('')}
@@ -482,15 +484,16 @@ export default function CashierDashboard() {
         id: 'order-1',
         tableNumber: 5,
         items: [
-          { id: '1', name: 'Adana Kebap', price: 85, quantity: 2, category: 'Ana Yemek', image: '', notes: '' },
-          { id: '2', name: 'Ayran', price: 15, quantity: 2, category: 'İçecek', image: '', notes: '' }
+          { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 85, quantity: 2, notes: '' },
+          { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 15, quantity: 2, notes: '' }
         ],
         status: 'ready' as const,
+        paymentStatus: 'pending' as const,
         total: 200,
+        subtotal: 200,
         tipAmount: 20,
         supportAmount: 0,
         discount: 0,
-        subtotal: 200,
         couponCode: null,
         paymentMethod: undefined,
         timestamp: Date.now() - 10 * 60 * 1000
@@ -499,15 +502,16 @@ export default function CashierDashboard() {
         id: 'order-2',
         tableNumber: 8,
         items: [
-          { id: '3', name: 'Lahmacun', price: 25, quantity: 4, category: 'Ana Yemek', image: '', notes: '' },
-          { id: '4', name: 'Çay', price: 8, quantity: 4, category: 'İçecek', image: '', notes: '' }
+          { id: '3', itemId: '3', name: { en: 'Lahmacun', tr: 'Lahmacun' }, price: 25, quantity: 4, notes: '' },
+          { id: '4', itemId: '4', name: { en: 'Tea', tr: 'Çay' }, price: 8, quantity: 4, notes: '' }
         ],
         status: 'delivered' as const,
+        paymentStatus: 'paid' as const,
         total: 132,
+        subtotal: 132,
         tipAmount: 13,
         supportAmount: 0,
         discount: 0,
-        subtotal: 132,
         couponCode: null,
         paymentMethod: undefined,
         timestamp: Date.now() - 5 * 60 * 1000
@@ -516,15 +520,16 @@ export default function CashierDashboard() {
         id: 'order-3',
         tableNumber: 12,
         items: [
-          { id: '5', name: 'Döner', price: 35, quantity: 1, category: 'Ana Yemek', image: '', notes: '' },
-          { id: '6', name: 'Kola', price: 12, quantity: 1, category: 'İçecek', image: '', notes: '' }
+          { id: '5', itemId: '5', name: { en: 'Doner', tr: 'Döner' }, price: 35, quantity: 1, notes: '' },
+          { id: '6', itemId: '6', name: { en: 'Cola', tr: 'Kola' }, price: 12, quantity: 1, notes: '' }
         ],
         status: 'pending' as const,
+        paymentStatus: 'pending' as const,
         total: 47,
+        subtotal: 47,
         tipAmount: 5,
         supportAmount: 0,
         discount: 0,
-        subtotal: 47,
         couponCode: null,
         paymentMethod: undefined,
         timestamp: Date.now() - 2 * 60 * 1000
@@ -587,10 +592,9 @@ export default function CashierDashboard() {
     } else {
       setCurrentOrderItems(prev => [...prev, {
         id: menuItem.id,
-        name: menuItem.name.tr,
+        name: menuItem.name,
         price: menuItem.price,
-        quantity: 1,
-        category: menuItem.category
+        quantity: 1
       }]);
     }
   };
@@ -622,10 +626,10 @@ export default function CashierDashboard() {
       tableNumber: selectedTable,
       items: currentOrderItems.map(item => ({
         id: item.id,
+        itemId: item.id,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        category: item.category,
         image: '',
         notes: ''
       })),
@@ -649,7 +653,7 @@ export default function CashierDashboard() {
   };
 
   const cancelOrder = (orderId: string) => {
-    updateOrderStatus(orderId, 'cancelled');
+    updateOrderStatus(orderId, 'delivered');
   };
 
   // Sipariş düzenleme fonksiyonları
@@ -660,7 +664,6 @@ export default function CashierDashboard() {
       name: item.name,
       price: item.price,
       quantity: item.quantity,
-      category: item.category
     })));
     setSelectedTable(order.tableNumber);
     setShowEditModal(true);
@@ -800,7 +803,7 @@ export default function CashierDashboard() {
   };
 
   const getUniqueCategories = () => {
-    const categories = [...new Set(menuData.map(item => item.category))];
+    const categories = Array.from(new Set(menuData.map(item => item.category)));
     return categories;
   };
 
@@ -925,8 +928,7 @@ export default function CashierDashboard() {
                   {currentOrderItems.map((item) => (
                     <div key={item.id} className="flex items-center justify-between bg-white p-3 rounded-lg">
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <h4 className="font-medium text-gray-900">{item.name.tr}</h4>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
@@ -1069,7 +1071,7 @@ export default function CashierDashboard() {
                         <div className="space-y-1">
                           {order.items.map((item, index) => (
                             <div key={index} className="flex justify-between text-sm">
-                              <span>{item.name} x{item.quantity}</span>
+                              <span>{item.name.tr} x{item.quantity}</span>
                               <span>{(item.price * item.quantity).toFixed(2)}₺</span>
                             </div>
                           ))}
@@ -1235,7 +1237,7 @@ export default function CashierDashboard() {
                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                              />
                              <div>
-                               <span className="font-medium text-gray-900">{item.name}</span>
+                               <span className="font-medium text-gray-900">{item.name.tr}</span>
                                <span className="text-sm text-gray-600 ml-2">(Mevcut: {item.quantity} adet)</span>
                              </div>
                            </div>
@@ -1424,7 +1426,7 @@ export default function CashierDashboard() {
                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                        />
                        <div className="flex-1">
-                         <h4 className="font-medium text-gray-900">{item.name}</h4>
+                         <h4 className="font-medium text-gray-900">{item.name.tr}</h4>
                          <p className="text-sm text-gray-600">Miktar: {item.quantity} - Birim Fiyat: {item.price}₺</p>
                        </div>
                      </div>
@@ -1503,8 +1505,8 @@ export default function CashierDashboard() {
                   {currentOrderItems.map((item) => (
                     <div key={item.id} className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
                       <div className="flex-1">
-                        <h5 className="font-medium text-gray-900">{item.name}</h5>
-                        <p className="text-sm text-gray-600">{item.category} - {item.price}₺</p>
+                        <h5 className="font-medium text-gray-900">{item.name.tr}</h5>
+                        <p className="text-sm text-gray-600">{item.price}₺</p>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
