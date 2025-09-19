@@ -1,11 +1,7 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { User, UserRole } from '@/types';
-import { ENV_CONFIG } from '@/config/env';
+// Bu dosya, karmaşık auth logic'i ve external dependency'leri kaldırmak için basitleştirilmiştir.
+// Gerçek bir uygulamada JWT, bcrypt gibi kütüphaneler kullanılmalıdır.
 
-const JWT_SECRET = ENV_CONFIG.JWT_SECRET;
-const JWT_EXPIRES_IN = '24h';
-const REFRESH_TOKEN_EXPIRES_IN = '7d';
+import { UserRole } from '@/types';
 
 export interface AuthTokens {
   accessToken: string;
@@ -21,100 +17,60 @@ export interface JWTPayload {
   exp: number;
 }
 
-// JWT Token oluşturma
-export function generateTokens(user: User): AuthTokens {
-  const payload: Omit<JWTPayload, 'iat' | 'exp'> = {
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    restaurantId: user.restaurantId,
-  };
-
-  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
-
-  return { accessToken, refreshToken };
-}
-
-// JWT Token doğrulama
+// Demo amaçlı basit bir token doğrulama fonksiyonu
 export function verifyToken(token: string): JWTPayload | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
-  } catch (error) {
-    return null;
+  if (token === 'demo-admin-token') {
+    return {
+      userId: 'admin-1',
+      email: 'admin@masapp.com',
+      role: 'super_admin',
+      iat: Date.now() / 1000,
+      exp: (Date.now() / 1000) + (24 * 60 * 60) // 24 saat
+    };
   }
-}
-
-// Şifre hashleme
-export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 12;
-  return bcrypt.hash(password, saltRounds);
-}
-
-// Şifre doğrulama
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
-}
-
-// Token'dan kullanıcı bilgilerini çıkarma
-export function getUserFromToken(token: string): JWTPayload | null {
-  return verifyToken(token);
-}
-
-// Rol kontrolü
-export function hasRole(userRole: UserRole, requiredRoles: UserRole[]): boolean {
-  return requiredRoles.includes(userRole);
-}
-
-// Admin rolü kontrolü
-export function isAdmin(userRole: UserRole): boolean {
-  return userRole === 'super_admin';
-}
-
-// Restoran sahibi/admin kontrolü
-export function isRestaurantUser(userRole: UserRole): boolean {
-  return ['restaurant_owner', 'restaurant_admin'].includes(userRole);
-}
-
-// Token süresi kontrolü
-export function isTokenExpired(token: string): boolean {
-  const payload = verifyToken(token);
-  if (!payload) return true;
-  
-  const now = Math.floor(Date.now() / 1000);
-  return payload.exp < now;
-}
-
-// Güvenli şifre oluşturma
-export function generateSecurePassword(length: number = 12): string {
-  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-  let password = '';
-  
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  if (token === 'demo-access-token') {
+    return {
+      userId: 'user-1',
+      email: 'user@masapp.com',
+      role: 'restaurant_owner',
+      restaurantId: 'restaurant-1',
+      iat: Date.now() / 1000,
+      exp: (Date.now() / 1000) + (24 * 60 * 60) // 24 saat
+    };
   }
+  return null;
+}
+
+// Demo amaçlı basit bir şifre doğrulama fonksiyonu
+export function verifyPassword(password: string, hashedPassword: string): boolean {
+  // Demo için her zaman true döndür veya basit bir kontrol yap
+  return password === 'admin123' && hashedPassword === '$2b$12$edZ0/kaYeqOg2DXwUUjQZOFopMWTWt..Ao4gSFT/6P9bM7EzbauG.';
+}
+
+// Demo token oluşturma
+export function generateTokens(userId: string, email: string, role: UserRole, restaurantId?: string): AuthTokens {
+  const accessToken = role === 'super_admin' ? 'demo-admin-token' : 'demo-access-token';
+  const refreshToken = 'demo-refresh-token';
   
-  return password;
+  return {
+    accessToken,
+    refreshToken
+  };
 }
 
-// 2FA kod oluşturma
-export function generate2FACode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+// Demo şifre hash'leme
+export function hashPassword(password: string): string {
+  // Demo için sabit bir hash döndür
+  return '$2b$12$edZ0/kaYeqOg2DXwUUjQZOFopMWTWt..Ao4gSFT/6P9bM7EzbauG.';
 }
 
-// Email doğrulama
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-// Güçlü şifre kontrolü
-export function isStrongPassword(password: string): boolean {
-  const minLength = 8;
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasNumbers = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
-  return password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar;
+// Demo token yenileme
+export function refreshToken(refreshToken: string): AuthTokens | null {
+  if (refreshToken === 'demo-refresh-token') {
+    return {
+      accessToken: 'demo-access-token',
+      refreshToken: 'demo-refresh-token'
+    };
+  }
+  return null;
 }
