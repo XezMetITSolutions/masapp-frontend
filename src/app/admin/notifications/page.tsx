@@ -21,7 +21,7 @@ import {
   FaBuilding,
   FaCreditCard,
   FaDownload,
-  FaRefresh,
+  FaSync,
   FaPlus,
   FaCog
 } from 'react-icons/fa';
@@ -349,7 +349,7 @@ export default function NotificationsManagement() {
                 onClick={() => window.location.reload()}
                 className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center"
               >
-                <FaRefresh className="mr-2" />
+                <FaSync className="mr-2" />
                 Yenile
             </button>
         </div>

@@ -23,7 +23,7 @@ import {
   FaSearch,
   FaDownload,
   FaUpload,
-  FaRefresh,
+  FaSync,
   FaBan,
   FaCheck,
   FaHistory,

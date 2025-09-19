@@ -17,7 +17,7 @@ import {
   FaPlus,
   FaEdit,
   FaSave,
-  FaRefresh,
+  FaSync,
   FaDownload,
   FaUpload
 } from 'react-icons/fa';
@@ -115,7 +115,7 @@ export default function KeyboardShortcuts({ onClose }: KeyboardShortcutsProps) {
     {
       key: 'F5',
       description: 'Sayfayı yenile',
-      icon: 'FaRefresh',
+      icon: 'FaSync',
       category: 'actions',
       action: () => {}
     },
@@ -170,7 +170,7 @@ export default function KeyboardShortcuts({ onClose }: KeyboardShortcutsProps) {
       case 'FaPlus': return <FaPlus className="text-green-600" />;
       case 'FaEdit': return <FaEdit className="text-yellow-600" />;
       case 'FaSave': return <FaSave className="text-blue-600" />;
-      case 'FaRefresh': return <FaRefresh className="text-gray-600" />;
+      case 'FaSync': return <FaSync className="text-gray-600" />;
       case 'FaDownload': return <FaDownload className="text-green-600" />;
       case 'FaUpload': return <FaUpload className="text-blue-600" />;
       case 'FaTimes': return <FaTimes className="text-red-600" />;

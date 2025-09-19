@@ -15,7 +15,7 @@ import {
   FaCalendarAlt,
   FaFileAlt,
   FaCog,
-  FaRefresh,
+  FaSync,
   FaHistory,
   FaCloud,
   FaHardDrive,

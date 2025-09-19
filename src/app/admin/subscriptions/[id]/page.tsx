@@ -22,7 +22,7 @@ import {
   FaPause,
   FaPlay,
   FaTimes,
-  FaRefresh,
+  FaSync,
   FaFileAlt,
   FaHistory
 } from 'react-icons/fa';
@@ -482,7 +482,7 @@ export default function SubscriptionDetail() {
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   ) : (
                     <>
-                      <FaRefresh className="mr-2" />
+                      <FaSync className="mr-2" />
                       Token Yenile
                     </>
                   )}

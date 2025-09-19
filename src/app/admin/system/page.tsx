@@ -7,7 +7,7 @@ import {
   FaFilter, 
   FaEdit,
   FaSave,
-  FaRefresh,
+  FaSync,
   FaDownload,
   FaUpload,
   FaTrash,
@@ -355,7 +355,7 @@ export default function SystemManagement() {
                 onClick={() => window.location.reload()}
                 className="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg flex items-center"
               >
-                <FaRefresh className="mr-2" />
+                <FaSync className="mr-2" />
                 Yenile
               </button>
             </div>

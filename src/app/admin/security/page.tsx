@@ -23,7 +23,7 @@ import {
   FaPlus,
   FaDownload,
   FaUpload,
-  FaRefresh,
+  FaSync,
   FaBan,
   FaCheck,
   FaHistory,
@@ -249,7 +249,7 @@ export default function SecurityManagement() {
             </div>
             <div className="flex space-x-3">
               <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
-                <FaRefresh className="mr-2" />
+                <FaSync className="mr-2" />
                 Tarama Başlat
               </button>
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">

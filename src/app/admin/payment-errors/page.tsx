@@ -7,7 +7,7 @@ import {
   FaSearch, 
   FaFilter, 
   FaEye,
-  FaRefresh,
+  FaSync,
   FaDownload,
   FaCreditCard,
   FaCalendarAlt,
@@ -313,7 +313,7 @@ export default function PaymentErrorsManagement() {
                 onClick={() => handleBulkAction('refresh')}
                 className="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg flex items-center"
               >
-                <FaRefresh className="mr-2" />
+                <FaSync className="mr-2" />
                 Yenile
               </button>
             </div>

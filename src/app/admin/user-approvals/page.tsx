@@ -17,7 +17,7 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaDownload,
-  FaRefresh,
+  FaSync,
   FaFileAlt,
   FaPaperPlane,
   FaEdit,
@@ -350,7 +350,7 @@ export default function UserApprovalsManagement() {
                 onClick={() => handleBulkAction('refresh')}
                 className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg flex items-center"
               >
-                <FaRefresh className="mr-2" />
+                <FaSync className="mr-2" />
                 Yenile
               </button>
             </div>

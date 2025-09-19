@@ -21,7 +21,7 @@ import {
   FaBug,
   FaShieldAlt,
   FaChartLine,
-  FaRefresh,
+  FaSync,
   FaPlay,
   FaPause,
   FaStop
