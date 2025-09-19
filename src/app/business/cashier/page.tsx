@@ -1705,5 +1705,3 @@ export default function CashierDashboard() {
     </div>
   );
 }
-
-}
