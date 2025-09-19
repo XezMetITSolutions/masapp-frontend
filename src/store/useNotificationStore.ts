@@ -251,3 +251,11 @@ export const useNotificationStore = create<NotificationState>()(
 );
 
 export default useNotificationStore;
+
+    {
+      name: 'masapp-notification-storage',
+    }
+  )
+);
+
+export default useNotificationStore;

@@ -1,19 +1,8 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[functions]
-  directory = "netlify/functions"

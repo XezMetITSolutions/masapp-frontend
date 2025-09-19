@@ -443,3 +443,11 @@ export default function UserApproval() {
     </Suspense>
   );
 }
+
+export default function UserApproval() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserApprovalContent />
+    </Suspense>
+  );
+}
