@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
+// Simple ID generator
+const generateId = () => Math.random().toString(36).substring(2, 15);
 
 export interface WaiterRequest {
   id: string;
@@ -35,7 +36,7 @@ const useWaiterStore = create<WaiterState>()(
       
       addRequest: (type, message) => {
         const newRequest: WaiterRequest = {
-          id: uuidv4(),
+          id: generateId(),
           type,
           message: type === 'custom' ? message : undefined,
           timestamp: Date.now(),

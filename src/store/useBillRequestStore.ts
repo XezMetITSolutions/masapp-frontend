@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
 import { BillRequest, Bill, BillItem } from '@/types';
+
+// Simple ID generator
+const generateId = () => Math.random().toString(36).substring(2, 15);
 
 interface BillRequestState {
   billRequests: BillRequest[];
@@ -33,7 +35,7 @@ export const useBillRequestStore = create<BillRequestState>()(
       
       // Create bill request
       createBillRequest: (orderId, tableNumber, totalAmount, requestedBy, waiterId) => {
-        const id = uuidv4();
+        const id = generateId();
         const newRequest: BillRequest = {
           id,
           orderId,
@@ -91,7 +93,7 @@ export const useBillRequestStore = create<BillRequestState>()(
         const billRequest = get().getBillRequestById(billRequestId);
         if (!billRequest) throw new Error('Bill request not found');
         
-        const billId = uuidv4();
+        const billId = generateId();
         const items: BillItem[] = orderItems.map(item => ({
           id: item.id,
           name: typeof item.name === 'string' ? item.name : item.name.tr,

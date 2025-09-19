@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
+// Simple ID generator
+const generateId = () => Math.random().toString(36).substring(2, 15);
 
 export interface CartItem {
   id: string;
@@ -69,7 +70,7 @@ const useCartStore = create<CartState>()(
           items[existingItemIndex].quantity += item.quantity;
         } else {
           // Add new item
-          items.push({ ...item, id: uuidv4() });
+          items.push({ ...item, id: generateId() });
         }
         
         set({ 

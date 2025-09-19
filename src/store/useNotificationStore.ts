@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
+// Simple ID generator
+const generateId = () => Math.random().toString(36).substring(2, 15);
 import { Notification, UserRole } from '@/types';
 
 interface NotificationState {
@@ -34,7 +35,7 @@ export const useNotificationStore = create<NotificationState>()(
       
       // Create notification
       createNotification: (notificationData) => {
-        const id = uuidv4();
+        const id = generateId();
         const newNotification: Notification = {
           ...notificationData,
           id,
