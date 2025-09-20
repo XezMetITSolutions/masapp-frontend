@@ -62,17 +62,6 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-4">
-          {/* Test Button */}
-          <button
-            onClick={() => {
-              console.log('Test button clicked');
-              alert('Test button works!');
-            }}
-            className="w-full p-2 bg-red-500 text-white rounded-lg cursor-pointer"
-          >
-            TEST BUTONU - TIKLA
-          </button>
-          
           <button
             onClick={(e) => {
               e.preventDefault();
