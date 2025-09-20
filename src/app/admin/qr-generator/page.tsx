@@ -12,7 +12,7 @@ export default function QRGeneratorPage() {
   const [bgColor, setBgColor] = useState('#FFFFFF');
   const [fgColor, setFgColor] = useState('#000000');
   const [includeLogoText, setIncludeLogoText] = useState(true);
-  const [language, setLanguage] = useState<'en' | 'tr'>('en');
+  const [language, setLanguage] = useState<'en' | 'tr' | 'de'>('en');
 
   const translations = {
     en: {
@@ -44,10 +44,25 @@ export default function QRGeneratorPage() {
       back: 'Panele Dön',
       tableQrCode: 'Masa QR Kodu',
       scanToOrder: 'Menüyü görmek ve sipariş vermek için tarayın',
+    },
+    de: {
+      qrGenerator: 'QR-Code-Generator',
+      tableNumber: 'Tischnummer',
+      restaurantId: 'Restaurant-ID',
+      size: 'QR-Code-Größe',
+      bgColor: 'Hintergrundfarbe',
+      fgColor: 'Vordergrundfarbe',
+      includeLogo: 'Logo-Text einbeziehen',
+      generate: 'QR-Code generieren',
+      download: 'QR-Code herunterladen',
+      print: 'QR-Code drucken',
+      back: 'Zurück zum Dashboard',
+      tableQrCode: 'Tisch-QR-Code',
+      scanToOrder: 'Scannen Sie, um die Speisekarte anzuzeigen und zu bestellen',
     }
   };
 
-  const t = translations[language];
+  const t = translations[language] || translations.en || translations.tr;
 
   const qrValue = `https://masapp.com/menu/${restaurantId}?table=${tableNumber}`;
 
@@ -146,9 +161,15 @@ export default function QRGeneratorPage() {
             </button>
             <button 
               onClick={() => setLanguage('tr')}
-              className={`px-3 py-1 rounded ${language === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              className={`mr-2 px-3 py-1 rounded ${language === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               TR
+            </button>
+            <button 
+              onClick={() => setLanguage('de')}
+              className={`px-3 py-1 rounded ${language === 'de' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            >
+              DE
             </button>
           </div>
         </div>

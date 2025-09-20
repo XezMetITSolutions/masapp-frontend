@@ -504,7 +504,7 @@ export default function CartPage() {
                   <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                     <Image
                       src={item.image || ''}
-                      alt={item.name[language as keyof typeof item.name] || ''}
+                      alt={item.name[language] || item.name.en || item.name.tr || ''}
                       fill
                       className="object-cover"
                     />
@@ -515,7 +515,7 @@ export default function CartPage() {
                   </div>
                   <div className="ml-3 flex-grow">
                     <div className="flex justify-between">
-                      <h3 className="font-semibold text-sm truncate pr-2">{item.name[language as keyof typeof item.name]}</h3>
+                      <h3 className="font-semibold text-sm truncate pr-2">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
                       <span className="font-semibold text-sm whitespace-nowrap" style={{ color: primary }}>{item.price} ₺</span>
                     </div>
                     
@@ -564,14 +564,14 @@ export default function CartPage() {
                 <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image
                     src={item.image || ''}
-                    alt={item.name[language as keyof typeof item.name] || ''}
+                    alt={item.name[language] || item.name.en || item.name.tr || ''}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div className="sm:ml-3 mt-2 sm:mt-0 flex-grow">
                   <div className="flex justify-between items-start gap-3">
-                    <h3 className="font-semibold text-sm truncate pr-2">{item.name[language as keyof typeof item.name]}</h3>
+                    <h3 className="font-semibold text-sm truncate pr-2">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
                     <span className="font-semibold text-sm whitespace-nowrap" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <div className="flex justify-between items-center mt-1.5">

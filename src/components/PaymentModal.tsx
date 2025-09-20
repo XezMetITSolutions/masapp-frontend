@@ -70,10 +70,28 @@ export default function PaymentModal({
       thankYou: 'Thank You!',
       processing: 'Processing...',
       success: 'Payment successful!'
+    },
+    de: {
+      payment: 'Zahlung',
+      paymentMethod: 'Zahlungsmethode',
+      card: 'Kredit-/Debitkarte',
+      cash: 'Bargeld',
+      qr: 'QR-Code-Zahlung',
+      tip: 'Trinkgeld',
+      tipOptional: 'Trinkgeld (optional)',
+      noTip: 'Kein Trinkgeld',
+      customTip: 'Eigener Betrag',
+      subtotal: 'Zwischensumme',
+      tipAmount: 'Trinkgeld',
+      total: 'Gesamt',
+      payNow: 'Jetzt bezahlen',
+      thankYou: 'Danke!',
+      processing: 'Wird verarbeitet...',
+      success: 'Zahlung erfolgreich!'
     }
   };
 
-  const t = texts[language];
+  const t = texts[language] || texts.en || texts.tr;
 
   const tipPercentages = [10, 15, 20, 25];
 

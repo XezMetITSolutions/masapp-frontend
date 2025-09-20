@@ -67,7 +67,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b" style={{ borderColor: 'var(--brand-subtle)' }}>
-          <h2 className="text-lg font-semibold">{item.name[language]}</h2>
+          <h2 className="text-lg font-semibold">{item.name[language] || item.name.en || item.name.tr || ''}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -80,7 +80,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
         <div className="relative h-48 w-full cursor-pointer" onClick={() => window.open(item.image, '_blank')}>
           <img
             src={item.image}
-            alt={item.name[language]}
+            alt={item.name[language] || item.name.en || item.name.tr || ''}
             className="w-full h-full object-cover hover:opacity-90 transition-opacity"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -104,7 +104,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-gray-600 mb-4">{item.description[language]}</p>
+          <p className="text-gray-600 mb-4">{item.description[language] || item.description.en || item.description.tr || ''}</p>
           
           <div className="text-2xl font-bold mb-4" style={{ color: 'var(--brand-strong)' }}>
             {item.price} ₺
@@ -121,7 +121,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                     className="text-xs px-2 py-1 rounded-full"
                     style={{ backgroundColor: 'var(--tone2-bg)', color: 'var(--tone2-text)', border: '1px solid var(--tone2-border)' }}
                   >
-                    {allergen[language]}
+                    {allergen[language] || allergen.en || allergen.tr || ''}
                   </span>
                 ))}
               </div>
