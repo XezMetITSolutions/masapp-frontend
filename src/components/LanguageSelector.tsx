@@ -7,8 +7,6 @@ const languageList = [
   { code: 'Turkish', label: 'TR' },
   { code: 'English', label: 'EN' },
   { code: 'German', label: 'DE' },
-  { code: 'Arabic', label: 'AR' },
-  { code: 'Russian', label: 'RU' },
 ];
 
 export default function LanguageSelector() {

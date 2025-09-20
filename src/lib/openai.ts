@@ -46,6 +46,4 @@ export const supportedLanguages = {
   'Turkish': { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
   'German': { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
   'English': { code: 'en', name: 'English', flag: '🇺🇸' },
-  'Arabic': { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  'Russian': { code: 'ru', name: 'Русский', flag: '🇷🇺' },
 };
