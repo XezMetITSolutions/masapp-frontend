@@ -592,7 +592,11 @@ export default function CashierDashboard() {
     } else {
       setCurrentOrderItems(prev => [...prev, {
         id: menuItem.id,
-        name: menuItem.name,
+        name: {
+          en: menuItem.name.en,
+          tr: menuItem.name.tr,
+          de: menuItem.name.de || menuItem.name.en
+        },
         price: menuItem.price,
         quantity: 1
       }]);

@@ -18,6 +18,7 @@ export interface MenuItem {
   servingInfo?: {
     en: string;
     tr: string;
+    de: string;
   };
 }
 
