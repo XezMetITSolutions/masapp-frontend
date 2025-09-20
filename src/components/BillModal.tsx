@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FaTimes, FaPrint, FaDownload, FaCheckCircle, FaHistory, FaMoneyBillWave } from 'react-icons/fa';
 import usePaymentHistoryStore from '@/store/usePaymentHistoryStore';
+import { useLanguageStore } from '@/store';
 
 interface BillModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ interface BillModalProps {
 }
 
 export default function BillModal({ isOpen, onClose, onPaymentComplete, order, restaurant, allowPartialPayment = false }: BillModalProps) {
+  const { language } = useLanguageStore();
   const [isPrinted, setIsPrinted] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [paymentType, setPaymentType] = useState<'system' | 'manual'>('system');
@@ -490,7 +492,7 @@ export default function BillModal({ isOpen, onClose, onPaymentComplete, order, r
                             <div className="space-y-1">
                               {payment.items.map((item, itemIndex) => (
                                 <div key={itemIndex} className="flex justify-between text-sm text-gray-600">
-                                  <span>{item.name} x {item.quantity}</span>
+                                  <span>{typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || '')} x {item.quantity}</span>
                                   <span>{(item.price * item.quantity).toFixed(2)} ₺</span>
                                 </div>
                               ))}
