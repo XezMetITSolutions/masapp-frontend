@@ -58,7 +58,7 @@ export default function CashierDashboard() {
   const [selectedTable, setSelectedTable] = useState<number>(1);
   const [currentOrderItems, setCurrentOrderItems] = useState<Array<{
     id: string;
-    name: {en: string, tr: string};
+    name: {en: string, tr: string, de: string};
     price: number;
     quantity: number;
   }>>([]);

@@ -7,10 +7,12 @@ export interface MenuItem {
   name: {
     en: string;
     tr: string;
+    de: string;
   };
   description: {
     en: string;
     tr: string;
+    de: string;
   };
   price: number;
   image: string;
@@ -19,12 +21,13 @@ export interface MenuItem {
   subcategory?: string;
   popular: boolean;
   ingredients?: string[];
-  allergens?: { en: string; tr: string }[];
+  allergens?: { en: string; tr: string; de: string }[];
   calories?: number;
   preparationTime?: number;
   servingInfo?: {
     en: string;
     tr: string;
+    de: string;
   };
   isAvailable?: boolean;
 }
@@ -34,6 +37,7 @@ export interface MenuSubcategory {
   name: {
     en: string;
     tr: string;
+    de: string;
   };
   parentId: string;
 }
@@ -43,10 +47,12 @@ export interface MenuCategory {
   name: {
     en: string;
     tr: string;
+    de: string;
   };
   description?: {
     en: string;
     tr: string;
+    de: string;
   };
   image?: string;
   subcategories?: MenuSubcategory[];
