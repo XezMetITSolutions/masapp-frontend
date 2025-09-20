@@ -595,7 +595,7 @@ export default function CashierDashboard() {
         name: {
           en: menuItem.name.en,
           tr: menuItem.name.tr,
-          de: menuItem.name.de || menuItem.name.en
+          de: (menuItem.name as any).de || menuItem.name.en
         },
         price: menuItem.price,
         quantity: 1
