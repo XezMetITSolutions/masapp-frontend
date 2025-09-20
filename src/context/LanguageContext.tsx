@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { translateText, detectLanguageFromLocation, supportedLanguages } from '@/lib/openai';
+import { detectLanguageFromLocation, supportedLanguages } from '@/lib/openai';
+import { translations } from '@/data/translations';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -80,20 +81,26 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
 
     setIsLoading(true);
     try {
-      // Convert language name to API-friendly format
+      // Convert language name to translation key
       const languageMap: { [key: string]: string } = {
-        'English': 'English',
-        'German': 'German', 
-        'Arabic': 'Arabic',
-        'Russian': 'Russian'
+        'English': 'en',
+        'German': 'de', 
+        'Arabic': 'ar',
+        'Russian': 'ru'
       };
       
-      const apiLanguage = languageMap[currentLanguage] || 'English';
-      console.log('Translating:', text, 'to:', apiLanguage);
-      const translatedText = await translateText(text, apiLanguage);
-      console.log('Translation result:', translatedText);
-      translationCache.set(cacheKey, translatedText);
-      return translatedText;
+      const languageKey = languageMap[currentLanguage] || 'en';
+      
+      // Check if we have a predefined translation
+      if (translations[text] && translations[text][languageKey]) {
+        const translatedText = translations[text][languageKey];
+        translationCache.set(cacheKey, translatedText);
+        return translatedText;
+      }
+      
+      // Fallback to original text if no translation found
+      translationCache.set(cacheKey, text);
+      return text;
     } catch (error) {
       console.error('Translation failed:', error);
       // Return original text instead of "Translation failed"
