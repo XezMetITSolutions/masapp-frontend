@@ -9,6 +9,7 @@ export interface CartItem {
   name: {
     en: string;
     tr: string;
+    de: string;
   };
   price: number;
   quantity: number;

@@ -11,7 +11,11 @@ export interface PaymentRecord {
   method: 'cash' | 'card' | 'mobile';
   items: Array<{
     id: string;
-    name: string;
+    name: {
+      en: string;
+      tr: string;
+      de: string;
+    } | string;
     quantity: number;
     price: number;
   }>;

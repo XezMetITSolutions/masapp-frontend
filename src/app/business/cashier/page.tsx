@@ -101,9 +101,9 @@ export default function CashierDashboard() {
       id: 'order-1',
       tableNumber: 5,
       items: [
-        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 85, quantity: 2, notes: '' },
-        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 8, quantity: 2, notes: '' },
-        { id: '3', itemId: '3', name: { en: 'Baklava', tr: 'Baklava' }, price: 25, quantity: 1, notes: '' }
+        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap', de: 'Adana Kebab' }, price: 85, quantity: 2, notes: '' },
+        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran', de: 'Ayran' }, price: 8, quantity: 2, notes: '' },
+        { id: '3', itemId: '3', name: { en: 'Baklava', tr: 'Baklava', de: 'Baklava' }, price: 25, quantity: 1, notes: '' }
       ],
       total: 211,
       subtotal: 211,
@@ -118,8 +118,8 @@ export default function CashierDashboard() {
       id: 'order-2',
       tableNumber: 12,
       items: [
-        { id: '4', itemId: '4', name: { en: 'Lahmacun', tr: 'Lahmacun' }, price: 15, quantity: 3, notes: '' },
-        { id: '5', itemId: '5', name: { en: 'Tea', tr: 'Çay' }, price: 5, quantity: 3, notes: '' }
+        { id: '4', itemId: '4', name: { en: 'Lahmacun', tr: 'Lahmacun', de: 'Lahmacun' }, price: 15, quantity: 3, notes: '' },
+        { id: '5', itemId: '5', name: { en: 'Tea', tr: 'Çay', de: 'Tee' }, price: 5, quantity: 3, notes: '' }
       ],
       total: 60,
       subtotal: 60,
@@ -134,9 +134,9 @@ export default function CashierDashboard() {
       id: 'order-3',
       tableNumber: 8,
       items: [
-        { id: '6', itemId: '6', name: { en: 'Doner', tr: 'Döner' }, price: 45, quantity: 1, notes: '' },
-        { id: '7', itemId: '7', name: { en: 'Cola', tr: 'Kola' }, price: 12, quantity: 1, notes: '' },
-        { id: '8', itemId: '8', name: { en: 'Kunefe', tr: 'Künefe' }, price: 30, quantity: 1, notes: '' }
+        { id: '6', itemId: '6', name: { en: 'Doner', tr: 'Döner', de: 'Döner' }, price: 45, quantity: 1, notes: '' },
+        { id: '7', itemId: '7', name: { en: 'Cola', tr: 'Kola', de: 'Cola' }, price: 12, quantity: 1, notes: '' },
+        { id: '8', itemId: '8', name: { en: 'Kunefe', tr: 'Künefe', de: 'Künefe' }, price: 30, quantity: 1, notes: '' }
       ],
       total: 87,
       subtotal: 87,
@@ -151,8 +151,8 @@ export default function CashierDashboard() {
       id: 'order-4',
       tableNumber: 15,
       items: [
-        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 65, quantity: 2, notes: '' },
-        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 8, quantity: 2, notes: '' }
+        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap', de: 'Adana Kebab' }, price: 65, quantity: 2, notes: '' },
+        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran', de: 'Ayran' }, price: 8, quantity: 2, notes: '' }
       ],
       total: 146,
       subtotal: 146,
@@ -484,8 +484,8 @@ export default function CashierDashboard() {
         id: 'order-1',
         tableNumber: 5,
         items: [
-          { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 85, quantity: 2, notes: '' },
-          { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 15, quantity: 2, notes: '' }
+          { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap', de: 'Adana Kebab' }, price: 85, quantity: 2, notes: '' },
+          { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran', de: 'Ayran' }, price: 15, quantity: 2, notes: '' }
         ],
         status: 'ready' as const,
         paymentStatus: 'pending' as const,
@@ -502,8 +502,8 @@ export default function CashierDashboard() {
         id: 'order-2',
         tableNumber: 8,
         items: [
-          { id: '3', itemId: '3', name: { en: 'Lahmacun', tr: 'Lahmacun' }, price: 25, quantity: 4, notes: '' },
-          { id: '4', itemId: '4', name: { en: 'Tea', tr: 'Çay' }, price: 8, quantity: 4, notes: '' }
+          { id: '3', itemId: '3', name: { en: 'Lahmacun', tr: 'Lahmacun', de: 'Lahmacun' }, price: 25, quantity: 4, notes: '' },
+          { id: '4', itemId: '4', name: { en: 'Tea', tr: 'Çay', de: 'Tee' }, price: 8, quantity: 4, notes: '' }
         ],
         status: 'delivered' as const,
         paymentStatus: 'paid' as const,
@@ -520,8 +520,8 @@ export default function CashierDashboard() {
         id: 'order-3',
         tableNumber: 12,
         items: [
-          { id: '5', itemId: '5', name: { en: 'Doner', tr: 'Döner' }, price: 35, quantity: 1, notes: '' },
-          { id: '6', itemId: '6', name: { en: 'Cola', tr: 'Kola' }, price: 12, quantity: 1, notes: '' }
+          { id: '5', itemId: '5', name: { en: 'Doner', tr: 'Döner', de: 'Döner' }, price: 35, quantity: 1, notes: '' },
+          { id: '6', itemId: '6', name: { en: 'Cola', tr: 'Kola', de: 'Cola' }, price: 12, quantity: 1, notes: '' }
         ],
         status: 'pending' as const,
         paymentStatus: 'pending' as const,

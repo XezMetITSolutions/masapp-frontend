@@ -5,7 +5,11 @@ const generateId = () => Math.random().toString(36).substring(2, 15);
 
 export interface OrderItem {
   id: string;
-  name: string;
+  name: {
+    en: string;
+    tr: string;
+    de: string;
+  } | string;
   quantity: number;
   price: number;
   notes?: string;
