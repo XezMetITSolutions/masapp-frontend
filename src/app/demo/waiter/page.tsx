@@ -70,10 +70,29 @@ export default function WaiterPage() {
       back: 'Menüye Dön',
       tableNumber: 'Masa',
       noActiveRequests: 'Aktif istek yok',
+    },
+    de: {
+      callWaiter: 'Kellner rufen',
+      menu: 'Speisekarte',
+      cart: 'Warenkorb',
+      quickRequests: 'Schnelle Anfragen',
+      water: 'Wasser bringen',
+      bill: 'Rechnung anfordern',
+      clean: 'Tisch abräumen',
+      help: 'Hilfe benötigt',
+      customRequest: 'Benutzerdefinierte Anfrage',
+      placeholder: 'Geben Sie hier Ihre Anfrage ein...',
+      send: 'Anfrage senden',
+      activeRequests: 'Aktive Anfragen',
+      requestSent: 'Anfrage gesendet!',
+      waiterComing: 'Ein Kellner wird in Kürze bei Ihnen sein',
+      back: 'Zurück zur Speisekarte',
+      tableNumber: 'Tisch',
+      noActiveRequests: 'Keine aktiven Anfragen',
     }
   };
 
-  const t = translations[language];
+  const t = translations[language as 'en' | 'tr' | 'de'];
 
   const quickRequests = [
     { id: 'water', icon: <FaGlassWhiskey />, text: t.water },

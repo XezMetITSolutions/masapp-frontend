@@ -93,10 +93,26 @@ export default function MenuPage() {
       allergens: 'Alerjenler',
       calories: 'Kalori',
       servingInfo: 'Servis Bilgisi',
+    },
+    de: {
+      menu: 'Speisekarte',
+      cart: 'Warenkorb',
+      callWaiter: 'Kellner rufen',
+      popular: 'Beliebt',
+      starters: 'Vorspeisen',
+      mains: 'Hauptgerichte',
+      desserts: 'Desserts',
+      drinks: 'Getränke',
+      addToCart: 'In den Warenkorb',
+      viewDetails: 'Details anzeigen',
+      tableNumber: 'Tisch',
+      allergens: 'Allergene',
+      calories: 'Kalorien',
+      servingInfo: 'Portionsinfo',
     }
   };
   
-  const t = translations[language as 'en' | 'tr'];
+  const t = translations[language as 'en' | 'tr' | 'de'];
 
   // Create category list from store data and add popular option
   const menuCategories = useMemo(() => [

@@ -175,10 +175,37 @@ export default function CartPage() {
       tableNumber: 'Masa',
       remove: 'Kaldır',
       discount: 'İndirim',
+    },
+    de: {
+      cart: 'Warenkorb',
+      menu: 'Speisekarte',
+      callWaiter: 'Kellner rufen',
+      emptyCart: 'Ihr Warenkorb ist leer',
+      browseMenu: 'Speisekarte durchsuchen',
+      quantity: 'Menge',
+      subtotal: 'Zwischensumme',
+      tip: 'Trinkgeld',
+      tipAmount: 'Trinkgeldbetrag',
+      tipMessage: 'Falls Sie mit dem Service zufrieden waren, können Sie ein Trinkgeld hinterlassen. Trinkgelder gehen direkt an das Restaurantpersonal.',
+      support: 'Unterstützung',
+      supportMessage: 'Möchten Sie den Systementwicklern eine kleine Unterstützung zukommen lassen? 🙂',
+      supportAmount: 'Unterstützungsbetrag',
+      customAmount: 'Betrag festlegen',
+      coupon: 'Gutschein',
+      couponNotice: 'Gutscheine sind nur für In-App-Zahlungen gültig.',
+      applyCoupon: 'Anwenden',
+      total: 'Gesamt',
+      placeOrder: 'Bestellung aufgeben',
+      payNow: 'Jetzt bezahlen',
+      orderPlaced: 'Ihre Bestellung wurde aufgegeben!',
+      addMore: 'Weitere Artikel hinzufügen',
+      tableNumber: 'Tisch',
+      remove: 'Entfernen',
+      discount: 'Rabatt',
     }
   };
   
-  const t = translations[language as 'en' | 'tr'];
+  const t = translations[language as 'en' | 'tr' | 'de'];
   
   const { 
     items: cartItems, 
@@ -811,4 +838,5 @@ export default function CartPage() {
     </main>
   );
 }
+
 
