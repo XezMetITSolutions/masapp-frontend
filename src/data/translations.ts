@@ -1,5 +1,5 @@
 // Pre-defined translations for static export
-export const translations = {
+export const translations: { [key: string]: { en: string; de: string; tr: string } } = {
   '120+ Restoran Güveniyor': {
     en: '120+ Restaurants Trust Us',
     de: '120+ Restaurants vertrauen uns',

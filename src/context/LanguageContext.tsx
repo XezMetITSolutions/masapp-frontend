@@ -92,8 +92,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       const languageKey = languageMap[currentLanguage] || 'en';
       
       // Check if we have a predefined translation
-      if (translations[text] && translations[text][languageKey]) {
-        const translatedText = translations[text][languageKey];
+      if (translations[text] && translations[text][languageKey as keyof typeof translations[typeof text]]) {
+        const translatedText = translations[text][languageKey as keyof typeof translations[typeof text]];
         translationCache.set(cacheKey, translatedText);
         return translatedText;
       }
