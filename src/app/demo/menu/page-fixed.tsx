@@ -165,7 +165,11 @@ export default function MenuPage() {
   const addToCart = useCallback((item: MenuItem) => {
     addItem({
       itemId: item.id,
-      name: item.name,
+      name: {
+        en: item.name.en,
+        tr: item.name.tr,
+        de: item.name.de || item.name.en
+      },
       price: item.price,
       quantity: 1,
       image: item.image
