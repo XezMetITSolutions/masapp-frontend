@@ -436,10 +436,6 @@ function UserApprovalContent() {
   );
 }
 
-export default function UserApproval() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <UserApprovalContent />
-    </Suspense>
-  );
+export default function UserApprovePage() {
+  return <UserApprovalContent />;
 }

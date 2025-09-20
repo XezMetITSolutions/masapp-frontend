@@ -104,8 +104,7 @@ export function createRateLimit(config: RateLimitConfig) {
       // Rate limit kontrolü
       const isAllowed = checkRateLimit(
         key, 
-        'general', 
-        config.windowMs
+        'general'
       );
       
       if (!isAllowed) {

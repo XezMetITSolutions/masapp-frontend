@@ -177,7 +177,7 @@ export function SecureFormInput({
       <SafeInput
         type={type}
         value={value}
-        onChange={onChange}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
           error ? 'border-red-500' : 'border-gray-300'
@@ -228,7 +228,7 @@ export function SecureFormTextarea({
       
       <SafeTextarea
         value={value}
-        onChange={onChange}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${

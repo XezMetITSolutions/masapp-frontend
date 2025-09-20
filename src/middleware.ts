@@ -4,13 +4,8 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
   
-  // Subdomain kontrolü
-  const subdomain = getSubdomain(hostname);
-  
-  if (subdomain && subdomain !== 'www' && subdomain !== 'admin') {
-    // Restoran subdomain'i
-    return handleRestaurantSubdomain(request, subdomain);
-  }
+  // Netlify'da subdomain kontrolü devre dışı
+  // const subdomain = getSubdomain(hostname);
   
   // Admin sayfalarını koru - Demo için direkt erişim
   if (pathname.startsWith('/admin')) {
