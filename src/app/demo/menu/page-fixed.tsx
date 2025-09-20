@@ -119,7 +119,7 @@ export default function MenuPage() {
     { id: 'popular', name: t.popular },
     ...categories.map(cat => ({
       id: cat.id,
-      name: cat.name[language as keyof typeof cat.name]
+      name: cat.name[language] || cat.name.en || cat.name.tr || ''
     }))
   ], [categories, language, t.popular]);
 
@@ -284,7 +284,7 @@ export default function MenuPage() {
                 }`}
                 onClick={() => handleSubcategoryChange(subcategory.id)}
               >
-                {subcategory.name[language as keyof typeof subcategory.name]}
+                {subcategory.name[language] || subcategory.name.en || subcategory.name.tr || ''}
               </button>
             ))}
           </div>

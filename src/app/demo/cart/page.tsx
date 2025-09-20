@@ -45,7 +45,7 @@ export default function CartPage() {
     if (existingOrder) {
       // Mevcut siparişe yeni ürünleri ekle
       const newItems = cartItems.map(item => ({
-        name: typeof item.name === 'string' ? item.name : item.name[language as 'tr' | 'en'],
+        name: typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || ''),
         quantity: item.quantity,
         price: item.price,
         notes: item.notes || '',
@@ -64,7 +64,7 @@ export default function CartPage() {
         tableNumber: tableNumber,
         guests: 2, // Varsayılan misafir sayısı
         items: cartItems.map(item => ({
-          name: typeof item.name === 'string' ? item.name : item.name[language as 'tr' | 'en'],
+          name: typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || ''),
           quantity: item.quantity,
           price: item.price,
           notes: item.notes || '',

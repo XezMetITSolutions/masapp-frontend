@@ -107,7 +107,7 @@ function MenuPageContent() {
     { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
     ...categories.map(cat => ({
       id: cat.id,
-      name: cat.name[language as keyof typeof cat.name]
+      name: cat.name[language] || cat.name.en || cat.name.tr || ''
     }))
   ];
 
@@ -123,8 +123,8 @@ function MenuPageContent() {
 
   if (search.trim() !== '') {
     filteredItems = filteredItems.filter(item =>
-      item.name[language as keyof typeof item.name].toLowerCase().includes(search.toLowerCase()) ||
-      (item.description[language as keyof typeof item.description] && item.description[language as keyof typeof item.description].toLowerCase().includes(search.toLowerCase()))
+      (item.name[language] || item.name.en || item.name.tr || '').toLowerCase().includes(search.toLowerCase()) ||
+      ((item.description[language] || item.description.en || item.description.tr || '').toLowerCase().includes(search.toLowerCase()))
     );
   }
 
@@ -329,7 +329,7 @@ function MenuPageContent() {
                   onClick={() => handleSubcategoryChange(subcategory.id)}
                   style={activeSubcategory === subcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
                 >
-                  {subcategory.name[language as keyof typeof subcategory.name]}
+                  {subcategory.name[language] || subcategory.name.en || subcategory.name.tr || ''}
                 </button>
               ))}
             </div>
@@ -344,7 +344,7 @@ function MenuPageContent() {
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image
                     src={item.image || '/placeholder-food.jpg'}
-                    alt={item.name[language as keyof typeof item.name] || 'Menu item'}
+                    alt={item.name[language] || item.name.en || item.name.tr || 'Menu item'}
                     width={80}
                     height={80}
                     className="object-cover w-full h-full rounded-lg"
@@ -358,11 +358,11 @@ function MenuPageContent() {
                 </div>
                 <div className="ml-3 flex-grow">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-dynamic-sm">{item.name[language as keyof typeof item.name] || item.name.tr || item.name.en}</h3>
+                    <h3 className="font-semibold text-dynamic-sm">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
                     <span className="font-semibold text-dynamic-sm" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                    {item.description[language as keyof typeof item.description] || item.description.tr || item.description.en}
+                    {item.description[language] || item.description.en || item.description.tr || ''}
                   </p>
 
                   {/* Allergens */}

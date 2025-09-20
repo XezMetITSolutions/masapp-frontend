@@ -894,7 +894,7 @@ export default function WaiterDashboard() {
                 <div key={index} className="flex justify-between items-center">
                   <div className="flex-1">
                     <p className="font-medium text-sm">
-                      {item.quantity}x {typeof item.name === 'string' ? item.name : item.name[language as 'tr' | 'en']}
+                      {item.quantity}x {typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || '')}
                     </p>
                     {item.notes && (
                       <p className="text-xs text-purple-600 italic">{item.notes}</p>
@@ -1018,7 +1018,7 @@ export default function WaiterDashboard() {
                         {order.items.map((item, index) => (
                           <div key={index} className="flex justify-between items-center p-3 bg-white border rounded-lg">
                             <div className="flex-1">
-                              <p className="font-medium">{item.quantity}x {typeof item.name === 'string' ? item.name : item.name[language as 'tr' | 'en']}</p>
+                              <p className="font-medium">{item.quantity}x {typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || '')}</p>
                               {item.notes && (
                                 <p className="text-sm text-purple-600 italic">{item.notes}</p>
                               )}
