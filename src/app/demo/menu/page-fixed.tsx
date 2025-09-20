@@ -146,8 +146,8 @@ export default function MenuPage() {
         
     if (search.trim() !== '') {
       items = items.filter(item =>
-        item.name[language].toLowerCase().includes(search.toLowerCase()) ||
-        (item.description[language] && item.description[language].toLowerCase().includes(search.toLowerCase()))
+        (item.name[language] || item.name.en || item.name.tr || '').toLowerCase().includes(search.toLowerCase()) ||
+        ((item.description[language] || item.description.en || item.description.tr || '').toLowerCase().includes(search.toLowerCase()))
       );
     }
     return items;
@@ -311,7 +311,7 @@ export default function MenuPage() {
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image 
                     src={item.image} 
-                    alt={item.name[language]} 
+                    alt={item.name[language] || item.name.en || item.name.tr || ''} 
                     width={80} 
                     height={80} 
                     className="object-cover w-full h-full rounded-lg"
@@ -329,14 +329,14 @@ export default function MenuPage() {
                 </div>
                 <div className="ml-3 flex-grow">
                   <div className="flex justify-between">
-                    <h3 className="font-semibold text-sm">{item.name[language]}</h3>
+                    <h3 className="font-semibold text-sm">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
                     <span className="font-semibold text-secondary text-sm">{item.price} ₺</span>
                   </div>
-                  <p className="text-xs text-gray-600 line-clamp-2 mb-1.5">{item.description[language]}</p>
+                  <p className="text-xs text-gray-600 line-clamp-2 mb-1.5">{item.description[language] || item.description.en || item.description.tr || ''}</p>
                   {/* Allerjen ve Diyet Etiketleri */}
                   <div className="flex flex-wrap gap-1 mb-1">
                     {item.allergens && item.allergens.length > 0 && item.allergens.map((a, i) => (
-                      <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">{a[language]}</span>
+                      <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">{a[language] || a.en || a.tr || ''}</span>
                     ))}
                     {/* Demo diyet etiketi: Vegan, Glutensiz */}
                     {item.id === 'caesar-salad' && (
