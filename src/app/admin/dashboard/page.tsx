@@ -15,7 +15,8 @@ import {
   FaBell,
   FaCheckCircle,
   FaClock,
-  FaExclamationCircle
+  FaExclamationCircle,
+  FaLanguage
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
@@ -101,6 +102,10 @@ export default function AdminDashboard() {
           <Link href="/admin/payment" onClick={() => setSidebarOpen(false)} className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-blue-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
             <FaCreditCard className="mr-2 sm:mr-3 text-sm sm:text-base" />
             <span className="text-sm sm:text-base font-medium">Ödeme & Abonelik</span>
+          </Link>
+          <Link href="/admin/translations" onClick={() => setSidebarOpen(false)} className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-blue-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
+            <FaLanguage className="mr-2 sm:mr-3 text-sm sm:text-base" />
+            <span className="text-sm sm:text-base font-medium">Çeviri Yönetimi</span>
           </Link>
           <Link href="/admin/settings" onClick={() => setSidebarOpen(false)} className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-blue-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
             <FaCog className="mr-2 sm:mr-3 text-sm sm:text-base" />
@@ -232,6 +237,13 @@ export default function AdminDashboard() {
                   <FaUsers className="text-sm sm:text-base" />
                 </div>
                 <span className="text-xs sm:text-sm text-gray-700 text-center font-medium">Kullanıcı Ekle</span>
+              </Link>
+              
+              <Link href="/admin/translations" className="flex flex-col items-center p-2 sm:p-4 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors group">
+                <div className="bg-indigo-600 p-2 sm:p-3 rounded-full text-white mb-1 sm:mb-2 group-hover:scale-110 transition-transform">
+                  <FaLanguage className="text-sm sm:text-base" />
+                </div>
+                <span className="text-xs sm:text-sm text-gray-700 text-center font-medium">Çeviri Yönetimi</span>
               </Link>
               
               <Link href="/admin/reports" className="flex flex-col items-center p-2 sm:p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors group">
