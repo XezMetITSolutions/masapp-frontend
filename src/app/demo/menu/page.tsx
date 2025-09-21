@@ -11,15 +11,101 @@ import MenuItemModal from '@/components/MenuItemModal';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
+import { useLanguageStore } from '@/store';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 
 function MenuPageContent() {
   // Store states
   const { currentLanguage, translate } = useLanguage();
+  const { language } = useLanguageStore();
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
+  
+  // Translations
+  const translations = {
+    tr: {
+      menu: 'Menü',
+      cart: 'Sepet',
+      callWaiter: 'Garson Çağır',
+      popular: 'Popüler',
+      starters: 'Başlangıçlar',
+      mains: 'Ana Yemekler',
+      desserts: 'Tatlılar',
+      drinks: 'İçecekler',
+      addToCart: 'Sepete Ekle',
+      viewDetails: 'Detayları Gör',
+      tableNumber: 'Masa',
+      allergens: 'Alerjenler',
+      calories: 'Kalori',
+      servingInfo: 'Porsiyon Bilgisi',
+      searchPlaceholder: 'Menüde ara...',
+      todaysSpecial: 'Bugüne Özel!',
+      soupOfTheDay: 'Günün Çorbası',
+      wifiPassword: 'WiFi Şifresi',
+      rateOnGoogle: 'Google\'da Değerlendir',
+      leaveComment: 'Yorum Yap',
+      workingHours: 'Çalışma Saatleri',
+      followOnInstagram: 'Instagram\'da Takip Et',
+      productAddedToCart: 'Ürün sepete eklendi!',
+      business: 'İşletme'
+    },
+    en: {
+      menu: 'Menu',
+      cart: 'Cart',
+      callWaiter: 'Call Waiter',
+      popular: 'Popular',
+      starters: 'Starters',
+      mains: 'Main Dishes',
+      desserts: 'Desserts',
+      drinks: 'Drinks',
+      addToCart: 'Add to Cart',
+      viewDetails: 'View Details',
+      tableNumber: 'Table',
+      allergens: 'Allergens',
+      calories: 'Calories',
+      servingInfo: 'Serving Info',
+      searchPlaceholder: 'Search menu...',
+      todaysSpecial: 'Today\'s Special!',
+      soupOfTheDay: 'Soup of the Day',
+      wifiPassword: 'WiFi Password',
+      rateOnGoogle: 'Rate on Google',
+      leaveComment: 'Leave Comment',
+      workingHours: 'Working Hours',
+      followOnInstagram: 'Follow on Instagram',
+      productAddedToCart: 'Product added to cart!',
+      business: 'Business'
+    },
+    de: {
+      menu: 'Speisekarte',
+      cart: 'Warenkorb',
+      callWaiter: 'Kellner rufen',
+      popular: 'Beliebt',
+      starters: 'Vorspeisen',
+      mains: 'Hauptgerichte',
+      desserts: 'Desserts',
+      drinks: 'Getränke',
+      addToCart: 'In den Warenkorb',
+      viewDetails: 'Details anzeigen',
+      tableNumber: 'Tisch',
+      allergens: 'Allergene',
+      calories: 'Kalorien',
+      servingInfo: 'Portionsinfo',
+      searchPlaceholder: 'Speisekarte durchsuchen...',
+      todaysSpecial: 'Heute\'s Spezial!',
+      soupOfTheDay: 'Suppe des Tages',
+      wifiPassword: 'WiFi-Passwort',
+      rateOnGoogle: 'Bei Google bewerten',
+      leaveComment: 'Kommentar hinterlassen',
+      workingHours: 'Öffnungszeiten',
+      followOnInstagram: 'Auf Instagram folgen',
+      productAddedToCart: 'Produkt zum Warenkorb hinzugefügt!',
+      business: 'Unternehmen'
+    }
+  };
+  
+  const t = translations[language] || translations.tr;
   
   // Menu store
   const items = useMenuStore(state => state.items);
@@ -100,14 +186,14 @@ function MenuPageContent() {
   }, [isClient, cartItems]);
 
   // Get language code for menu data
-  const language = currentLanguage === 'Turkish' ? 'tr' : 'en';
+  const menuLanguage = currentLanguage === 'Turkish' ? 'tr' : 'en';
   
   // Get menu categories
   const menuCategories = [
-    { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
+    { id: 'popular', name: t.popular },
     ...categories.map(cat => ({
       id: cat.id,
-      name: cat.name[language] || cat.name.en || cat.name.tr || ''
+      name: cat.name[menuLanguage] || cat.name.en || cat.name.tr || ''
     }))
   ];
 
@@ -123,8 +209,8 @@ function MenuPageContent() {
 
   if (search.trim() !== '') {
     filteredItems = filteredItems.filter(item =>
-      (item.name[language] || item.name.en || item.name.tr || '').toLowerCase().includes(search.toLowerCase()) ||
-      ((item.description[language] || item.description.en || item.description.tr || '').toLowerCase().includes(search.toLowerCase()))
+      (item.name[menuLanguage] || item.name.en || item.name.tr || '').toLowerCase().includes(search.toLowerCase()) ||
+      ((item.description[menuLanguage] || item.description.en || item.description.tr || '').toLowerCase().includes(search.toLowerCase()))
     );
   }
 
@@ -204,7 +290,7 @@ function MenuPageContent() {
           `}</style>
         </div>
       )}
-      <Toast message="Ürün sepete eklendi!" visible={toastVisible} onClose={() => setToastVisible(false)} />
+      <Toast message={t.productAddedToCart} visible={toastVisible} onClose={() => setToastVisible(false)} />
       <AnnouncementPopup />
       <main className="min-h-screen pb-20">
         {/* Header */}
@@ -235,7 +321,7 @@ function MenuPageContent() {
           <input
             type="text"
             className="border rounded p-2 w-full mr-2"
-            placeholder={searchPlaceholder}
+            placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -333,7 +419,7 @@ function MenuPageContent() {
                   onClick={() => handleSubcategoryChange(subcategory.id)}
                   style={activeSubcategory === subcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
                 >
-                  {subcategory.name[language] || subcategory.name.en || subcategory.name.tr || ''}
+                  {subcategory.name[menuLanguage] || subcategory.name.en || subcategory.name.tr || ''}
                 </button>
               ))}
             </div>
@@ -348,7 +434,7 @@ function MenuPageContent() {
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image
                     src={item.image || '/placeholder-food.jpg'}
-                    alt={item.name[language] || item.name.en || item.name.tr || 'Menu item'}
+                    alt={item.name[menuLanguage] || item.name.en || item.name.tr || 'Menu item'}
                     width={80}
                     height={80}
                     className="object-cover w-full h-full rounded-lg"
@@ -356,17 +442,17 @@ function MenuPageContent() {
                   {item.popular && (
                     <div className="absolute top-0 left-0 text-white text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--brand-strong)' }}>
                       <FaStar className="inline-block mr-1" size={8} />
-                      <TranslatedText>Popüler</TranslatedText>
+                      {t.popular}
                     </div>
                   )}
                 </div>
                 <div className="ml-3 flex-grow">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-dynamic-sm">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
+                    <h3 className="font-semibold text-dynamic-sm">{item.name[menuLanguage] || item.name.en || item.name.tr || ''}</h3>
                     <span className="font-semibold text-dynamic-sm" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                    {item.description[language] || item.description.en || item.description.tr || ''}
+                    {item.description[menuLanguage] || item.description.en || item.description.tr || ''}
                   </p>
 
                   {/* Allergens */}
@@ -387,14 +473,14 @@ function MenuPageContent() {
                       style={{ color: primary }}
                     >
                       <FaInfo className="mr-1" size={10} />
-                      <TranslatedText>Detayları Gör</TranslatedText>
+                      {t.viewDetails}
                     </button>
                     <button
                       className="btn btn-secondary py-1 px-3 text-xs rounded flex items-center"
                       onClick={() => addToCart(item)}
                     >
                       <FaPlus className="mr-1" size={10} />
-                      <TranslatedText>Sepete Ekle</TranslatedText>
+                      {t.addToCart}
                     </button>
                   </div>
                 </div>
@@ -472,7 +558,7 @@ function MenuPageContent() {
           <div className="container mx-auto flex justify-around">
             <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <FaUtensils className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
+              <span className="text-[10px]">{t.menu}</span>
             </Link>
             <Link href="/demo/cart" className="flex flex-col items-center" style={{ color: primary }}>
               <div className="relative">
@@ -483,11 +569,11 @@ function MenuPageContent() {
                   </span>
                 )}
               </div>
-              <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
+              <span className="text-[10px]">{t.cart}</span>
             </Link>
             <Link href="/demo/waiter" className="flex flex-col items-center" style={{ color: primary }}>
               <FaBell className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Garson Çağır</TranslatedText></span>
+              <span className="text-[10px]">{t.callWaiter}</span>
             </Link>
           </div>
         </nav>
