@@ -629,5 +629,85 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     en: 'Annual',
     de: 'Jährlich',
     tr: 'Yıllık'
+  },
+  'Deneme Süresi': {
+    en: 'Trial Period',
+    de: 'Testzeitraum',
+    tr: 'Deneme Süresi'
+  },
+  'Garantisi': {
+    en: 'Guarantee',
+    de: 'Garantie',
+    tr: 'Garantisi'
+  },
+  'Sertifikası': {
+    en: 'Certificate',
+    de: 'Zertifikat',
+    tr: 'Sertifikası'
+  },
+  '6+ Ay Planlar': {
+    en: '6+ Month Plans',
+    de: '6+ Monatspläne',
+    tr: '6+ Ay Planlar'
+  },
+  'Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.': {
+    en: 'If cancellation occurs after installation, only the installation fee is charged. All plans are protected with SSL security certificate.',
+    de: 'Bei Kündigung nach der Installation wird nur die Installationsgebühr berechnet. Alle Pläne sind mit SSL-Sicherheitszertifikat geschützt.',
+    tr: 'Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.'
+  },
+  'Hangi ödeme yöntemlerini kabul ediyorsunuz?': {
+    en: 'What payment methods do you accept?',
+    de: 'Welche Zahlungsmethoden akzeptieren Sie?',
+    tr: 'Hangi ödeme yöntemlerini kabul ediyorsunuz?'
+  },
+  'Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.': {
+    en: 'We accept credit cards, debit cards, wire transfer/EFT and all mobile payment options. We offer big discounts for 6-month and annual payments. Installment options are also available.',
+    de: 'Wir akzeptieren Kreditkarten, Bankkarten, Überweisung/EFT und alle mobilen Zahlungsoptionen. Wir bieten große Rabatte für 6-Monats- und Jahreszahlungen. Ratenzahlungsoptionen sind ebenfalls verfügbar.',
+    tr: 'Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.'
+  },
+  'Teknik destek sağlıyor musunuz?': {
+    en: 'Do you provide technical support?',
+    de: 'Bieten Sie technischen Support?',
+    tr: 'Teknik destek sağlıyor musunuz?'
+  },
+  'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.': {
+    en: 'Of course! In the Premium package, we offer WhatsApp and priority support, in the Enterprise package, 24/7 phone support. We also provide online training videos and documentation for all our customers.',
+    de: 'Natürlich! Im Premium-Paket bieten wir WhatsApp- und Prioritätssupport, im Enterprise-Paket 24/7 Telefonsupport. Wir bieten auch Online-Schulungsvideos und Dokumentation für alle unsere Kunden.',
+    tr: 'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.'
+  },
+  'Sistemi öğrenmek ne kadar sürer?': {
+    en: 'How long does it take to learn the system?',
+    de: 'Wie lange dauert es, das System zu erlernen?',
+    tr: 'Sistemi öğrenmek ne kadar sürer?'
+  },
+  'MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.': {
+    en: 'MasApp is designed to be very user-friendly. Your staff can learn the system in 1-2 hours. We provide detailed training during installation and provide continuous support.',
+    de: 'MasApp ist sehr benutzerfreundlich gestaltet. Ihr Personal kann das System in 1-2 Stunden erlernen. Wir bieten während der Installation eine detaillierte Schulung und bieten kontinuierliche Unterstützung.',
+    tr: 'MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.'
+  },
+  'Mevcut POS sistemimle uyumlu mu?': {
+    en: 'Is it compatible with my existing POS system?',
+    de: 'Ist es mit meinem bestehenden POS-System kompatibel?',
+    tr: 'Mevcut POS sistemimle uyumlu mu?'
+  },
+  'MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.': {
+    en: 'MasApp works independently but can be integrated with your existing POS systems. In the Enterprise package, you can connect all your systems with API integrations.',
+    de: 'MasApp funktioniert unabhängig, kann aber in Ihre bestehenden POS-Systeme integriert werden. Im Enterprise-Paket können Sie alle Ihre Systeme mit API-Integrationen verbinden.',
+    tr: 'MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.'
+  },
+  'Raporlama özellikleri neler?': {
+    en: 'What are the reporting features?',
+    de: 'Was sind die Berichtsfunktionen?',
+    tr: 'Raporlama özellikleri neler?'
+  },
+  'Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.': {
+    en: 'You can get detailed reports such as daily/weekly/monthly sales reports, best-selling products, table efficiency, staff performance and customer analytics.',
+    de: 'Sie können detaillierte Berichte wie tägliche/wöchentliche/monatliche Verkaufsberichte, Bestseller, Tischeffizienz, Personalleistung und Kundenanalysen erhalten.',
+    tr: 'Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.'
+  },
+  '14 gün ücretsiz deneme ile risk almadan başlayın.': {
+    en: 'Start without risk with a 14-day free trial.',
+    de: 'Starten Sie risikofrei mit einer 14-tägigen kostenlosen Testversion.',
+    tr: '14 gün ücretsiz deneme ile risk almadan başlayın.'
   }
 };

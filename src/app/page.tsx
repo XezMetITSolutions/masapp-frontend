@@ -273,28 +273,27 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               <div className="flex flex-col items-center">
                 <FaRocket className="text-3xl text-green-500 mb-2" />
-                <p className="font-semibold text-gray-900">14 Gün Ücretsiz</p>
-                <p className="text-sm text-gray-600">Deneme Süresi</p>
+                <p className="font-semibold text-gray-900"><TranslatedText>14 Gün Ücretsiz</TranslatedText></p>
+                <p className="text-sm text-gray-600"><TranslatedText>Deneme Süresi</TranslatedText></p>
           </div>
               <div className="flex flex-col items-center">
                 <FaShieldAlt className="text-3xl text-blue-500 mb-2" />
-                <p className="font-semibold text-gray-900">30 Gün İade</p>
-                <p className="text-sm text-gray-600">Garantisi</p>
+                <p className="font-semibold text-gray-900"><TranslatedText>30 Gün İade</TranslatedText></p>
+                <p className="text-sm text-gray-600"><TranslatedText>Garantisi</TranslatedText></p>
         </div>
               <div className="flex flex-col items-center">
                 <FaCheckCircle className="text-3xl text-purple-500 mb-2" />
-                <p className="font-semibold text-gray-900">SSL Güvenlik</p>
-                <p className="text-sm text-gray-600">Sertifikası</p>
+                <p className="font-semibold text-gray-900"><TranslatedText>SSL Güvenlik</TranslatedText></p>
+                <p className="text-sm text-gray-600"><TranslatedText>Sertifikası</TranslatedText></p>
           </div>
               <div className="flex flex-col items-center">
                 <FaUsers className="text-3xl text-orange-500 mb-2" />
-                <p className="font-semibold text-gray-900">Ücretsiz Kurulum</p>
-                <p className="text-sm text-gray-600">6+ Ay Planlar</p>
+                <p className="font-semibold text-gray-900"><TranslatedText>Ücretsiz Kurulum</TranslatedText></p>
+                <p className="text-sm text-gray-600"><TranslatedText>6+ Ay Planlar</TranslatedText></p>
             </div>
             </div>
             <p className="text-sm text-gray-500 mt-6 max-w-2xl mx-auto">
-              * Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. 
-              Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.
+              * <TranslatedText>Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.</TranslatedText>
             </p>
           </div>
         </div>
@@ -414,55 +413,50 @@ export default function Home() {
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-purple-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaShoppingCart className="text-purple-500 mr-3" />
-                  Hangi ödeme yöntemlerini kabul ediyorsunuz?
+                  <TranslatedText>Hangi ödeme yöntemlerini kabul ediyorsunuz?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 
-                  6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.
+                  <TranslatedText>Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.</TranslatedText>
                 </p>
               </div>
 
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-red-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaPhone className="text-red-500 mr-3" />
-                  Teknik destek sağlıyor musunuz?
+                  <TranslatedText>Teknik destek sağlıyor musunuz?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. 
-                  Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.
+                  <TranslatedText>Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.</TranslatedText>
                 </p>
               </div>
 
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-yellow-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaClock className="text-yellow-500 mr-3" />
-                  Sistemi öğrenmek ne kadar sürer?
+                  <TranslatedText>Sistemi öğrenmek ne kadar sürer?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. 
-                  Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.
+                  <TranslatedText>MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.</TranslatedText>
                 </p>
               </div>
 
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-indigo-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaUtensils className="text-indigo-500 mr-3" />
-                  Mevcut POS sistemimle uyumlu mu?
+                  <TranslatedText>Mevcut POS sistemimle uyumlu mu?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. 
-                  Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.
+                  <TranslatedText>MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.</TranslatedText>
                 </p>
               </div>
 
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-pink-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaChartLine className="text-pink-500 mr-3" />
-                  Raporlama özellikleri neler?
+                  <TranslatedText>Raporlama özellikleri neler?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, 
-                  personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.
+                  <TranslatedText>Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.</TranslatedText>
                 </p>
               </div>
             </div>
