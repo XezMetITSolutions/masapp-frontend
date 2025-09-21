@@ -5,6 +5,7 @@ import { FaQrcode, FaUtensils, FaShoppingCart, FaBell, FaMagic, FaChartLine, FaU
 import { LanguageProvider } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
+import PriceDisplay from '@/components/PriceDisplay';
 
 export default function Home() {
   return (
@@ -41,9 +42,9 @@ export default function Home() {
       {/* Services Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-5xl font-bold text-blue-900 mb-6 text-center">Hizmetlerimiz</h2>
+          <h2 className="text-5xl font-bold text-blue-900 mb-6 text-center"><TranslatedText>Hizmetlerimiz</TranslatedText></h2>
           <p className="text-2xl text-blue-700 max-w-4xl mx-auto mb-16 text-center">
-            Restoranınızı dijital dünyaya taşıyacak kapsamlı çözümlerimizi keşfedin.
+            <TranslatedText>Restoranınızı dijital dünyaya taşıyacak kapsamlı çözümlerimizi keşfedin.</TranslatedText>
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
@@ -137,30 +138,30 @@ export default function Home() {
       {/* Benefits Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-indigo-900 mb-6 text-center">MasApp ile Kazançlarınız</h2>
+          <h2 className="text-4xl font-bold text-indigo-900 mb-6 text-center"><TranslatedText>MasApp ile Kazançlarınız</TranslatedText></h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="text-center">
               <div className="bg-red-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FaChartLine className="text-white text-3xl" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">%95 Daha Az Hata</h3>
-              <p className="text-gray-600">Sistemsel yaklaşım ile insan hatalarını ortadan kaldırın</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4"><TranslatedText>%95 Daha Az Hata</TranslatedText></h3>
+              <p className="text-gray-600"><TranslatedText>Sistemsel yaklaşım ile insan hatalarını ortadan kaldırın</TranslatedText></p>
             </div>
             
             <div className="text-center">
               <div className="bg-green-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FaRocket className="text-white text-3xl" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">%300 Verimlilik Artışı</h3>
-              <p className="text-gray-600">Otomatik süreçler ile zaman ve kaynak tasarrufu</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4"><TranslatedText>%300 Verimlilik Artışı</TranslatedText></h3>
+              <p className="text-gray-600"><TranslatedText>Otomatik süreçler ile zaman ve kaynak tasarrufu</TranslatedText></p>
             </div>
             
             <div className="text-center">
               <div className="bg-blue-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FaUsers className="text-white text-3xl" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Müşteri Memnuniyeti</h3>
-              <p className="text-gray-600">Daha hızlı servis, doğru siparişler, daha iyi deneyim</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4"><TranslatedText>Müşteri Memnuniyeti</TranslatedText></h3>
+              <p className="text-gray-600"><TranslatedText>Daha hızlı servis, doğru siparişler, daha iyi deneyim</TranslatedText></p>
             </div>
           </div>
         </div>
@@ -169,13 +170,13 @@ export default function Home() {
       {/* Demo Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Canlı Demo İnceleyin</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6"><TranslatedText>Canlı Demo İnceleyin</TranslatedText></h2>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            MasApp'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!
+            <TranslatedText>MasApp'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!</TranslatedText>
           </p>
           <Link href="/demo/menu" className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
             <FaUtensils className="inline mr-2" />
-            Demo Menüyü İncele
+            <TranslatedText>Demo Menüyü İncele</TranslatedText>
             </Link>
         </div>
       </section>
@@ -184,13 +185,13 @@ export default function Home() {
       <section className="py-20 bg-white" id="pricing">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Fiyatlandırma</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6"><TranslatedText>Fiyatlandırma</TranslatedText></h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              14 gün ücretsiz deneme, 30 gün iade garantisi ve uzun süreli paketlerde büyük indirimler!
+              <TranslatedText>14 gün ücretsiz deneme, 30 gün iade garantisi ve uzun süreli paketlerde büyük indirimler!</TranslatedText>
             </p>
             <div className="inline-flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-full font-semibold">
               <FaRocket className="mr-2" />
-              Yıllık planlar %20 daha avantajlı!
+              <TranslatedText>Yıllık planlar %20 daha avantajlı!</TranslatedText>
             </div>
           </div>
           
@@ -202,25 +203,31 @@ export default function Home() {
                   🔥 EN POPÜLER
                 </span>
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6 mt-4">Premium Paket</h3>
+              <h3 className="text-3xl font-bold text-gray-900 mb-6 mt-4"><TranslatedText>Premium Paket</TranslatedText></h3>
               <div className="mb-8">
-                <div className="text-5xl font-black text-orange-600 mb-4">₺4.980<span className="text-xl text-gray-500">/ay</span></div>
+                <div className="text-5xl font-black text-orange-600 mb-4">
+                  <PriceDisplay turkishLira={4980} showPerMonth={true} />
+                </div>
                 <div className="space-y-3">
-                  <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full text-base font-bold inline-block">6 Ay: ₺24.900 (%17 İndirim)</div>
-                  <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-base font-bold inline-block ml-2">Yıllık: ₺47.900 (%20 İndirim)</div>
+                  <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full text-base font-bold inline-block">
+                    6 Ay: <PriceDisplay turkishLira={24900} /> (<TranslatedText>%17 İndirim</TranslatedText>)
+                  </div>
+                  <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-base font-bold inline-block ml-2">
+                    <TranslatedText>Yıllık:</TranslatedText> <PriceDisplay turkishLira={47900} /> (<TranslatedText>%20 İndirim</TranslatedText>)
+                  </div>
                 </div>
               </div>
               <ul className="text-left space-y-4 mb-10 text-base">
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> QR Menü & Sipariş Sistemi</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> AI Menü Optimizasyonu</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Tüm Panel Erişimi</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Gelişmiş Analitik</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Öncelikli Destek</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Ücretsiz Kurulum</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> SSL Güvenlik</li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>QR Menü & Sipariş Sistemi</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>AI Menü Optimizasyonu</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Tüm Panel Erişimi</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Gelişmiş Analitik</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Öncelikli Destek</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Ücretsiz Kurulum</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>SSL Güvenlik</TranslatedText></li>
               </ul>
               <a href="https://wa.me/905393222797?text=Premium%20paket%20hakkında%20bilgi%20almak%20istiyorum" target="_blank" className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-2xl text-xl font-bold hover:from-orange-600 hover:to-red-600 transition-colors inline-block shadow-xl">
-                Premium Paketi Seç
+                <TranslatedText>Premium Paketi Seç</TranslatedText>
               </a>
             </div>
 
@@ -231,26 +238,32 @@ export default function Home() {
                   🏢 KURUMSAL
                 </span>
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-6 mt-4">Kurumsal Paket</h3>
-              <p className="text-lg text-purple-600 mb-6 font-semibold">Büyük işletmeler ve zincirler için</p>
+              <h3 className="text-3xl font-bold text-gray-900 mb-6 mt-4"><TranslatedText>Kurumsal Paket</TranslatedText></h3>
+              <p className="text-lg text-purple-600 mb-6 font-semibold"><TranslatedText>Büyük işletmeler ve zincirler için</TranslatedText></p>
               <div className="mb-8">
-                <div className="text-5xl font-black text-purple-600 mb-4">₺9.980<span className="text-xl text-gray-500">/ay</span></div>
+                <div className="text-5xl font-black text-purple-600 mb-4">
+                  <PriceDisplay turkishLira={9980} showPerMonth={true} />
+                </div>
                 <div className="space-y-3">
-                  <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full text-base font-bold inline-block">6 Ay: ₺49.900 (%17 İndirim)</div>
-                  <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-base font-bold inline-block ml-2">Yıllık: ₺95.900 (%20 İndirim)</div>
+                  <div className="bg-red-100 text-red-800 px-4 py-2 rounded-full text-base font-bold inline-block">
+                    6 Ay: <PriceDisplay turkishLira={49900} /> (<TranslatedText>%17 İndirim</TranslatedText>)
+                  </div>
+                  <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-base font-bold inline-block ml-2">
+                    <TranslatedText>Yıllık:</TranslatedText> <PriceDisplay turkishLira={95900} /> (<TranslatedText>%20 İndirim</TranslatedText>)
+                  </div>
                 </div>
               </div>
               <ul className="text-left space-y-4 mb-10 text-base">
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Özel Menü & Logo Entegrasyonu</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Sınırsız Kullanıcı (Tüm Paneller)</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Çoklu Şube Yönetimi</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> API Entegrasyonları</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> 7/24 Telefon Desteği</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Beyaz Etiket Çözümü</li>
-                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> Özel Eğitim & Kurulum</li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Özel Menü & Logo Entegrasyonu</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Sınırsız Kullanıcı (Tüm Paneller)</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Çoklu Şube Yönetimi</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>API Entegrasyonları</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>7/24 Telefon Desteği</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Beyaz Etiket Çözümü</TranslatedText></li>
+                <li className="flex items-center"><FaCheckCircle className="text-green-500 mr-3 text-lg" /> <TranslatedText>Özel Eğitim & Kurulum</TranslatedText></li>
               </ul>
               <a href="https://wa.me/905393222797?text=Kurumsal%20paket%20hakkında%20bilgi%20almak%20istiyorum" target="_blank" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-2xl text-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-colors inline-block shadow-xl">
-                Kurumsal Çözüm Al
+                <TranslatedText>Kurumsal Çözüm Al</TranslatedText>
               </a>
             </div>
           </div>
@@ -290,9 +303,9 @@ export default function Home() {
       {/* Testimonials Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6 text-center">Müşterilerimiz Ne Diyor?</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6 text-center"><TranslatedText>Müşterilerimiz Ne Diyor?</TranslatedText></h2>
           <p className="text-xl text-gray-600 text-center mb-16 max-w-2xl mx-auto">
-            120+ restoran MasApp ile operasyonlarını dijitalleştirdi ve müşteri memnuniyetini artırdı.
+            <TranslatedText>120+ restoran MasApp ile operasyonlarını dijitalleştirdi ve müşteri memnuniyetini artırdı.</TranslatedText>
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -303,7 +316,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-600 mb-6 italic">
-                "MasApp sayesinde siparişlerdeki hatalar %90 azaldı. Müşterilerimiz artık daha hızlı servis alıyor ve memnuniyet oranımız arttı."
+                <TranslatedText>"MasApp sayesinde siparişlerdeki hatalar %90 azaldı. Müşterilerimiz artık daha hızlı servis alıyor ve memnuniyet oranımız arttı."</TranslatedText>
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
@@ -323,7 +336,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-600 mb-6 italic">
-                "QR menü sistemi müşterilerimizin çok hoşuna gitti. Özellikle pandemi sonrası temassız hizmet çok önemli oldu."
+                <TranslatedText>"QR menü sistemi müşterilerimizin çok hoşuna gitti. Özellikle pandemi sonrası temassız hizmet çok önemli oldu."</TranslatedText>
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
@@ -343,7 +356,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-gray-600 mb-6 italic">
-                "AI menü optimizasyonu harika! Ürün fotoğraflarımız artık çok daha profesyonel görünüyor. Satışlarımız %25 arttı."
+                <TranslatedText>"AI menü optimizasyonu harika! Ürün fotoğraflarımız artık çok daha profesyonel görünüyor. Satışlarımız %25 arttı."</TranslatedText>
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
@@ -362,41 +375,39 @@ export default function Home() {
       {/* FAQ Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6 text-center">Sıkça Sorulan Sorular</h2>
+          <h2 className="text-5xl font-bold text-gray-900 mb-6 text-center"><TranslatedText>Sıkça Sorulan Sorular</TranslatedText></h2>
           <p className="text-xl text-gray-600 text-center mb-16 max-w-3xl mx-auto">
-            MasApp hakkında merak ettiklerinizin cevapları burada. Başka sorularınız için bize ulaşın!
+            <TranslatedText>MasApp hakkında merak ettiklerinizin cevapları burada. Başka sorularınız için bize ulaşın!</TranslatedText>
           </p>
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-orange-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaQrcode className="text-orange-500 mr-3" />
-                  MasApp nedir?
+                  <TranslatedText>MasApp nedir?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  MasApp, menüden siparişe, personelden muhasebeye kadar tüm operasyonu tek platformda yöneten restoran işletim sistemidir. AI ile görsellerinizi profesyonelleştirir, menüyü optimize eder ve satışları artırır; POS ve muhasebe sistemlerinizle sorunsuz entegre olur.
+                  <TranslatedText>MasApp, menüden siparişe, personelden muhasebeye kadar tüm operasyonu tek platformda yöneten restoran işletim sistemidir. AI ile görsellerinizi profesyonelleştirir, menüyü optimize eder ve satışları artırır; POS ve muhasebe sistemlerinizle sorunsuz entegre olur.</TranslatedText>
                 </p>
               </div>
 
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-blue-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaRocket className="text-blue-500 mr-3" />
-                  Kurulum süreci nasıl işliyor?
+                  <TranslatedText>Kurulum süreci nasıl işliyor?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  6 ay ve üzeri planlar için kurulum tamamen ücretsizdir. Uzman teknik ekibimiz restoranınıza gelir, 
-                  sistemi kurar ve tüm personellerinizi eğitir. Kurulum süreci 1-2 gün sürer ve hemen kullanmaya başlayabilirsiniz.
+                  <TranslatedText>6 ay ve üzeri planlar için kurulum tamamen ücretsizdir. Uzman teknik ekibimiz restoranınıza gelir, sistemi kurar ve tüm personellerinizi eğitir. Kurulum süreci 1-2 gün sürer ve hemen kullanmaya başlayabilirsiniz.</TranslatedText>
                 </p>
               </div>
 
               <div className="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-green-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
                   <FaShieldAlt className="text-green-500 mr-3" />
-                  İade garantisi nasıl çalışır?
+                  <TranslatedText>İade garantisi nasıl çalışır?</TranslatedText>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  30 gün içinde herhangi bir sebeple memnun kalmazsanız, ücretinizi tam olarak iade ediyoruz. 
-                  Kurulum yapılmış ise sadece kurulum maliyeti kesilerek kalan tutar iade edilir. Risk almadan deneyin!
+                  <TranslatedText>30 gün içinde herhangi bir sebeple memnun kalmazsanız, ücretinizi tam olarak iade ediyoruz. Kurulum yapılmış ise sadece kurulum maliyeti kesilerek kalan tutar iade edilir. Risk almadan deneyin!</TranslatedText>
                 </p>
               </div>
 
@@ -463,17 +474,17 @@ export default function Home() {
       <section className="py-20 bg-gradient-to-r from-orange-500 to-orange-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-white/5"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-5xl font-bold mb-8">Hemen Başlayın!</h2>
+          <h2 className="text-5xl font-bold mb-8"><TranslatedText>Hemen Başlayın!</TranslatedText></h2>
           <p className="text-2xl mb-12 text-orange-50 max-w-3xl mx-auto font-medium">
-            🚀 Restoranınızı bugün dijital dünyaya taşıyın! <br/>
-            <span className="text-white font-bold">14 gün ücretsiz deneme</span> ile risk almadan başlayın.
+            🚀 <TranslatedText>Restoranınızı bugün dijital dünyaya taşıyın!</TranslatedText> <br/>
+            <span className="text-white font-bold"><TranslatedText>14 gün ücretsiz deneme</TranslatedText></span> <TranslatedText>ile risk almadan başlayın.</TranslatedText>
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6 mb-10">
             <a href="tel:+905393222797" className="bg-white text-orange-600 px-10 py-5 rounded-2xl text-xl font-black flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
-              <FaPhone className="text-2xl" /> Hemen Bizi Arayın
+              <FaPhone className="text-2xl" /> <TranslatedText>Hemen Bizi Arayın</TranslatedText>
             </a>
             <Link href="#pricing" className="bg-orange-700 hover:bg-orange-800 text-white px-10 py-5 rounded-2xl text-xl font-black transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
-              <FaRocket className="inline mr-3 text-2xl" /> 14 Gün Ücretsiz Deneyin
+              <FaRocket className="inline mr-3 text-2xl" /> <TranslatedText>14 Gün Ücretsiz Deneyin</TranslatedText>
             </Link>
           </div>
         </div>
@@ -505,14 +516,14 @@ export default function Home() {
             </div>
             
             <div>
-              <h4 className="text-xl font-bold mb-6 text-gray-800">Hizmetlerimiz</h4>
+              <h4 className="text-xl font-bold mb-6 text-gray-800"><TranslatedText>Hizmetlerimiz</TranslatedText></h4>
               <ul className="space-y-3">
-                <li className="text-gray-600 flex items-center gap-2"><FaQrcode className="text-orange-500" /> QR Menü Sistemi</li>
-                <li className="text-gray-600 flex items-center gap-2"><FaShoppingCart className="text-orange-500" /> Akıllı Sipariş Yönetimi</li>
-                <li className="text-gray-600 flex items-center gap-2"><FaChartLine className="text-orange-500" /> Analitik & Raporlama</li>
-                <li className="text-gray-600 flex items-center gap-2"><FaMagic className="text-orange-500" /> AI Menü Optimizasyonu</li>
-                <li className="text-gray-600 flex items-center gap-2"><FaShieldAlt className="text-orange-500" /> Güvenli Ödeme Sistemi</li>
-                <li className="text-gray-600 flex items-center gap-2"><FaUsers className="text-orange-500" /> Çoklu Panel Yönetimi</li>
+                <li className="text-gray-600 flex items-center gap-2"><FaQrcode className="text-orange-500" /> <TranslatedText>QR Menü Sistemi</TranslatedText></li>
+                <li className="text-gray-600 flex items-center gap-2"><FaShoppingCart className="text-orange-500" /> <TranslatedText>Akıllı Sipariş Yönetimi</TranslatedText></li>
+                <li className="text-gray-600 flex items-center gap-2"><FaChartLine className="text-orange-500" /> <TranslatedText>Analitik & Raporlama</TranslatedText></li>
+                <li className="text-gray-600 flex items-center gap-2"><FaMagic className="text-orange-500" /> <TranslatedText>AI Menü Optimizasyonu</TranslatedText></li>
+                <li className="text-gray-600 flex items-center gap-2"><FaShieldAlt className="text-orange-500" /> <TranslatedText>Güvenli Ödeme Sistemi</TranslatedText></li>
+                <li className="text-gray-600 flex items-center gap-2"><FaUsers className="text-orange-500" /> <TranslatedText>Çoklu Panel Yönetimi</TranslatedText></li>
               </ul>
             </div>
           </div>
@@ -520,21 +531,21 @@ export default function Home() {
           <div className="border-t border-gray-200 mt-12 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-gray-600 mb-4 md:mb-0">
-                <p>&copy; 2025 MasApp. Tüm hakları saklıdır.</p>
-                <p className="text-sm mt-1">Türkiye'nin öncü restoran dijitalleştirme platformu</p>
+                <p><TranslatedText>© 2025 MasApp. Tüm hakları saklıdır.</TranslatedText></p>
+                <p className="text-sm mt-1"><TranslatedText>Türkiye'nin öncü restoran dijitalleştirme platformu</TranslatedText></p>
               </div>
               <div className="flex items-center space-x-6">
                 <span className="text-gray-600 flex items-center gap-2">
                   <FaShieldAlt className="text-orange-500" />
-                  SSL Güvenli
+                  <TranslatedText>SSL Güvenli</TranslatedText>
                 </span>
                 <span className="text-gray-600 flex items-center gap-2">
                   <FaStar className="text-orange-500" />
-                  120+ Restoran
+                  <TranslatedText>120+ Restoran</TranslatedText>
                 </span>
                 <span className="text-gray-600 flex items-center gap-2">
                   <FaPhone className="text-orange-500" />
-                  7/24 Destek
+                  <TranslatedText>7/24 Destek</TranslatedText>
                 </span>
               </div>
             </div>

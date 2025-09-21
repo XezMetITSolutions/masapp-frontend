@@ -609,5 +609,25 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     en: '24/7 Support',
     de: '24/7 Support',
     tr: '7/24 Destek'
+  },
+  '%17 İndirim': {
+    en: '17% Discount',
+    de: '17% Rabatt',
+    tr: '%17 İndirim'
+  },
+  '%20 İndirim': {
+    en: '20% Discount',
+    de: '20% Rabatt',
+    tr: '%20 İndirim'
+  },
+  '6 Ay': {
+    en: '6 Months',
+    de: '6 Monate',
+    tr: '6 Ay'
+  },
+  'Yıllık': {
+    en: 'Annual',
+    de: 'Jährlich',
+    tr: 'Yıllık'
   }
 };
