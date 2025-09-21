@@ -1,29 +1,29 @@
 // Pre-defined translations for static export
 export const translations: { [key: string]: { en: string; de: string; tr: string } } = {
   '120+ Restoran Güveniyor': {
-    en: '120+ Restaurants Trust Us',
-    de: '120+ Restaurants vertrauen uns',
+    en: '120+ Restaurants Trust',
+    de: '120+ Restaurants vertrauen',
     tr: '120+ Restoran Güveniyor'
   },
   'Restoranınız': {
-    en: 'Is Your Restaurant',
-    de: 'Ist Ihr Restaurant',
+    en: 'Your restaurant',
+    de: 'Ihr Restaurant',
     tr: 'Restoranınız'
   },
   'Dijital Çağa': {
-    en: 'Ready for the Digital Age?',
-    de: 'Bereit für das digitale Zeitalter?',
+    en: 'Digital Age',
+    de: 'Digitales Zeitalter',
     tr: 'Dijital Çağa'
   },
   'Hazır mı?': {
-    en: 'Ready?',
-    de: 'Bereit?',
+    en: 'Is it ready?',
+    de: 'Ist sie fertig?',
     tr: 'Hazır mı?'
   },
-  'Türkiye\'nin en gelişmiş QR menü ve sipariş yönetim sistemi ile': {
-    en: 'With Turkey\'s most advanced QR menu and order management system',
-    de: 'Mit der fortschrittlichsten QR-Menü- und Bestellverwaltung der Türkei',
-    tr: 'Türkiye\'nin en gelişmiş QR menü ve sipariş yönetim sistemi ile'
+  'nin en gelişmiş QR menü ve sipariş yönetim sistemi ile': {
+    en: 'with the most advanced QR menu and order management system',
+    de: 'mit dem fortschrittlichsten QR-Menü- und Auftragsverwaltungssystem',
+    tr: 'nin en gelişmiş QR menü ve sipariş yönetim sistemi ile'
   },
   'satışlarınızı %300 artırın!': {
     en: 'increase your sales by 300%!',
@@ -51,8 +51,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Hizmetlerimiz'
   },
   'Restoranınızı dijital dünyaya taşıyacak kapsamlı çözümlerimizi keşfedin.': {
-    en: 'Discover our comprehensive solutions that will take your restaurant to the digital world.',
-    de: 'Entdecken Sie unsere umfassenden Lösungen, die Ihr Restaurant in die digitale Welt bringen.',
+    en: 'Discover our comprehensive solutions to bring your restaurant into the digital world.',
+    de: 'Entdecken Sie unsere umfassenden Lösungen, die Ihr Restaurant in die digitale Welt führen werden.',
     tr: 'Restoranınızı dijital dünyaya taşıyacak kapsamlı çözümlerimizi keşfedin.'
   },
   'QR Menü Sistemi': {
@@ -62,47 +62,47 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Temassız menü deneyimi': {
     en: 'Contactless menu experience',
-    de: 'Kontaktloses Menüerlebnis',
+    de: 'Kontaktlose Menüerfahrung',
     tr: 'Temassız menü deneyimi'
   },
   'Anlık menü güncelleme': {
-    en: 'Instant menu updates',
-    de: 'Sofortige Menüaktualisierungen',
+    en: 'Instant menu update',
+    de: 'Sofortige Aktualisierung des Menüs',
     tr: 'Anlık menü güncelleme'
   },
   'Çoklu dil desteği': {
     en: 'Multi-language support',
-    de: 'Mehrsprachige Unterstützung',
+    de: 'Unterstützung mehrerer Sprachen',
     tr: 'Çoklu dil desteği'
   },
   'Mobil uyumlu tasarım': {
-    en: 'Mobile-friendly design',
-    de: 'Mobilfreundliches Design',
+    en: 'Mobile compatible design',
+    de: 'Handytaugliches Design',
     tr: 'Mobil uyumlu tasarım'
   },
   'Hijyen güvencesi': {
-    en: 'Hygiene guarantee',
-    de: 'Hygienegarantie',
+    en: 'Hygiene assurance',
+    de: 'Gewährleistung der Hygiene',
     tr: 'Hijyen güvencesi'
   },
   'Akıllı Sipariş Yönetimi': {
     en: 'Smart Order Management',
-    de: 'Intelligente Bestellverwaltung',
+    de: 'Intelligente Auftragsverwaltung',
     tr: 'Akıllı Sipariş Yönetimi'
   },
   'Otomatik sipariş akışı': {
-    en: 'Automatic order flow',
-    de: 'Automatischer Bestellablauf',
+    en: 'Automated order flow',
+    de: 'Automatisierter Auftragsfluss',
     tr: 'Otomatik sipariş akışı'
   },
   'Gerçek zamanlı takip': {
     en: 'Real-time tracking',
-    de: 'Echtzeitverfolgung',
+    de: 'Verfolgung in Echtzeit',
     tr: 'Gerçek zamanlı takip'
   },
   'Öncelik sıralaması': {
     en: 'Priority ranking',
-    de: 'Prioritätsreihenfolge',
+    de: 'Rangfolge der Prioritäten',
     tr: 'Öncelik sıralaması'
   },
   'Otomatik bildirimler': {
@@ -112,26 +112,26 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Hata önleme': {
     en: 'Error prevention',
-    de: 'Fehlerprävention',
+    de: 'Fehlervermeidung',
     tr: 'Hata önleme'
   },
   'Analitik & Raporlama': {
     en: 'Analytics & Reporting',
-    de: 'Analytik & Berichterstattung',
+    de: 'Analytik und Berichterstattung',
     tr: 'Analitik & Raporlama'
   },
   'Detaylı iş zekası': {
     en: 'Detailed business intelligence',
-    de: 'Detaillierte Geschäftsintelligenz',
+    de: 'Detaillierte Geschäftsinformationen',
     tr: 'Detaylı iş zekası'
   },
   'Satış analizleri': {
-    en: 'Sales analytics',
+    en: 'Sales analysis',
     de: 'Verkaufsanalysen',
     tr: 'Satış analizleri'
   },
   'Müşteri davranışları': {
-    en: 'Customer behaviors',
+    en: 'Customer behavior',
     de: 'Kundenverhalten',
     tr: 'Müşteri davranışları'
   },
@@ -142,17 +142,17 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Kar marjı analizi': {
     en: 'Profit margin analysis',
-    de: 'Gewinnspannenanalyse',
+    de: 'Analyse der Gewinnspanne',
     tr: 'Kar marjı analizi'
   },
   'AI Menü Optimizasyonu': {
     en: 'AI Menu Optimization',
-    de: 'KI-Menü-Optimierung',
+    de: 'AI-Menü-Optimierung',
     tr: 'AI Menü Optimizasyonu'
   },
   'Yapay zeka destekli öneriler': {
     en: 'AI-powered recommendations',
-    de: 'KI-gestützte Empfehlungen',
+    de: 'Durch künstliche Intelligenz unterstützte Empfehlungen',
     tr: 'Yapay zeka destekli öneriler'
   },
   'Fiyat optimizasyonu': {
@@ -162,17 +162,17 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Popüler ürün analizi': {
     en: 'Popular product analysis',
-    de: 'Beliebte Produktanalyse',
+    de: 'Populäre Produktanalyse',
     tr: 'Popüler ürün analizi'
   },
   'Stok yönetimi': {
     en: 'Inventory management',
-    de: 'Lagerverwaltung',
+    de: 'Verwaltung der Bestände',
     tr: 'Stok yönetimi'
   },
   'Trend tahminleri': {
-    en: 'Trend predictions',
-    de: 'Trendvorhersagen',
+    en: 'Trend forecasts',
+    de: 'Trend-Prognosen',
     tr: 'Trend tahminleri'
   },
   'Güvenli Ödeme Sistemi': {
@@ -182,12 +182,12 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'PCI DSS uyumlu güvenlik': {
     en: 'PCI DSS compliant security',
-    de: 'PCI DSS konforme Sicherheit',
+    de: 'PCI DSS-konforme Sicherheit',
     tr: 'PCI DSS uyumlu güvenlik'
   },
   'Kredi kartı güvenliği': {
-    en: 'Credit card security',
-    de: 'Kreditkartensicherheit',
+    en: 'Kredi kartı güvenliği',
+    de: 'Kredi kartı güvenliği',
     tr: 'Kredi kartı güvenliği'
   },
   'SSL şifreleme': {
@@ -197,7 +197,7 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Fraud koruması': {
     en: 'Fraud protection',
-    de: 'Betrugsschutz',
+    de: 'Schutz vor Betrug',
     tr: 'Fraud koruması'
   },
   'Güvenli API': {
@@ -206,38 +206,38 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Güvenli API'
   },
   'Çoklu Panel Yönetimi': {
-    en: 'Multi-Panel Management',
-    de: 'Multi-Panel-Verwaltung',
+    en: 'Multiple Panel Management',
+    de: 'Verwaltung mehrerer Panels',
     tr: 'Çoklu Panel Yönetimi'
   },
   'Entegre işletme sistemi': {
-    en: 'Integrated business system',
-    de: 'Integriertes Geschäftssystem',
+    en: 'Integrated operating system',
+    de: 'Integriertes Betriebssystem',
     tr: 'Entegre işletme sistemi'
   },
   'Mutfak paneli': {
     en: 'Kitchen panel',
-    de: 'Küchenpanel',
+    de: 'Küchenpaneel',
     tr: 'Mutfak paneli'
   },
   'Garson paneli': {
     en: 'Waiter panel',
-    de: 'Kellnerpanel',
+    de: 'Kellner-Panel',
     tr: 'Garson paneli'
   },
   'Kasa paneli': {
-    en: 'Cashier panel',
-    de: 'Kassierpanel',
+    en: 'Case panel',
+    de: 'Gehäuse-Panel',
     tr: 'Kasa paneli'
   },
   'Yönetim paneli': {
-    en: 'Management panel',
-    de: 'Verwaltungspanel',
+    en: 'Administration panel',
+    de: 'Verwaltungs-Panel',
     tr: 'Yönetim paneli'
   },
   'MasApp ile Kazançlarınız': {
-    en: 'Your Benefits with MasApp',
-    de: 'Ihre Vorteile mit MasApp',
+    en: 'Your Earnings with MasApp',
+    de: 'Ihr Verdienst mit MasApp',
     tr: 'MasApp ile Kazançlarınız'
   },
   '%95 Daha Az Hata': {
@@ -246,8 +246,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: '%95 Daha Az Hata'
   },
   'Sistemsel yaklaşım ile insan hatalarını ortadan kaldırın': {
-    en: 'Eliminate human errors with systematic approach',
-    de: 'Eliminieren Sie menschliche Fehler mit systematischem Ansatz',
+    en: 'Eliminate human error with a systemic approach',
+    de: 'Eliminierung menschlicher Fehler durch einen systemischen Ansatz',
     tr: 'Sistemsel yaklaşım ile insan hatalarını ortadan kaldırın'
   },
   '%300 Verimlilik Artışı': {
@@ -256,8 +256,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: '%300 Verimlilik Artışı'
   },
   'Otomatik süreçler ile zaman ve kaynak tasarrufu': {
-    en: 'Time and resource savings with automated processes',
-    de: 'Zeit- und Ressourceneinsparungen durch automatisierte Prozesse',
+    en: 'Saving time and resources with automated processes',
+    de: 'Zeit- und Ressourcenersparnis durch automatisierte Prozesse',
     tr: 'Otomatik süreçler ile zaman ve kaynak tasarrufu'
   },
   'Müşteri Memnuniyeti': {
@@ -266,43 +266,43 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Müşteri Memnuniyeti'
   },
   'Daha hızlı servis, doğru siparişler, daha iyi deneyim': {
-    en: 'Faster service, accurate orders, better experience',
-    de: 'Schnellerer Service, genaue Bestellungen, bessere Erfahrung',
+    en: 'Faster service, correct orders, better experience',
+    de: 'Schnellerer Service, korrekte Bestellungen, besseres Erlebnis',
     tr: 'Daha hızlı servis, doğru siparişler, daha iyi deneyim'
   },
   'Canlı Demo İnceleyin': {
-    en: 'Try Live Demo',
-    de: 'Live-Demo ausprobieren',
+    en: 'Review Live Demo',
+    de: 'Rückblick Live-Demo',
     tr: 'Canlı Demo İnceleyin'
   },
-  'MasApp\'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!': {
-    en: 'Check out our demo menu to see how MasApp works. Experience the real restaurant experience!',
-    de: 'Schauen Sie sich unser Demo-Menü an, um zu sehen, wie MasApp funktioniert. Erleben Sie das echte Restaurant-Erlebnis!',
-    tr: 'MasApp\'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!'
+  'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!': {
+    en: 'our demo menu to see how it works. Experience the real restaurant experience!',
+    de: 'unser Demo-Menü, um zu sehen, wie es funktioniert. Erleben Sie das echte Restaurant-Erlebnis!',
+    tr: 'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!'
   },
   'Demo Menüyü İncele': {
-    en: 'Check Demo Menu',
-    de: 'Demo-Menü ansehen',
+    en: 'View Demo Menu',
+    de: 'Demo-Menü anzeigen',
     tr: 'Demo Menüyü İncele'
   },
   'Fiyatlandırma': {
     en: 'Pricing',
-    de: 'Preise',
+    de: 'Preisgestaltung',
     tr: 'Fiyatlandırma'
   },
   '14 gün ücretsiz deneme, 30 gün iade garantisi ve uzun süreli paketlerde büyük indirimler!': {
-    en: '14-day free trial, 30-day money-back guarantee and big discounts on long-term packages!',
-    de: '14-tägige kostenlose Testversion, 30-tägige Geld-zurück-Garantie und große Rabatte auf langfristige Pakete!',
+    en: '14-day free trial, 30-day return guarantee and big discounts on long-term packages!',
+    de: '14 Tage kostenloser Test, 30 Tage Rückgabegarantie und große Rabatte auf Langzeitpakete!',
     tr: '14 gün ücretsiz deneme, 30 gün iade garantisi ve uzun süreli paketlerde büyük indirimler!'
   },
   'Yıllık planlar %20 daha avantajlı!': {
     en: 'Annual plans are 20% more advantageous!',
-    de: 'Jährliche Pläne sind 20% vorteilhafter!',
+    de: 'Jahrespläne sind 20% günstiger!',
     tr: 'Yıllık planlar %20 daha avantajlı!'
   },
   'EN POPÜLER': {
     en: 'MOST POPULAR',
-    de: 'AM BELIEBTESTEN',
+    de: 'MEISTBESUCHT',
     tr: 'EN POPÜLER'
   },
   'Premium Paket': {
@@ -311,13 +311,13 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Premium Paket'
   },
   'QR Menü & Sipariş Sistemi': {
-    en: 'QR Menu & Order System',
-    de: 'QR-Menü- und Bestellsystem',
+    en: 'QR Menu & Ordering System',
+    de: 'QR-Menü & Bestellsystem',
     tr: 'QR Menü & Sipariş Sistemi'
   },
   'Tüm Panel Erişimi': {
     en: 'All Panel Access',
-    de: 'Alle Panel-Zugriffe',
+    de: 'Zugriff auf alle Bedienfelder',
     tr: 'Tüm Panel Erişimi'
   },
   'Gelişmiş Analitik': {
@@ -327,7 +327,7 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Öncelikli Destek': {
     en: 'Priority Support',
-    de: 'Prioritätssupport',
+    de: 'Vorrangige Unterstützung',
     tr: 'Öncelikli Destek'
   },
   'Ücretsiz Kurulum': {
@@ -341,38 +341,38 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'SSL Güvenlik'
   },
   'Premium Paketi Seç': {
-    en: 'Choose Premium Package',
-    de: 'Premium-Paket wählen',
+    en: 'Select Premium Package',
+    de: 'Premium-Paket auswählen',
     tr: 'Premium Paketi Seç'
   },
   'KURUMSAL': {
-    en: 'ENTERPRISE',
-    de: 'UNTERNEHMEN',
+    en: 'CORPORATE',
+    de: 'CORPORATE',
     tr: 'KURUMSAL'
   },
   'Kurumsal Paket': {
-    en: 'Enterprise Package',
-    de: 'Unternehmenspaket',
+    en: 'Corporate Package',
+    de: 'Unternehmens-Paket',
     tr: 'Kurumsal Paket'
   },
   'Büyük işletmeler ve zincirler için': {
-    en: 'For large businesses and chains',
+    en: 'For large enterprises and chains',
     de: 'Für große Unternehmen und Ketten',
     tr: 'Büyük işletmeler ve zincirler için'
   },
   'Özel Menü & Logo Entegrasyonu': {
     en: 'Custom Menu & Logo Integration',
-    de: 'Benutzerdefinierte Menü- und Logo-Integration',
+    de: 'Benutzerdefiniertes Menü und Logo-Integration',
     tr: 'Özel Menü & Logo Entegrasyonu'
   },
   'Sınırsız Kullanıcı (Tüm Paneller)': {
     en: 'Unlimited Users (All Panels)',
-    de: 'Unbegrenzte Benutzer (Alle Panels)',
+    de: 'Unbegrenzte Anzahl von Benutzern (alle Panels)',
     tr: 'Sınırsız Kullanıcı (Tüm Paneller)'
   },
   'Çoklu Şube Yönetimi': {
-    en: 'Multi-Branch Management',
-    de: 'Multi-Branch-Verwaltung',
+    en: 'Multiple Branch Management',
+    de: 'Verwaltung mehrerer Niederlassungen',
     tr: 'Çoklu Şube Yönetimi'
   },
   'API Entegrasyonları': {
@@ -391,12 +391,12 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Beyaz Etiket Çözümü'
   },
   'Özel Eğitim & Kurulum': {
-    en: 'Custom Training & Installation',
-    de: 'Maßgeschneiderte Schulung & Installation',
+    en: 'Special Training & Installation',
+    de: 'Spezielle Ausbildung und Installation',
     tr: 'Özel Eğitim & Kurulum'
   },
   'Kurumsal Çözüm Al': {
-    en: 'Get Enterprise Solution',
+    en: 'Get Corporate Solution',
     de: 'Unternehmenslösung erhalten',
     tr: 'Kurumsal Çözüm Al'
   },
@@ -407,17 +407,17 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Deneme Süresi': {
     en: 'Trial Period',
-    de: 'Testzeitraum',
+    de: 'Probezeit',
     tr: 'Deneme Süresi'
   },
   '30 Gün İade': {
-    en: '30 Day Refund',
-    de: '30 Tage Rückerstattung',
+    en: '30 Days Returns',
+    de: '30 Tage Rückgabe',
     tr: '30 Gün İade'
   },
   'Garantisi': {
     en: 'Guarantee',
-    de: 'Garantie',
+    de: 'Bürgschaft',
     tr: 'Garantisi'
   },
   'Güvenlik': {
@@ -432,32 +432,32 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   '6+ Ay Planlar': {
     en: '6+ Month Plans',
-    de: '6+ Monatspläne',
+    de: '6+ Monats-Pläne',
     tr: '6+ Ay Planlar'
   },
   'Müşterilerimiz Ne Diyor?': {
-    en: 'What Our Customers Say?',
+    en: 'What Do Our Customers Say?',
     de: 'Was sagen unsere Kunden?',
     tr: 'Müşterilerimiz Ne Diyor?'
   },
   '120+ restoran MasApp ile operasyonlarını dijitalleştirdi ve müşteri memnuniyetini artırdı.': {
-    en: '120+ restaurants have digitized their operations with MasApp and increased customer satisfaction.',
-    de: '120+ Restaurants haben ihre Betriebe mit MasApp digitalisiert und die Kundenzufriedenheit gesteigert.',
+    en: '120+ restaurants digitalized their operations and increased customer satisfaction with MasApp.',
+    de: 'Über 120 Restaurants haben mit MasApp ihre Abläufe digitalisiert und die Kundenzufriedenheit erhöht.',
     tr: '120+ restoran MasApp ile operasyonlarını dijitalleştirdi ve müşteri memnuniyetini artırdı.'
   },
   'MasApp sayesinde siparişlerdeki hatalar %90 azaldı. Müşterilerimiz artık daha hızlı servis alıyor ve memnuniyet oranımız arttı.': {
-    en: 'Thanks to MasApp, order errors decreased by 90%. Our customers now receive faster service and our satisfaction rate has increased.',
-    de: 'Dank MasApp sind die Bestellfehler um 90% gesunken. Unsere Kunden erhalten jetzt schnelleren Service und unsere Zufriedenheitsrate ist gestiegen.',
+    en: 'Thanks to MasApp, errors in orders decreased by 90%. Our customers now receive faster service and our satisfaction rate has increased.',
+    de: 'Dank MasApp sind die Fehler bei Bestellungen um 90 % zurückgegangen. Unsere Kunden erhalten nun einen schnelleren Service, und unsere Zufriedenheitsquote ist gestiegen.',
     tr: 'MasApp sayesinde siparişlerdeki hatalar %90 azaldı. Müşterilerimiz artık daha hızlı servis alıyor ve memnuniyet oranımız arttı.'
   },
   'QR menü sistemi müşterilerimizin çok hoşuna gitti. Özellikle pandemi sonrası temassız hizmet çok önemli oldu.': {
-    en: 'Our customers loved the QR menu system. Especially after the pandemic, contactless service became very important.',
-    de: 'Das QR-Menü-System hat unseren Kunden sehr gut gefallen. Besonders nach der Pandemie wurde kontaktloser Service sehr wichtig.',
+    en: 'Our customers liked the QR menu system very much. Contactless service has been very important especially after the pandemic.',
+    de: 'Unseren Kunden hat das QR-Menüsystem sehr gut gefallen. Der kontaktlose Service war besonders nach der Pandemie sehr wichtig.',
     tr: 'QR menü sistemi müşterilerimizin çok hoşuna gitti. Özellikle pandemi sonrası temassız hizmet çok önemli oldu.'
   },
   'AI menü optimizasyonu harika! Ürün fotoğraflarımız artık çok daha profesyonel görünüyor. Satışlarımız %25 arttı.': {
-    en: 'AI menu optimization is great! Our product photos now look much more professional. Our sales increased by 25%.',
-    de: 'Die KI-Menü-Optimierung ist großartig! Unsere Produktfotos sehen jetzt viel professioneller aus. Unser Umsatz ist um 25% gestiegen.',
+    en: 'AI menu optimization is great! Our product photos look much more professional now. Our sales increased by 25%.',
+    de: 'Die AI-Menüoptimierung ist großartig! Unsere Produktfotos sehen jetzt viel professioneller aus. Unser Umsatz ist um 25% gestiegen.',
     tr: 'AI menü optimizasyonu harika! Ürün fotoğraflarımız artık çok daha profesyonel görünüyor. Satışlarımız %25 arttı.'
   },
   'Sıkça Sorulan Sorular': {
@@ -466,8 +466,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Sıkça Sorulan Sorular'
   },
   'MasApp hakkında merak ettiklerinizin cevapları burada. Başka sorularınız için bize ulaşın!': {
-    en: 'Answers to your questions about MasApp are here. Contact us for other questions!',
-    de: 'Antworten auf Ihre Fragen zu MasApp finden Sie hier. Kontaktieren Sie uns für andere Fragen!',
+    en: 'Here are the answers to your questions about MasApp. Contact us for further questions!',
+    de: 'Hier finden Sie die Antworten auf Ihre Fragen zu MasApp. Kontaktieren Sie uns für weitere Fragen!',
     tr: 'MasApp hakkında merak ettiklerinizin cevapları burada. Başka sorularınız için bize ulaşın!'
   },
   'MasApp nedir?': {
@@ -476,48 +476,48 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'MasApp nedir?'
   },
   'MasApp, menüden siparişe, personelden muhasebeye kadar tüm operasyonu tek platformda yöneten restoran işletim sistemidir. AI ile görsellerinizi profesyonelleştirir, menüyü optimize eder ve satışları artırır; POS ve muhasebe sistemlerinizle sorunsuz entegre olur.': {
-    en: 'MasApp is a restaurant management system that manages all operations from menu to order, from staff to accounting on a single platform. It professionalizes your visuals with AI, optimizes the menu and increases sales; integrates seamlessly with your POS and accounting systems.',
-    de: 'MasApp ist ein Restaurantverwaltungssystem, das alle Betriebe von der Speisekarte bis zur Bestellung, vom Personal bis zur Buchhaltung auf einer einzigen Plattform verwaltet. Es professionalisiert Ihre Bilder mit KI, optimiert das Menü und steigert den Umsatz; integriert sich nahtlos in Ihre POS- und Buchhaltungssysteme.',
+    en: 'MasApp is a restaurant operating system that manages the entire operation from menu to ordering, from personnel to accounting on a single platform. It professionalizes your visuals with AI, optimizes the menu and increases sales; integrates seamlessly with your POS and accounting systems.',
+    de: 'MasApp ist ein Restaurantbetriebssystem, das den gesamten Betrieb von der Speisekarte bis zur Bestellung, vom Personal bis zur Buchhaltung auf einer einzigen Plattform verwaltet. Es professionalisiert Ihr Erscheinungsbild mit KI, optimiert die Speisekarte und steigert den Umsatz; es lässt sich nahtlos in Ihre Kassen- und Buchhaltungssysteme integrieren.',
     tr: 'MasApp, menüden siparişe, personelden muhasebeye kadar tüm operasyonu tek platformda yöneten restoran işletim sistemidir. AI ile görsellerinizi profesyonelleştirir, menüyü optimize eder ve satışları artırır; POS ve muhasebe sistemlerinizle sorunsuz entegre olur.'
   },
   'Kurulum süreci nasıl işliyor?': {
     en: 'How does the installation process work?',
-    de: 'Wie funktioniert der Installationsprozess?',
+    de: 'Wie läuft der Installationsprozess ab?',
     tr: 'Kurulum süreci nasıl işliyor?'
   },
   '6 ay ve üzeri planlar için kurulum tamamen ücretsizdir. Uzman teknik ekibimiz restoranınıza gelir, sistemi kurar ve tüm personellerinizi eğitir. Kurulum süreci 1-2 gün sürer ve hemen kullanmaya başlayabilirsiniz.': {
-    en: 'Installation is completely free for 6-month and longer plans. Our expert technical team comes to your restaurant, installs the system and trains all your staff. The installation process takes 1-2 days and you can start using it immediately.',
-    de: 'Die Installation ist für 6-Monats- und längere Pläne völlig kostenlos. Unser Expertenteam kommt in Ihr Restaurant, installiert das System und schult Ihr gesamtes Personal. Der Installationsprozess dauert 1-2 Tage und Sie können sofort mit der Nutzung beginnen.',
+    en: 'For plans of 6 months and above, installation is completely free. Our expert technical team will come to your restaurant, install the system and train all your staff. The installation process takes 1-2 days and you can start using it immediately.',
+    de: 'Bei Verträgen mit einer Laufzeit von 6 Monaten und mehr ist die Installation völlig kostenlos. Unser technisches Expertenteam kommt in Ihr Restaurant, installiert das System und schult Ihr gesamtes Personal. Die Installation dauert 1-2 Tage und Sie können sofort mit der Nutzung beginnen.',
     tr: '6 ay ve üzeri planlar için kurulum tamamen ücretsizdir. Uzman teknik ekibimiz restoranınıza gelir, sistemi kurar ve tüm personellerinizi eğitir. Kurulum süreci 1-2 gün sürer ve hemen kullanmaya başlayabilirsiniz.'
   },
   'İade garantisi nasıl çalışır?': {
-    en: 'How does the refund guarantee work?',
-    de: 'Wie funktioniert die Rückerstattungsgarantie?',
+    en: 'How does the return guarantee work?',
+    de: 'Wie funktioniert die Rückgabegarantie?',
     tr: 'İade garantisi nasıl çalışır?'
   },
   '30 gün içinde herhangi bir sebeple memnun kalmazsanız, ücretinizi tam olarak iade ediyoruz. Kurulum yapılmış ise sadece kurulum maliyeti kesilerek kalan tutar iade edilir. Risk almadan deneyin!': {
-    en: 'If you are not satisfied for any reason within 30 days, we will refund your fee in full. If installation has been done, only the installation cost is deducted and the remaining amount is refunded. Try without risk!',
-    de: 'Wenn Sie innerhalb von 30 Tagen aus irgendeinem Grund nicht zufrieden sind, erstatten wir Ihre Gebühr vollständig zurück. Wenn eine Installation durchgeführt wurde, werden nur die Installationskosten abgezogen und der verbleibende Betrag erstattet. Probieren Sie es risikofrei aus!',
+    en: 'If within 30 days you are not satisfied for any reason, we will refund your fee in full. If the installation was done, only the installation cost will be deducted and the remaining amount will be refunded. Try it risk-free!',
+    de: 'Wenn Sie innerhalb von 30 Tagen aus irgendeinem Grund nicht zufrieden sind, erstatten wir Ihnen den vollen Betrag. Wenn die Installation durchgeführt wurde, werden nur die Installationskosten abgezogen und der Restbetrag wird zurückerstattet. Testen Sie es ohne Risiko!',
     tr: '30 gün içinde herhangi bir sebeple memnun kalmazsanız, ücretinizi tam olarak iade ediyoruz. Kurulum yapılmış ise sadece kurulum maliyeti kesilerek kalan tutar iade edilir. Risk almadan deneyin!'
   },
   'Hangi ödeme yöntemlerini kabul ediyorsunuz?': {
-    en: 'What payment methods do you accept?',
-    de: 'Welche Zahlungsmethoden akzeptieren Sie?',
+    en: 'Which payment methods do you accept?',
+    de: 'Welche Zahlungsarten akzeptieren Sie?',
     tr: 'Hangi ödeme yöntemlerini kabul ediyorsunuz?'
   },
   'Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.': {
-    en: 'We accept credit cards, debit cards, wire transfer/EFT and all mobile payment options. We offer big discounts for 6-month and annual payments. Installment options are also available.',
-    de: 'Wir akzeptieren Kreditkarten, Bankkarten, Überweisung/EFT und alle mobilen Zahlungsoptionen. Wir bieten große Rabatte für 6-Monats- und Jahreszahlungen. Ratenzahlungsoptionen sind ebenfalls verfügbar.',
+    en: 'We accept credit card, debit card, money order/EFT and all mobile payment options. We offer big discounts for 6-month and annual payments. Installment options are also available.',
+    de: 'Wir akzeptieren Kreditkarten, Debitkarten, Zahlungsanweisungen/EFT und alle mobilen Zahlungsoptionen. Wir bieten große Rabatte für 6 monatliche und jährliche Zahlungen. Ratenzahlungsoptionen sind ebenfalls verfügbar.',
     tr: 'Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.'
   },
   'Teknik destek sağlıyor musunuz?': {
     en: 'Do you provide technical support?',
-    de: 'Bieten Sie technischen Support?',
+    de: 'Bieten Sie technische Unterstützung an?',
     tr: 'Teknik destek sağlıyor musunuz?'
   },
   'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.': {
-    en: 'Of course! In the Premium package, we offer WhatsApp and priority support, in the Enterprise package, 24/7 phone support. We also provide online training videos and documentation for all our customers.',
-    de: 'Natürlich! Im Premium-Paket bieten wir WhatsApp- und Prioritätssupport, im Enterprise-Paket 24/7 Telefonsupport. Wir bieten auch Online-Schulungsvideos und Dokumentation für alle unsere Kunden.',
+    en: 'Of course! We offer WhatsApp and priority support in the Premium package and 24/7 phone support in the Corporate package. We also provide online training videos and documentation for all our customers.',
+    de: 'Ja, natürlich! Wir bieten WhatsApp- und Prioritäts-Support im Premium-Paket und 24/7-Telefon-Support im Corporate-Paket. Wir bieten auch Online-Schulungsvideos und Dokumentation für alle unsere Kunden.',
     tr: 'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.'
   },
   'Sistemi öğrenmek ne kadar sürer?': {
@@ -526,8 +526,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Sistemi öğrenmek ne kadar sürer?'
   },
   'MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.': {
-    en: 'MasApp is designed to be very user-friendly. Your staff can learn the system in 1-2 hours. We provide detailed training during installation and provide continuous support.',
-    de: 'MasApp ist sehr benutzerfreundlich gestaltet. Ihr Personal kann das System in 1-2 Stunden erlernen. Wir bieten während der Installation eine detaillierte Schulung und bieten kontinuierliche Unterstützung.',
+    en: 'MasApp is designed very user-friendly. Your staff can learn the system in 1-2 hours. We provide detailed training during installation and provide continuous support.',
+    de: 'MasApp ist sehr benutzerfreundlich gestaltet. Ihre Mitarbeiter können das System in 1-2 Stunden erlernen. Wir bieten eine detaillierte Schulung während der Installation und bieten kontinuierlichen Support.',
     tr: 'MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.'
   },
   'Mevcut POS sistemimle uyumlu mu?': {
@@ -536,8 +536,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Mevcut POS sistemimle uyumlu mu?'
   },
   'MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.': {
-    en: 'MasApp works independently but can be integrated with your existing POS systems. In the Enterprise package, you can connect all your systems with API integrations.',
-    de: 'MasApp funktioniert unabhängig, kann aber in Ihre bestehenden POS-Systeme integriert werden. Im Enterprise-Paket können Sie alle Ihre Systeme mit API-Integrationen verbinden.',
+    en: 'MasApp works independently but can be integrated with your existing POS systems. In the corporate package, you can connect all your systems with API integrations.',
+    de: 'MasApp arbeitet unabhängig, kann aber in Ihre bestehenden POS-Systeme integriert werden. Mit dem Unternehmenspaket können Sie alle Ihre Systeme mit API-Integrationen verbinden.',
     tr: 'MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.'
   },
   'Raporlama özellikleri neler?': {
@@ -546,22 +546,22 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Raporlama özellikleri neler?'
   },
   'Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.': {
-    en: 'You can get detailed reports such as daily/weekly/monthly sales reports, best-selling products, table efficiency, staff performance and customer analytics.',
-    de: 'Sie können detaillierte Berichte wie tägliche/wöchentliche/monatliche Verkaufsberichte, Bestseller, Tischeffizienz, Personalleistung und Kundenanalysen erhalten.',
+    en: 'You can get detailed reports such as daily/weekly/monthly sales reports, best-selling products, desk productivity, staff performance and customer analytics.',
+    de: 'Sie können detaillierte Berichte erhalten, z. B. tägliche/wöchentliche/monatliche Verkaufsberichte, meistverkaufte Produkte, Schreibtischproduktivität, Mitarbeiterleistung und Kundenanalysen.',
     tr: 'Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.'
   },
   'Hemen Başlayın!': {
-    en: 'Get Started Now!',
-    de: 'Jetzt starten!',
+    en: 'Start Now!',
+    de: 'Starten Sie jetzt!',
     tr: 'Hemen Başlayın!'
   },
   '🚀 Restoranınızı bugün dijital dünyaya taşıyın!': {
     en: '🚀 Take your restaurant to the digital world today!',
-    de: '🚀 Bringen Sie Ihr Restaurant heute in die digitale Welt!',
+    de: '🚀 Bringen Sie Ihr Restaurant noch heute in die digitale Welt!',
     tr: '🚀 Restoranınızı bugün dijital dünyaya taşıyın!'
   },
   '14 gün ücretsiz deneme ile risk almadan başlayın.': {
-    en: 'Start without risk with a 14-day free trial.',
+    en: 'Start risk-free with a 14-day free trial.',
     de: 'Starten Sie risikofrei mit einer 14-tägigen kostenlosen Testversion.',
     tr: '14 gün ücretsiz deneme ile risk almadan başlayın.'
   },
@@ -570,10 +570,10 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     de: 'MasApp',
     tr: 'MasApp'
   },
-  'Türkiye\'nin en gelişmiş QR menü ve restoran yönetim sistemi. 120+ restoranın güvendiği çözümle satışlarınızı artırın.': {
-    en: 'Turkey\'s most advanced QR menu and restaurant management system. Increase your sales with the solution trusted by 120+ restaurants.',
-    de: 'Die fortschrittlichste QR-Menü- und Restaurantverwaltung der Türkei. Steigern Sie Ihren Umsatz mit der Lösung, der 120+ Restaurants vertrauen.',
-    tr: 'Türkiye\'nin en gelişmiş QR menü ve restoran yönetim sistemi. 120+ restoranın güvendiği çözümle satışlarınızı artırın.'
+  'nin en gelişmiş QR menü ve restoran yönetim sistemi. 120+ restoranın güvendiği çözümle satışlarınızı artırın.': {
+    en: 'the most advanced QR menu and restaurant management system. Increase your sales with the solution trusted by 120+ restaurants.',
+    de: 'dem fortschrittlichsten QR-Menü- und Restaurant-Management-System. Steigern Sie Ihren Umsatz mit der Lösung, der über 120 Restaurants vertrauen.',
+    tr: 'nin en gelişmiş QR menü ve restoran yönetim sistemi. 120+ restoranın güvendiği çözümle satışlarınızı artırın.'
   },
   'Hemen Arayın': {
     en: 'Call Now',
@@ -587,27 +587,27 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   '© 2025 MasApp. Tüm hakları saklıdır.': {
     en: '© 2025 MasApp. All rights reserved.',
-    de: '© 2025 MasApp. Alle Rechte vorbehalten.',
+    de: '© 2025 MasApp. alle Rechte vorbehalten.',
     tr: '© 2025 MasApp. Tüm hakları saklıdır.'
   },
-  'Türkiye\'nin öncü restoran dijitalleştirme platformu': {
-    en: 'Turkey\'s leading restaurant digitization platform',
-    de: 'Die führende Restaurant-Digitalisierungsplattform der Türkei',
-    tr: 'Türkiye\'nin öncü restoran dijitalleştirme platformu'
+  'nin öncü restoran dijitalleştirme platformu': {
+    en: 'the leading restaurant digitization platform',
+    de: 'die führende Plattform für die Digitalisierung der Gastronomie',
+    tr: 'nin öncü restoran dijitalleştirme platformu'
   },
   'SSL Güvenli': {
     en: 'SSL Secure',
-    de: 'SSL-Sicher',
+    de: 'SSL sicher',
     tr: 'SSL Güvenli'
   },
   '120+ Restoran': {
     en: '120+ Restaurants',
-    de: '120+ Restaurants',
+    de: '120+ Restaurant',
     tr: '120+ Restoran'
   },
   '7/24 Destek': {
     en: '24/7 Support',
-    de: '24/7 Support',
+    de: '24/7 Unterstützung',
     tr: '7/24 Destek'
   },
   '%17 İndirim': {
@@ -621,7 +621,7 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: '%20 İndirim'
   },
   '6 Ay': {
-    en: '6 Months',
+    en: '6 months',
     de: '6 Monate',
     tr: '6 Ay'
   },
@@ -630,84 +630,10 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     de: 'Jährlich',
     tr: 'Yıllık'
   },
-  'Deneme Süresi': {
-    en: 'Trial Period',
-    de: 'Testzeitraum',
-    tr: 'Deneme Süresi'
-  },
-  'Garantisi': {
-    en: 'Guarantee',
-    de: 'Garantie',
-    tr: 'Garantisi'
-  },
-  'Sertifikası': {
-    en: 'Certificate',
-    de: 'Zertifikat',
-    tr: 'Sertifikası'
-  },
-  '6+ Ay Planlar': {
-    en: '6+ Month Plans',
-    de: '6+ Monatspläne',
-    tr: '6+ Ay Planlar'
-  },
   'Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.': {
-    en: 'If cancellation occurs after installation, only the installation fee is charged. All plans are protected with SSL security certificate.',
-    de: 'Bei Kündigung nach der Installation wird nur die Installationsgebühr berechnet. Alle Pläne sind mit SSL-Sicherheitszertifikat geschützt.',
+    en: 'In case of cancellation after installation, only the installation fee is charged. All plans are protected with SSL security certificate.',
+    de: 'Im Falle einer Stornierung nach der Installation wird nur die Installationsgebühr berechnet. Alle Pläne sind durch ein SSL-Sicherheitszertifikat geschützt.',
     tr: 'Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.'
-  },
-  'Hangi ödeme yöntemlerini kabul ediyorsunuz?': {
-    en: 'What payment methods do you accept?',
-    de: 'Welche Zahlungsmethoden akzeptieren Sie?',
-    tr: 'Hangi ödeme yöntemlerini kabul ediyorsunuz?'
-  },
-  'Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.': {
-    en: 'We accept credit cards, debit cards, wire transfer/EFT and all mobile payment options. We offer big discounts for 6-month and annual payments. Installment options are also available.',
-    de: 'Wir akzeptieren Kreditkarten, Bankkarten, Überweisung/EFT und alle mobilen Zahlungsoptionen. Wir bieten große Rabatte für 6-Monats- und Jahreszahlungen. Ratenzahlungsoptionen sind ebenfalls verfügbar.',
-    tr: 'Kredi kartı, banka kartı, havale/EFT ve tüm mobil ödeme seçeneklerini kabul ediyoruz. 6 aylık ve yıllık ödemeler için büyük indirimler sunuyoruz. Taksit seçenekleri de mevcuttur.'
-  },
-  'Teknik destek sağlıyor musunuz?': {
-    en: 'Do you provide technical support?',
-    de: 'Bieten Sie technischen Support?',
-    tr: 'Teknik destek sağlıyor musunuz?'
-  },
-  'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.': {
-    en: 'Of course! In the Premium package, we offer WhatsApp and priority support, in the Enterprise package, 24/7 phone support. We also provide online training videos and documentation for all our customers.',
-    de: 'Natürlich! Im Premium-Paket bieten wir WhatsApp- und Prioritätssupport, im Enterprise-Paket 24/7 Telefonsupport. Wir bieten auch Online-Schulungsvideos und Dokumentation für alle unsere Kunden.',
-    tr: 'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.'
-  },
-  'Sistemi öğrenmek ne kadar sürer?': {
-    en: 'How long does it take to learn the system?',
-    de: 'Wie lange dauert es, das System zu erlernen?',
-    tr: 'Sistemi öğrenmek ne kadar sürer?'
-  },
-  'MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.': {
-    en: 'MasApp is designed to be very user-friendly. Your staff can learn the system in 1-2 hours. We provide detailed training during installation and provide continuous support.',
-    de: 'MasApp ist sehr benutzerfreundlich gestaltet. Ihr Personal kann das System in 1-2 Stunden erlernen. Wir bieten während der Installation eine detaillierte Schulung und bieten kontinuierliche Unterstützung.',
-    tr: 'MasApp çok kullanıcı dostu tasarlandı. Personelleriniz 1-2 saatte sistemi öğrenebilir. Kurulum sırasında detaylı eğitim veriyoruz ve sürekli destek sağlıyoruz.'
-  },
-  'Mevcut POS sistemimle uyumlu mu?': {
-    en: 'Is it compatible with my existing POS system?',
-    de: 'Ist es mit meinem bestehenden POS-System kompatibel?',
-    tr: 'Mevcut POS sistemimle uyumlu mu?'
-  },
-  'MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.': {
-    en: 'MasApp works independently but can be integrated with your existing POS systems. In the Enterprise package, you can connect all your systems with API integrations.',
-    de: 'MasApp funktioniert unabhängig, kann aber in Ihre bestehenden POS-Systeme integriert werden. Im Enterprise-Paket können Sie alle Ihre Systeme mit API-Integrationen verbinden.',
-    tr: 'MasApp bağımsız çalışır ancak mevcut POS sistemlerinizle entegre edilebilir. Kurumsal pakette API entegrasyonları ile tüm sistemlerinizi birbirine bağlayabilirsiniz.'
-  },
-  'Raporlama özellikleri neler?': {
-    en: 'What are the reporting features?',
-    de: 'Was sind die Berichtsfunktionen?',
-    tr: 'Raporlama özellikleri neler?'
-  },
-  'Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.': {
-    en: 'You can get detailed reports such as daily/weekly/monthly sales reports, best-selling products, table efficiency, staff performance and customer analytics.',
-    de: 'Sie können detaillierte Berichte wie tägliche/wöchentliche/monatliche Verkaufsberichte, Bestseller, Tischeffizienz, Personalleistung und Kundenanalysen erhalten.',
-    tr: 'Günlük/haftalık/aylık satış raporları, en çok satan ürünler, masa verimliliği, personel performansı ve müşteri analitikleri gibi detaylı raporlar alabilirsiniz.'
-  },
-  '14 gün ücretsiz deneme ile risk almadan başlayın.': {
-    en: 'Start without risk with a 14-day free trial.',
-    de: 'Starten Sie risikofrei mit einer 14-tägigen kostenlosen Testversion.',
-    tr: '14 gün ücretsiz deneme ile risk almadan başlayın.'
   }
 };
+
