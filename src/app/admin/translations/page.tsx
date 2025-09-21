@@ -17,14 +17,43 @@ export default function TranslationsPage() {
   const [editedTranslations, setEditedTranslations] = useState<{ [key: string]: { tr: string; en: string; de: string } }>({});
 
   useEffect(() => {
-    // Çevirileri array'e dönüştür
-    const items: TranslationItem[] = Object.entries(translations).map(([key, value]) => ({
-      key,
-      tr: value.tr,
-      en: value.en,
-      de: value.de
-    }));
-    setTranslationItems(items);
+    // Çevirileri server'dan yükle
+    const loadTranslations = async () => {
+      try {
+        const response = await fetch('/api/admin/translations');
+        if (response.ok) {
+          const data = await response.json();
+          const items: TranslationItem[] = Object.entries(data.translations).map(([key, value]: [string, any]) => ({
+            key,
+            tr: value.tr,
+            en: value.en,
+            de: value.de
+          }));
+          setTranslationItems(items);
+        } else {
+          // Fallback to local translations
+          const items: TranslationItem[] = Object.entries(translations).map(([key, value]) => ({
+            key,
+            tr: value.tr,
+            en: value.en,
+            de: value.de
+          }));
+          setTranslationItems(items);
+        }
+      } catch (error) {
+        console.error('Error loading translations:', error);
+        // Fallback to local translations
+        const items: TranslationItem[] = Object.entries(translations).map(([key, value]) => ({
+          key,
+          tr: value.tr,
+          en: value.en,
+          de: value.de
+        }));
+        setTranslationItems(items);
+      }
+    };
+
+    loadTranslations();
   }, []);
 
   const filteredItems = translationItems.filter(item =>
@@ -45,14 +74,43 @@ export default function TranslationsPage() {
     }));
   };
 
-  const handleSave = (key: string) => {
+  const handleSave = async (key: string) => {
     const edited = editedTranslations[key];
     if (edited) {
+      // Update local state first
       setTranslationItems(prev => prev.map(item =>
         item.key === key
           ? { ...item, ...edited }
           : item
       ));
+      
+      // Save to server
+      try {
+        const updatedTranslations = translationItems.reduce((acc, item) => {
+          if (item.key === key) {
+            acc[item.key] = { ...edited };
+          } else {
+            acc[item.key] = { tr: item.tr, en: item.en, de: item.de };
+          }
+          return acc;
+        }, {} as { [key: string]: { tr: string; en: string; de: string } });
+
+        const response = await fetch('/api/admin/translations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ translations: updatedTranslations }),
+        });
+
+        if (response.ok) {
+          console.log('Translation saved successfully');
+        } else {
+          console.error('Failed to save translation');
+        }
+      } catch (error) {
+        console.error('Error saving translation:', error);
+      }
     }
     setIsEditing(prev => ({ ...prev, [key]: false }));
   };
@@ -74,6 +132,32 @@ export default function TranslationsPage() {
         [language]: value
       }
     }));
+  };
+
+  const saveAllTranslations = async () => {
+    try {
+      const translationsObject = translationItems.reduce((acc, item) => {
+        acc[item.key] = { tr: item.tr, en: item.en, de: item.de };
+        return acc;
+      }, {} as { [key: string]: { tr: string; en: string; de: string } });
+
+      const response = await fetch('/api/admin/translations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ translations: translationsObject }),
+      });
+
+      if (response.ok) {
+        alert('Tüm çeviriler başarıyla kaydedildi!');
+      } else {
+        alert('Çeviriler kaydedilirken hata oluştu!');
+      }
+    } catch (error) {
+      console.error('Error saving all translations:', error);
+      alert('Çeviriler kaydedilirken hata oluştu!');
+    }
   };
 
   const generateNewTranslationsFile = () => {
@@ -115,6 +199,12 @@ export default function TranslationsPage() {
               </p>
             </div>
             <div className="flex gap-3">
+              <button
+                onClick={saveAllTranslations}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                💾 Tümünü Kaydet
+              </button>
               <button
                 onClick={generateNewTranslationsFile}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
@@ -267,10 +357,12 @@ export default function TranslationsPage() {
           <h3 className="text-lg font-semibold text-blue-900 mb-3">📝 Kullanım Talimatları</h3>
           <div className="text-blue-800 space-y-2">
             <p>• <strong>Düzenle:</strong> Herhangi bir çeviriyi düzenlemek için "Düzenle" butonuna tıklayın</p>
-            <p>• <strong>Kaydet:</strong> Değişikliklerinizi kaydetmek için "Kaydet" butonuna tıklayın</p>
+            <p>• <strong>Kaydet:</strong> Değişikliklerinizi kaydetmek için "Kaydet" butonuna tıklayın (kalıcı kayıt)</p>
             <p>• <strong>İptal:</strong> Değişiklikleri iptal etmek için "İptal" butonuna tıklayın</p>
+            <p>• <strong>Tümünü Kaydet:</strong> Tüm değişiklikleri bir seferde kaydetmek için "Tümünü Kaydet" butonunu kullanın</p>
             <p>• <strong>Arama:</strong> Üstteki arama kutusunu kullanarak çevirileri filtreleyin</p>
             <p>• <strong>İndir:</strong> "Çevirileri İndir" butonu ile güncellenmiş translations.ts dosyasını indirin</p>
+            <p>• <strong>Otomatik Yükleme:</strong> Sayfa her yenilendiğinde çeviriler otomatik olarak server'dan yüklenir</p>
           </div>
         </div>
       </div>
