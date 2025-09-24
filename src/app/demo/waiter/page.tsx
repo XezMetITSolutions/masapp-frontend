@@ -221,14 +221,14 @@ function WaiterPageContent() {
           </div>
           <div className="flex items-center">
             <button 
-              onClick={() => setLanguage('tr')}
-              className={`mr-2 px-3 py-1 rounded ${language === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              onClick={() => () => {}('tr')}
+              className={`mr-2 px-3 py-1 rounded ${languageCode === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               TR
             </button>
             <button 
-              onClick={() => setLanguage('en')}
-              className={`px-3 py-1 rounded ${language === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              onClick={() => () => {}('en')}
+              className={`px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               EN
             </button>
@@ -291,7 +291,7 @@ function WaiterPageContent() {
                         style={{ color: primary, backgroundColor: `${primary}1A` }}
                         onClick={() => handleRemoveRequest(request.id)}
                       >
-                        {language === 'tr' ? 'İptal Et' : 'Cancel'}
+                        {languageCode === 'tr' ? 'İptal Et' : 'Cancel'}
                       </button>
                       <button 
                         className="text-base font-bold hover:bg-gray-200 h-6 w-6 flex items-center justify-center rounded-full"
