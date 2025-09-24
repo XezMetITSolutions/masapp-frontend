@@ -3,21 +3,24 @@ export interface MenuItem {
   name: {
     en: string;
     tr: string;
+    de?: string;
   };
   description: {
     en: string;
     tr: string;
+    de?: string;
   };
   price: number;
   image: string;
   category: string;
   popular: boolean;
   isAvailable?: boolean;
-  allergens?: Array<string | {en: string; tr: string}>;
+  allergens?: Array<string | {en: string; tr: string; de?: string}>;
   calories?: number;
   servingInfo?: {
     en: string;
     tr: string;
+    de?: string;
   };
 }
 
@@ -28,12 +31,12 @@ export const menuData: MenuItem[] = [
     name: {
       en: 'Gourmet Beef Burger',
       tr: 'Gurme Burger',
-      de: 'Gourmet-Burger',
       de: 'Gourmet-Burger'
     },
     description: {
       en: 'Premium beef patty with caramelized onions, cheddar cheese, and special sauce on a brioche bun',
-      tr: 'Özel soslu, karamelize soğanlı, cheddar peynirli premium dana köfte ve brioche ekmek'
+      tr: 'Özel soslu, karamelize soğanlı, cheddar peynirli premium dana köfte ve brioche ekmek',
+      de: 'Premium-Rindfleischpatty mit karamellisierten Zwiebeln, Cheddar und Spezialsauce im Brioche-Brötchen'
     },
     price: 120,
     image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=500',
@@ -46,7 +49,8 @@ export const menuData: MenuItem[] = [
     calories: 850,
     servingInfo: {
       en: 'Served with french fries and coleslaw',
-      tr: 'Patates kızartması ve coleslaw ile servis edilir'
+      tr: 'Patates kızartması ve coleslaw ile servis edilir',
+      de: 'Mit Pommes Frites und Krautsalat serviert'
     }
   },
   {
@@ -332,8 +336,7 @@ export const menuData: MenuItem[] = [
     },
     description: {
       en: 'Traditional Spanish rice dish with shrimp, mussels, calamari, and saffron',
-      tr: 'Karides, midye, kalamar ve safranla geleneksel İspanyol pilav yemeği',
-      de: 'Knusprige Calamari'
+      tr: 'Karides, midye, kalamar ve safranla geleneksel İspanyol pilav yemeği'
     },
     price: 180,
     image: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=500',
