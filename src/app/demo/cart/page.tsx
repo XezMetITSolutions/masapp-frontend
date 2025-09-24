@@ -304,7 +304,7 @@ function CartPageContent() {
       cart.resetTable?.();
       
       // Başarı mesajı
-      alert(language === 'tr' ? 'Siparişiniz alındı! Garson paneline gönderildi.' : 'Your order has been received! Sent to waiter panel.');
+      alert(languageCode === 'tr' ? 'Siparişiniz alındı! Garson paneline gönderildi.' : languageCode === 'de' ? 'Ihre Bestellung wurde erhalten! An die Kellner-Tafel gesendet.' : 'Your order has been received! Sent to waiter panel.');
     }
   };
 
@@ -323,7 +323,7 @@ function CartPageContent() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {language === 'tr' ? 'Yükleniyor...' : 'Loading...'}
+            {languageCode === 'tr' ? 'Yükleniyor...' : 'Loading...'}
           </p>
         </div>
       </main>
@@ -349,14 +349,14 @@ function CartPageContent() {
             </div>
             <div className="flex items-center">
               <button 
-                onClick={() => setLanguage('en')}
-                className={`mr-2 px-2 py-1 rounded ${language === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                onClick={() => {}}
+                className={`mr-2 px-2 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
               >
                 EN
               </button>
               <button 
-                onClick={() => setLanguage('tr')}
-                className={`px-2 py-1 rounded ${language === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                onClick={() => {}}
+                className={`px-2 py-1 rounded ${languageCode === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
               >
                 TR
               </button>
@@ -412,14 +412,14 @@ function CartPageContent() {
             </div>
             <div className="flex items-center">
               <button 
-                onClick={() => setLanguage('en')}
-                className={`mr-2 px-2 py-1 rounded ${language === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                onClick={() => {}}
+                className={`mr-2 px-2 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
               >
                 EN
               </button>
               <button 
-                onClick={() => setLanguage('tr')}
-                className={`px-2 py-1 rounded ${language === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                onClick={() => {}}
+                className={`px-2 py-1 rounded ${languageCode === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
               >
                 TR
               </button>
@@ -479,13 +479,13 @@ function CartPageContent() {
           <div className="flex items-center">
             <button 
               onClick={() => setLanguage('tr')}
-              className={`mr-2 px-3 py-1 rounded ${language === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              className={`mr-2 px-3 py-1 rounded ${languageCode === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               TR
             </button>
             <button 
               onClick={() => setLanguage('en')}
-              className={`px-3 py-1 rounded ${language === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              className={`px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               EN
             </button>
@@ -500,7 +500,7 @@ function CartPageContent() {
             <div className="mb-4">
               <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: primary }}>
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: primary }}></div>
-                {language === 'tr' ? 'Hazırlanan Ürünler' : 'Preparing Items'}
+                {languageCode === 'tr' ? 'Hazırlanan Ürünler' : 'Preparing Items'}
               </h3>
               {preparingItems.map((item) => (
                 <div key={item.id} className="card flex mb-3 p-3 shadow-sm" style={{ backgroundColor: `${primary}0D`, borderColor: `${primary}33`, borderWidth: 1 }}>
@@ -526,13 +526,13 @@ function CartPageContent() {
                     <div className="flex items-center gap-1 mt-1">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: primary }}></div>
                       <span className="text-xs font-medium" style={{ color: primary }}>
-                        {language === 'tr' ? 'Hazırlanıyor...' : 'Preparing...'}
+                        {languageCode === 'tr' ? 'Hazırlanıyor...' : 'Preparing...'}
                       </span>
                     </div>
                     
                     <div className="flex justify-between items-center mt-1.5">
                       <span className="text-sm font-medium text-gray-600">
-                        {item.quantity} {language === 'tr' ? 'adet' : 'pcs'}
+                        {item.quantity} {languageCode === 'tr' ? 'adet' : 'pcs'}
                       </span>
                       <span className="text-sm font-semibold" style={{ color: primary }}>
                         ₺{item.price * item.quantity}
@@ -546,7 +546,7 @@ function CartPageContent() {
               <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: `${primary}1A` }}>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-semibold" style={{ color: primary }}>
-                    {language === 'tr' ? 'Hazırlanan Sipariş Toplamı:' : 'Preparing Order Total:'}
+                    {languageCode === 'tr' ? 'Hazırlanan Sipariş Toplamı:' : 'Preparing Order Total:'}
                   </span>
                   <span className="text-lg font-bold" style={{ color: primary }}>
                     ₺{preparingSubtotal.toFixed(2)}
@@ -560,7 +560,7 @@ function CartPageContent() {
           {cartItems.length > 0 && (
           <div className="mb-4">
               <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                {language === 'tr' ? 'Sepetim' : 'My Cart'}
+                {languageCode === 'tr' ? 'Sepetim' : 'My Cart'}
               </h3>
             {cartItems.map((item) => (
               <div key={item.id} className="card flex flex-col sm:flex-row mb-3 p-3 shadow-sm">
@@ -665,7 +665,7 @@ function CartPageContent() {
                   style={{ color: primary }}
                   onClick={() => setShowTipSection(!showTipSection)}
                 >
-                  {showTipSection ? (language === 'en' ? 'Hide' : 'Gizle') : (language === 'en' ? 'Show' : 'Göster')}
+                  {showTipSection ? (languageCode === 'en' ? 'Hide' : 'Gizle') : (languageCode === 'en' ? 'Show' : 'Göster')}
                 </button>
               </div>
               
@@ -730,7 +730,7 @@ function CartPageContent() {
                   style={{ color: primary }}
                   onClick={() => setShowSupportSection(!showSupportSection)}
                 >
-                  {showSupportSection ? (language === 'en' ? 'Hide' : 'Gizle') : (language === 'en' ? 'Show' : 'Göster')}
+                  {showSupportSection ? (languageCode === 'en' ? 'Hide' : 'Gizle') : (languageCode === 'en' ? 'Show' : 'Göster')}
                 </button>
               </div>
               
@@ -802,7 +802,7 @@ function CartPageContent() {
     onClick={prepareOrder}
   >
     <FaUtensils size={14} />
-    {language === 'tr' ? 'Siparişini Hazırlat' : 'Prepare Order'}
+    {languageCode === 'tr' ? 'Siparişini Hazırlat' : 'Prepare Order'}
   </button>
   <button 
     className="btn btn-gradient w-full flex items-center justify-center gap-1.5 py-2 text-sm"
@@ -814,7 +814,7 @@ function CartPageContent() {
               </>
             ) : preparingItems.length > 0 ? (
               <div className="text-center text-gray-600 text-sm">
-                {language === 'tr' ? 'Yeni ürün ekleyebilirsiniz' : 'You can add new items'}
+                {languageCode === 'tr' ? 'Yeni ürün ekleyebilirsiniz' : 'You can add new items'}
               </div>
             ) : null}
 </div>
