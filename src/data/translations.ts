@@ -186,8 +186,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'PCI DSS uyumlu güvenlik'
   },
   'Kredi kartı güvenliği': {
-    en: 'Kredi kartı güvenliği',
-    de: 'Kredi kartı güvenliği',
+    en: 'Credit card security',
+    de: 'Kreditkartensicherheit',
     tr: 'Kredi kartı güvenliği'
   },
   'SSL şifreleme': {
@@ -226,8 +226,8 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     tr: 'Garson paneli'
   },
   'Kasa paneli': {
-    en: 'Case panel',
-    de: 'Gehäuse-Panel',
+    en: 'Cashier panel',
+    de: 'Kassierer-Panel',
     tr: 'Kasa paneli'
   },
   'Yönetim paneli': {
@@ -517,7 +517,7 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
   },
   'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.': {
     en: 'Of course! We offer WhatsApp and priority support in the Premium package and 24/7 phone support in the Corporate package. We also provide online training videos and documentation for all our customers.',
-    de: 'Ja, natürlich! Wir bieten WhatsApp- und Prioritäts-Support im Premium-Paket und 24/7-Telefon-Support im Corporate-Paket. Wir bieten auch Online-Schulungsvideos und Dokumentation für alle unsere Kunden.',
+    de: 'Ja, natürlich! Wir bieten WhatsApp- und Priority-Support im Premium-Paket und 24/7-Telefonsupport im Corporate-Paket. Wir bieten auch Online-Schulungsvideos und Dokumentation für alle unsere Kunden.',
     tr: 'Elbette! Premium pakette WhatsApp ve öncelikli destek, Kurumsal pakette 7/24 telefon desteği sunuyoruz. Ayrıca tüm müşterilerimiz için online eğitim videoları ve dokümantasyon sağlıyoruz.'
   },
   'Sistemi öğrenmek ne kadar sürer?': {
@@ -634,6 +634,32 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     en: 'In case of cancellation after installation, only the installation fee is charged. All plans are protected with SSL security certificate.',
     de: 'Im Falle einer Stornierung nach der Installation wird nur die Installationsgebühr berechnet. Alle Pläne sind durch ein SSL-Sicherheitszertifikat geschützt.',
     tr: 'Kurulum yapıldıktan sonra iptal durumunda sadece kurulum ücreti alınır. Tüm planlar SSL güvenlik sertifikası ile korunmaktadır.'
+  },
+  'Türkiye\'nin en gelişmiş QR menü ve restoran yönetim sistemi.': {
+    en: 'Turkey\'s most advanced QR menu and restaurant management system.',
+    de: 'Das fortschrittlichste QR-Menü- und Restaurant-Management-System der Türkei.',
+    tr: 'Türkiye\'nin en gelişmiş QR menü ve restoran yönetim sistemi.'
+  },
+  '120+ restoranın güvendiği çözümle satışlarınızı artırın.': {
+    en: 'Increase your sales with the solution trusted by 120+ restaurants.',
+    de: 'Steigern Sie Ihren Umsatz mit der Lösung, der über 120 Restaurants vertrauen.',
+    tr: '120+ restoranın güvendiği çözümle satışlarınızı artırın.'
+  },
+  'Tüm tatlılarda %20 indirim - Sadece bugün geçerli': {
+    en: '20% discount on all desserts - Valid only today',
+    de: '20% Rabatt auf alle Desserts - Nur heute gültig',
+    tr: 'Tüm tatlılarda %20 indirim - Sadece bugün geçerli'
+  },
+  'Ezogelin çorbası - Ev yapımı lezzet': {
+    en: 'Ezogelin soup - Homemade flavor',
+    de: 'Ezogelin-Suppe - Hausgemachter Geschmack',
+    tr: 'Ezogelin çorbası - Ev yapımı lezzet'
+  },
+  'Tümü': {
+    en: 'All',
+    de: 'Alle',
+    tr: 'Tümü'
   }
 };
+
 

@@ -496,12 +496,12 @@ export default function Home() {
                 <h3 className="text-3xl font-bold text-gray-800">MasApp</h3>
               </div>
               <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                Türkiye'nin en gelişmiş QR menü ve restoran yönetim sistemi. 
-                120+ restoranın güvendiği çözümle satışlarınızı artırın.
+                <TranslatedText>Türkiye'nin en gelişmiş QR menü ve restoran yönetim sistemi.</TranslatedText> 
+                <TranslatedText>120+ restoranın güvendiği çözümle satışlarınızı artırın.</TranslatedText>
               </p>
               <div className="flex space-x-4">
                 <a href="tel:+905393222797" className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-300 flex items-center gap-2">
-                  <FaPhone /> Hemen Arayın
+                  <FaPhone /> <TranslatedText>Hemen Arayın</TranslatedText>
                 </a>
                 <a href="https://wa.me/905393222797" target="_blank" className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-300 flex items-center gap-2">
                   <FaWhatsapp /> WhatsApp

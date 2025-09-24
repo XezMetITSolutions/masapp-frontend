@@ -44,3 +44,4 @@ export default function PriceDisplay({ turkishLira, className = '', showPerMonth
     </span>
   );
 }
+

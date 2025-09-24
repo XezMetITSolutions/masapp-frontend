@@ -46,6 +46,14 @@ export default function TranslatedText({
     };
 
     translateContent();
+
+    // Listen for language change events
+    const handleLanguageChange = () => {
+      translateContent();
+    };
+
+    window.addEventListener('languageChanged', handleLanguageChange);
+    return () => window.removeEventListener('languageChanged', handleLanguageChange);
   }, [children, currentLanguage, translate, isClient]);
 
   return (

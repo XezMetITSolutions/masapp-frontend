@@ -20,14 +20,29 @@ import {
   FaHamburger 
 } from 'react-icons/fa';
 import { RiEmotionHappyLine, RiHeartsFill } from 'react-icons/ri';
-import { useCartStore, useLanguageStore, useOrderStore } from '@/store';
+import { useCartStore, useOrderStore } from '@/store';
+import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
+import TranslatedText from '@/components/TranslatedText';
 import CartItemNotes from '@/components/CartItemNotes';
 import { v4 as uuidv4 } from 'uuid';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 
-export default function CartPage() {
+function CartPageContent() {
   const { settings } = useBusinessSettingsStore();
+  const { currentLanguage } = useLanguage();
+  
+  // Get language code
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+  
+  const languageCode = getLanguageCode();
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
   const [hazirlatildi, setHazirlatildi] = useState(false);
@@ -45,7 +60,7 @@ export default function CartPage() {
     if (existingOrder) {
       // Mevcut siparişe yeni ürünleri ekle
       const newItems = cartItems.map(item => ({
-        name: typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || ''),
+        name: typeof item.name === 'string' ? item.name : (item.name[languageCode] || item.name.en || item.name.tr || ''),
         quantity: item.quantity,
         price: item.price,
         notes: item.notes || '',
@@ -64,7 +79,7 @@ export default function CartPage() {
         tableNumber: tableNumber,
         guests: 2, // Varsayılan misafir sayısı
         items: cartItems.map(item => ({
-          name: typeof item.name === 'string' ? item.name : (item.name[language] || item.name.en || item.name.tr || ''),
+          name: typeof item.name === 'string' ? item.name : (item.name[languageCode] || item.name.en || item.name.tr || ''),
           quantity: item.quantity,
           price: item.price,
           notes: item.notes || '',
@@ -504,7 +519,7 @@ export default function CartPage() {
                   <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                     <Image
                       src={item.image || ''}
-                      alt={item.name[language] || item.name.en || item.name.tr || ''}
+                      alt={item.name[languageCode] || item.name.en || item.name.tr || ''}
                       fill
                       className="object-cover"
                     />
@@ -515,7 +530,7 @@ export default function CartPage() {
                   </div>
                   <div className="ml-3 flex-grow">
                     <div className="flex justify-between">
-                      <h3 className="font-semibold text-sm truncate pr-2">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
+                      <h3 className="font-semibold text-sm truncate pr-2">{item.name[languageCode] || item.name.en || item.name.tr || ''}</h3>
                       <span className="font-semibold text-sm whitespace-nowrap" style={{ color: primary }}>{item.price} ₺</span>
                     </div>
                     
@@ -564,14 +579,14 @@ export default function CartPage() {
                 <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image
                     src={item.image || ''}
-                    alt={item.name[language] || item.name.en || item.name.tr || ''}
+                    alt={item.name[languageCode] || item.name.en || item.name.tr || ''}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div className="sm:ml-3 mt-2 sm:mt-0 flex-grow">
                   <div className="flex justify-between items-start gap-3">
-                    <h3 className="font-semibold text-sm truncate pr-2">{item.name[language] || item.name.en || item.name.tr || ''}</h3>
+                    <h3 className="font-semibold text-sm truncate pr-2">{item.name[languageCode] || item.name.en || item.name.tr || ''}</h3>
                     <span className="font-semibold text-sm whitespace-nowrap" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <div className="flex justify-between items-center mt-1.5">
@@ -839,4 +854,10 @@ export default function CartPage() {
   );
 }
 
-
+export default function CartPage() {
+  return (
+    <LanguageProvider>
+      <CartPageContent />
+    </LanguageProvider>
+  );
+}

@@ -27,7 +27,9 @@ export const menuData: MenuItem[] = [
     id: 'beef-burger',
     name: {
       en: 'Gourmet Beef Burger',
-      tr: 'Gurme Burger'
+      tr: 'Gurme Burger',
+      de: 'Gourmet-Burger',
+      de: 'Gourmet-Burger'
     },
     description: {
       en: 'Premium beef patty with caramelized onions, cheddar cheese, and special sauce on a brioche bun',
@@ -330,7 +332,8 @@ export const menuData: MenuItem[] = [
     },
     description: {
       en: 'Traditional Spanish rice dish with shrimp, mussels, calamari, and saffron',
-      tr: 'Karides, midye, kalamar ve safranla geleneksel İspanyol pilav yemeği'
+      tr: 'Karides, midye, kalamar ve safranla geleneksel İspanyol pilav yemeği',
+      de: 'Knusprige Calamari'
     },
     price: 180,
     image: 'https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=500',

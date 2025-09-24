@@ -11,14 +11,12 @@ import MenuItemModal from '@/components/MenuItemModal';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
-import { useLanguageStore } from '@/store';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 
 function MenuPageContent() {
   // Store states
   const { currentLanguage, translate } = useLanguage();
-  const { language } = useLanguageStore();
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
@@ -105,7 +103,17 @@ function MenuPageContent() {
     }
   };
   
-  const t = translations[language] || translations.tr;
+  // Get language code
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+  
+  const languageCode = getLanguageCode();
+  const t = translations[languageCode] || translations.tr;
   
   // Menu store
   const items = useMenuStore(state => state.items);
@@ -186,7 +194,7 @@ function MenuPageContent() {
   }, [isClient, cartItems]);
 
   // Get language code for menu data
-  const menuLanguage = currentLanguage === 'Turkish' ? 'tr' : 'en';
+  const menuLanguage = languageCode;
   
   // Get menu categories
   const menuCategories = [
@@ -460,7 +468,7 @@ function MenuPageContent() {
                     <div className="flex flex-wrap gap-1 mb-2">
                       {item.allergens.slice(0, 3).map((allergen, i) => (
                         <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
-                          {allergen[language as keyof typeof allergen] || allergen.tr || allergen.en}
+                          {typeof allergen === 'string' ? allergen : (allergen[menuLanguage] || allergen.en || allergen.tr)}
                         </span>
                       ))}
                     </div>

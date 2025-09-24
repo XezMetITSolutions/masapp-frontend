@@ -65,6 +65,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     localStorage.setItem('masapp-language', language);
     // Clear cache when language changes
     translationCache.clear();
+    // Force re-render of all TranslatedText components
+    window.dispatchEvent(new Event('languageChanged'));
   };
 
   const translate = async (text: string): Promise<string> => {

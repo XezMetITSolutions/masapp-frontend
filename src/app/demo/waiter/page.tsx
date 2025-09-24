@@ -3,20 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaArrowLeft, FaShoppingCart, FaBell, FaUtensils, FaGlassWhiskey, FaReceipt, FaSprayCan, FaPlus } from 'react-icons/fa';
-import { useWaiterStore, useLanguageStore, useCartStore } from '@/store';
+import { useWaiterStore, useCartStore } from '@/store';
+import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
+import TranslatedText from '@/components/TranslatedText';
 import { publish } from '@/lib/realtime';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 import type { WaiterRequest } from '@/store';
 
-export default function WaiterPage() {
+function WaiterPageContent() {
   const { settings } = useBusinessSettingsStore();
+  const { currentLanguage } = useLanguage();
   const primary = settings.branding.primaryColor;
-  // Use Zustand stores
-  const { language, setLanguage } = useLanguageStore(state => ({
-    language: state.language,
-    setLanguage: state.setLanguage
-  }));
   
   const { tableNumber } = useCartStore();
   const { 
@@ -322,5 +321,13 @@ export default function WaiterPage() {
         </div>
       </nav>
     </main>
+  );
+}
+
+export default function WaiterPage() {
+  return (
+    <LanguageProvider>
+      <WaiterPageContent />
+    </LanguageProvider>
   );
 }
