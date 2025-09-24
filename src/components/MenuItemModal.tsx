@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { FaTimes, FaPlus, FaMinus, FaStar } from 'react-icons/fa';
-import { useCartStore, useLanguageStore } from '@/store';
+import { useCartStore } from '@/store';
+import { useLanguage } from '@/context/LanguageContext';
 import { MenuItem } from '@/store/useMenuStore';
 
 interface MenuItemModalProps {
@@ -12,10 +13,20 @@ interface MenuItemModalProps {
 }
 
 export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalProps) {
-  const { language } = useLanguageStore();
+  const { currentLanguage } = useLanguage();
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
+
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+
+  const languageCode = getLanguageCode();
 
   const handleAddToCart = useCallback(() => {
     addItem({
@@ -55,10 +66,20 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
       allergens: 'Alerjenler',
       calories: 'Kalori',
       popular: 'Popüler'
+    },
+    de: {
+      addToCart: 'In den Warenkorb',
+      quantity: 'Menge',
+      notes: 'Besondere Notizen',
+      notesPlaceholder: 'Haben Sie besondere Wünsche?',
+      total: 'Gesamt',
+      allergens: 'Allergene',
+      calories: 'Kalorien',
+      popular: 'Beliebt'
     }
   };
 
-  const t = translations[language as 'en' | 'tr'];
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
 
   return (
     <div 
@@ -71,7 +92,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b" style={{ borderColor: 'var(--brand-subtle)' }}>
-          <h2 className="text-lg font-semibold">{item.name[language] || item.name.en || item.name.tr || ''}</h2>
+          <h2 className="text-lg font-semibold">{item.name[languageCode] || item.name.en || item.name.tr || ''}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -84,7 +105,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
         <div className="relative h-48 w-full cursor-pointer" onClick={() => window.open(item.image, '_blank')}>
           <img
             src={item.image}
-            alt={item.name[language] || item.name.en || item.name.tr || ''}
+            alt={item.name[languageCode] || item.name.en || item.name.tr || ''}
             className="w-full h-full object-cover hover:opacity-90 transition-opacity"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -108,7 +129,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-gray-600 mb-4">{item.description[language] || item.description.en || item.description.tr || ''}</p>
+          <p className="text-gray-600 mb-4">{item.description[languageCode] || item.description.en || item.description.tr || ''}</p>
           
           <div className="text-2xl font-bold mb-4" style={{ color: 'var(--brand-strong)' }}>
             {item.price} ₺
@@ -125,7 +146,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                     className="text-xs px-2 py-1 rounded-full"
                     style={{ backgroundColor: 'var(--tone2-bg)', color: 'var(--tone2-text)', border: '1px solid var(--tone2-border)' }}
                   >
-                    {allergen[language] || allergen.en || allergen.tr || ''}
+                    {typeof allergen === 'string' ? allergen : (allergen[languageCode] || allergen.en || allergen.tr || '')}
                   </span>
                 ))}
               </div>

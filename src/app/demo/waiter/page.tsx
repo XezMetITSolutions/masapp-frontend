@@ -162,9 +162,15 @@ function WaiterPageContent() {
               </button>
               <button 
                 onClick={() => {}}
-                className={`px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+                className={`mr-2 px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
               >
                 EN
+              </button>
+              <button 
+                onClick={() => {}}
+                className={`px-3 py-1 rounded ${languageCode === 'de' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              >
+                DE
               </button>
             </div>
           </div>
@@ -228,9 +234,15 @@ function WaiterPageContent() {
             </button>
             <button 
               onClick={() => {}}
-              className={`px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+              className={`mr-2 px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               EN
+            </button>
+            <button 
+              onClick={() => {}}
+              className={`px-3 py-1 rounded ${languageCode === 'de' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            >
+              DE
             </button>
           </div>
         </div>
