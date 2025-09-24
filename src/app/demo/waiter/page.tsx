@@ -91,7 +91,16 @@ function WaiterPageContent() {
     }
   };
 
-  const t = translations[language as 'en' | 'tr' | 'de'];
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      case 'Turkish': return 'tr';
+      default: return 'tr';
+    }
+  };
+  const languageCode = getLanguageCode();
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
 
   const quickRequests = [
     { id: 'water', icon: <FaGlassWhiskey />, text: t.water },
