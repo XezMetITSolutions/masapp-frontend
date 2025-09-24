@@ -13,15 +13,92 @@ import {
   FaChartLine
 } from 'react-icons/fa';
 import useCentralOrderStore from '@/store/useCentralOrderStore';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function StandaloneKitchenPage() {
   const router = useRouter();
+  const { currentLanguage, setLanguage } = useLanguage();
   const { 
     getKitchenOrders, 
     updateOrderStatus, 
     updateItemStatus, 
     initializeDemoData 
   } = useCentralOrderStore();
+
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+
+  const languageCode = getLanguageCode();
+
+  const translations = {
+    en: {
+      title: 'Kitchen Panel',
+      subtitle: 'Order Management',
+      all: 'All',
+      active: 'Active',
+      completed: 'Completed',
+      time: 'Time',
+      priority: 'Priority',
+      table: 'Table',
+      search: 'Search orders...',
+      tableNumber: 'Table',
+      orderTime: 'Order Time',
+      items: 'Items',
+      status: 'Status',
+      actions: 'Actions',
+      markReady: 'Mark Ready',
+      markCompleted: 'Mark Completed',
+      noOrders: 'No orders found',
+      redirecting: 'Redirecting to kitchen panel...'
+    },
+    tr: {
+      title: 'Mutfak Paneli',
+      subtitle: 'Sipariş Yönetimi',
+      all: 'Tümü',
+      active: 'Aktif',
+      completed: 'Tamamlanan',
+      time: 'Süre',
+      priority: 'Öncelik',
+      table: 'Masa',
+      search: 'Sipariş ara...',
+      tableNumber: 'Masa',
+      orderTime: 'Sipariş Zamanı',
+      items: 'Ürünler',
+      status: 'Durum',
+      actions: 'İşlemler',
+      markReady: 'Hazır İşaretle',
+      markCompleted: 'Tamamlandı İşaretle',
+      noOrders: 'Sipariş bulunamadı',
+      redirecting: 'Mutfak paneline yönlendiriliyor...'
+    },
+    de: {
+      title: 'Küchen-Panel',
+      subtitle: 'Bestellungsverwaltung',
+      all: 'Alle',
+      active: 'Aktiv',
+      completed: 'Abgeschlossen',
+      time: 'Zeit',
+      priority: 'Priorität',
+      table: 'Tisch',
+      search: 'Bestellungen suchen...',
+      tableNumber: 'Tisch',
+      orderTime: 'Bestellzeit',
+      items: 'Artikel',
+      status: 'Status',
+      actions: 'Aktionen',
+      markReady: 'Als bereit markieren',
+      markCompleted: 'Als abgeschlossen markieren',
+      noOrders: 'Keine Bestellungen gefunden',
+      redirecting: 'Weiterleitung zum Küchen-Panel...'
+    }
+  };
+
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
   const [activeFilter, setActiveFilter] = useState('all'); // 'all' = tüm siparişler, 'active' = aktif siparişler, 'served' = tamamlanan
   const [sortBy, setSortBy] = useState('time'); // time, priority, table
   const [searchTerm, setSearchTerm] = useState('');
@@ -467,11 +544,32 @@ export default function StandaloneKitchenPage() {
               <FaUtensils className="text-2xl" />
             </div>
           <div>
-              <h2 className="text-lg sm:text-2xl font-bold">Mutfak Paneli</h2>
-              <p className="text-orange-100 text-xs sm:text-sm hidden sm:block">Sipariş hazırlama ve takip</p>
+              <h2 className="text-lg sm:text-2xl font-bold">{t.title}</h2>
+              <p className="text-orange-100 text-xs sm:text-sm hidden sm:block">{t.subtitle}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
+            {/* Language Selector */}
+            <div className="flex bg-white bg-opacity-20 rounded-lg p-1">
+              <button
+                onClick={() => setLanguage('Turkish')}
+                className={`px-2 py-1 rounded text-xs ${languageCode === 'tr' ? 'bg-white text-orange-600' : 'text-white'}`}
+              >
+                TR
+              </button>
+              <button
+                onClick={() => setLanguage('English')}
+                className={`px-2 py-1 rounded text-xs ${languageCode === 'en' ? 'bg-white text-orange-600' : 'text-white'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('German')}
+                className={`px-2 py-1 rounded text-xs ${languageCode === 'de' ? 'bg-white text-orange-600' : 'text-white'}`}
+              >
+                DE
+              </button>
+            </div>
             <button
               onClick={() => { router.replace('/business/login'); }}
               className="px-2 sm:px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
@@ -492,7 +590,7 @@ export default function StandaloneKitchenPage() {
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Masa veya ürün ara..."
+                placeholder={t.search}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
@@ -505,19 +603,19 @@ export default function StandaloneKitchenPage() {
                 onClick={() => setActiveFilter('all')}
                 className={`px-2 sm:px-4 py-2 rounded-md transition-colors whitespace-nowrap text-sm ${activeFilter === 'all' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
               >
-                Tüm Siparişler
+{t.all}
               </button>
               <button
                 onClick={() => setActiveFilter('active')}
                 className={`px-2 sm:px-4 py-2 rounded-md transition-colors whitespace-nowrap text-sm ${activeFilter === 'active' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
               >
-                Aktif Siparişler
+{t.active}
               </button>
             <button
               onClick={() => setActiveFilter('served')}
                 className={`px-2 sm:px-4 py-2 rounded-md transition-colors whitespace-nowrap text-sm ${activeFilter === 'served' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
             >
-                Tamamlanan Siparişler ({completedOrdersCount})
+{t.completed} ({completedOrdersCount})
             </button>
             </div>
 
@@ -529,9 +627,9 @@ export default function StandaloneKitchenPage() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
               >
-                <option value="time">Zamana Göre</option>
-                <option value="priority">Önceliğe Göre</option>
-                <option value="table">Masaya Göre</option>
+                <option value="time">{t.time}</option>
+                <option value="priority">{t.priority}</option>
+                <option value="table">{t.table}</option>
               </select>
             </div>
           </div>

@@ -3,12 +3,68 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useLanguage } from '@/context/LanguageContext';
 // React Icons yerine emoji kullanıyoruz
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuthStore();
+  const { currentLanguage, setLanguage } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<'waiter' | 'kitchen' | 'cashier' | null>(null);
+
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+
+  const languageCode = getLanguageCode();
+
+  const translations = {
+    en: {
+      title: 'MasApp Business',
+      subtitle: 'MasApp Login Panel',
+      waiterPanel: 'Waiter Panel',
+      waiterDesc: 'Manage orders and view customer calls',
+      kitchenPanel: 'Kitchen Panel', 
+      kitchenDesc: 'Prepare orders and update statuses',
+      cashierPanel: 'Cashier Panel',
+      cashierDesc: 'Take payments and manage cash operations',
+      adminPanel: 'Business Panel',
+      adminDesc: 'Manage restaurant and view statistics',
+      selectRole: 'You can select any role for MasApp'
+    },
+    tr: {
+      title: 'MasApp Business',
+      subtitle: 'MasApp Giriş Paneli',
+      waiterPanel: 'Garson Paneli',
+      waiterDesc: 'Siparişleri yönet ve müşteri çağrılarını gör',
+      kitchenPanel: 'Mutfak Paneli',
+      kitchenDesc: 'Siparişleri hazırla ve durumları güncelle',
+      cashierPanel: 'Kasa Paneli',
+      cashierDesc: 'Ödemeleri al ve kasa işlemlerini yönet',
+      adminPanel: 'İşletme Paneli',
+      adminDesc: 'Restoranı yönet ve istatistikleri gör',
+      selectRole: 'MasApp için herhangi bir rol seçebilirsiniz'
+    },
+    de: {
+      title: 'MasApp Business',
+      subtitle: 'MasApp Anmelde-Panel',
+      waiterPanel: 'Kellner-Panel',
+      waiterDesc: 'Bestellungen verwalten und Kundenanrufe anzeigen',
+      kitchenPanel: 'Küchen-Panel',
+      kitchenDesc: 'Bestellungen zubereiten und Status aktualisieren',
+      cashierPanel: 'Kassierer-Panel',
+      cashierDesc: 'Zahlungen entgegennehmen und Kassenvorgänge verwalten',
+      adminPanel: 'Geschäfts-Panel',
+      adminDesc: 'Restaurant verwalten und Statistiken anzeigen',
+      selectRole: 'Sie können jede Rolle für MasApp auswählen'
+    }
+  };
+
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
 
   const handleDemoLogin = async (role: 'waiter' | 'kitchen' | 'cashier' | 'restaurant_owner') => {
     console.log('handleDemoLogin called with role:', role);
@@ -53,12 +109,36 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        {/* Language Selector */}
+        <div className="flex justify-center mb-6">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setLanguage('Turkish')}
+              className={`px-3 py-1 rounded ${languageCode === 'tr' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+            >
+              TR
+            </button>
+            <button
+              onClick={() => setLanguage('English')}
+              className={`px-3 py-1 rounded ${languageCode === 'en' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLanguage('German')}
+              className={`px-3 py-1 rounded ${languageCode === 'de' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+            >
+              DE
+            </button>
+          </div>
+        </div>
+
         <div className="text-center mb-8">
           <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
             <span className="text-purple-600 text-2xl">🍽️</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">MasApp Business</h1>
-          <p className="text-gray-600 mt-2">MasApp Giriş Paneli</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t.title}</h1>
+          <p className="text-gray-600 mt-2">{t.subtitle}</p>
         </div>
 
         <div className="space-y-4">
@@ -73,8 +153,8 @@ export default function LoginPage() {
           >
             <span className="text-xl">🔔</span>
             <div className="text-left">
-              <div className="font-semibold">Garson Paneli</div>
-              <div className="text-sm opacity-90">Siparişleri yönet ve müşteri çağrılarını gör</div>
+              <div className="font-semibold">{t.waiterPanel}</div>
+              <div className="text-sm opacity-90">{t.waiterDesc}</div>
             </div>
           </button>
 
@@ -84,8 +164,8 @@ export default function LoginPage() {
           >
             <span className="text-xl">👨‍🍳</span>
             <div className="text-left">
-              <div className="font-semibold">Mutfak Paneli</div>
-              <div className="text-sm opacity-90">Siparişleri hazırla ve durumları güncelle</div>
+              <div className="font-semibold">{t.kitchenPanel}</div>
+              <div className="text-sm opacity-90">{t.kitchenDesc}</div>
             </div>
           </button>
 
@@ -95,8 +175,8 @@ export default function LoginPage() {
           >
             <span className="text-xl">💰</span>
             <div className="text-left">
-              <div className="font-semibold">Kasa Paneli</div>
-              <div className="text-sm opacity-90">Ödemeleri al ve kasa işlemlerini yönet</div>
+              <div className="font-semibold">{t.cashierPanel}</div>
+              <div className="text-sm opacity-90">{t.cashierDesc}</div>
             </div>
           </button>
 
@@ -106,15 +186,15 @@ export default function LoginPage() {
           >
             <span className="text-xl">🏪</span>
             <div className="text-left">
-              <div className="font-semibold">İşletme Paneli</div>
-              <div className="text-sm opacity-90">Restoranı yönet ve istatistikleri gör</div>
+              <div className="font-semibold">{t.adminPanel}</div>
+              <div className="text-sm opacity-90">{t.adminDesc}</div>
             </div>
           </button>
             </div>
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            MasApp için herhangi bir rol seçebilirsiniz
+            {t.selectRole}
           </p>
         </div>
       </div>

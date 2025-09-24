@@ -29,11 +29,43 @@ import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useState } from 'react';
 import BusinessPaymentModal from '@/components/BusinessPaymentModal';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function BusinessDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { currentRestaurant } = useRestaurantStore();
+  const { currentLanguage, setLanguage } = useLanguage();
+
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+
+  const languageCode = getLanguageCode();
+
+  const translations = {
+    en: {
+      title: 'Business Dashboard',
+      subtitle: 'Restaurant Management',
+      logout: 'Logout'
+    },
+    tr: {
+      title: 'İşletme Paneli',
+      subtitle: 'Restoran Yönetimi',
+      logout: 'Çıkış'
+    },
+    de: {
+      title: 'Geschäfts-Dashboard',
+      subtitle: 'Restaurant-Management',
+      logout: 'Abmelden'
+    }
+  };
+
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
   
   // Premium plan state'leri
   const [currentPlan, setCurrentPlan] = useState('premium'); // basic, premium, enterprise
@@ -355,11 +387,32 @@ export default function BusinessDashboard() {
                 <FaBars className="text-lg text-gray-600" />
               </button>
             <div>
-                <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">Kontrol Paneli</h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Hoş geldiniz{user?.name ? `, ${user.name}` : ''} 👋</p>
+                <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">{t.title}</h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">{t.subtitle}{user?.name ? `, ${user.name}` : ''} 👋</p>
             </div>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
+              {/* Language Selector */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setLanguage('Turkish')}
+                  className={`px-2 py-1 rounded text-xs ${languageCode === 'tr' ? 'bg-white text-purple-600' : 'text-gray-600'}`}
+                >
+                  TR
+                </button>
+                <button
+                  onClick={() => setLanguage('English')}
+                  className={`px-2 py-1 rounded text-xs ${languageCode === 'en' ? 'bg-white text-purple-600' : 'text-gray-600'}`}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => setLanguage('German')}
+                  className={`px-2 py-1 rounded text-xs ${languageCode === 'de' ? 'bg-white text-purple-600' : 'text-gray-600'}`}
+                >
+                  DE
+                </button>
+              </div>
               <button 
                 onClick={() => setShowUpgradeModal(true)}
                 className={`px-2 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all hover:scale-105 ${

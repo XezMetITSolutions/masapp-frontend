@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   FaConciergeBell, 
   FaUtensils, 
@@ -35,6 +36,100 @@ export default function WaiterDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const { language } = useLanguageStore();
+  const { currentLanguage, setLanguage } = useLanguage();
+
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+
+  const languageCode = getLanguageCode();
+
+  const translations = {
+    en: {
+      title: 'MasApp Waiter',
+      subtitle: '• Flavor Stop',
+      activeCalls: 'active calls',
+      idle: 'Idle',
+      active: 'Active', 
+      preparing: 'Preparing',
+      ready: 'Ready',
+      bill: 'Bill',
+      all: 'All',
+      newOrders: 'New Orders',
+      preparingOrders: 'Preparing Orders',
+      readyOrders: 'Ready Orders',
+      billRequests: 'Bill Requests',
+      table: 'Table',
+      status: 'Status',
+      items: 'Items',
+      total: 'Total',
+      time: 'Time',
+      actions: 'Actions',
+      view: 'View',
+      markReady: 'Mark Ready',
+      deliverBill: 'Deliver Bill',
+      noOrders: 'No orders found',
+      noBillRequests: 'No bill requests found'
+    },
+    tr: {
+      title: 'MasApp Garson',
+      subtitle: '• Lezzet Durağı',
+      activeCalls: 'aktif çağrı',
+      idle: 'Boş',
+      active: 'Aktif',
+      preparing: 'Hazırlanıyor', 
+      ready: 'Hazır',
+      bill: 'Hesap',
+      all: 'Tümü',
+      newOrders: 'Yeni Siparişler',
+      preparingOrders: 'Hazırlanan Siparişler',
+      readyOrders: 'Hazır Siparişler',
+      billRequests: 'Hesap Talepleri',
+      table: 'Masa',
+      status: 'Durum',
+      items: 'Ürünler',
+      total: 'Toplam',
+      time: 'Süre',
+      actions: 'İşlemler',
+      view: 'Görüntüle',
+      markReady: 'Hazır İşaretle',
+      deliverBill: 'Hesap Teslim Et',
+      noOrders: 'Sipariş bulunamadı',
+      noBillRequests: 'Hesap talebi bulunamadı'
+    },
+    de: {
+      title: 'MasApp Kellner',
+      subtitle: '• Geschmacks-Haltestelle',
+      activeCalls: 'aktive Anrufe',
+      idle: 'Leer',
+      active: 'Aktiv',
+      preparing: 'Zubereitung',
+      ready: 'Bereit',
+      bill: 'Rechnung',
+      all: 'Alle',
+      newOrders: 'Neue Bestellungen',
+      preparingOrders: 'Zubereitende Bestellungen',
+      readyOrders: 'Fertige Bestellungen',
+      billRequests: 'Rechnungsanfragen',
+      table: 'Tisch',
+      status: 'Status',
+      items: 'Artikel',
+      total: 'Gesamt',
+      time: 'Zeit',
+      actions: 'Aktionen',
+      view: 'Anzeigen',
+      markReady: 'Als bereit markieren',
+      deliverBill: 'Rechnung ausliefern',
+      noOrders: 'Keine Bestellungen gefunden',
+      noBillRequests: 'Keine Rechnungsanfragen gefunden'
+    }
+  };
+
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
   const { 
     createBillRequest, 
     getBillRequestsByStatus, 
@@ -706,11 +801,32 @@ export default function WaiterDashboard() {
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2">
               <FaConciergeBell />
-              MasApp Garson
+              {t.title}
             </h1>
-            <p className="text-purple-200 text-sm">{user?.name} • Lezzet Durağı</p>
+            <p className="text-purple-200 text-sm">{user?.name} {t.subtitle}</p>
           </div>
           <div className="flex items-center gap-4">
+            {/* Language Selector */}
+            <div className="flex bg-white bg-opacity-20 rounded-lg p-1">
+              <button
+                onClick={() => setLanguage('Turkish')}
+                className={`px-2 py-1 rounded text-xs ${languageCode === 'tr' ? 'bg-white text-purple-600' : 'text-white'}`}
+              >
+                TR
+              </button>
+              <button
+                onClick={() => setLanguage('English')}
+                className={`px-2 py-1 rounded text-xs ${languageCode === 'en' ? 'bg-white text-purple-600' : 'text-white'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('German')}
+                className={`px-2 py-1 rounded text-xs ${languageCode === 'de' ? 'bg-white text-purple-600' : 'text-white'}`}
+              >
+                DE
+              </button>
+            </div>
             <button
               onClick={handleLogout}
               className="p-2 hover:bg-purple-700 rounded-lg transition-colors"
@@ -719,7 +835,7 @@ export default function WaiterDashboard() {
             </button>
             {activeCalls.length > 0 && (
               <div className="px-2 py-1 bg-red-600 text-white text-xs rounded-md animate-pulse">
-                {activeCalls.length} aktif çağrı
+                {activeCalls.length} {t.activeCalls}
               </div>
             )}
           </div>
@@ -729,23 +845,23 @@ export default function WaiterDashboard() {
         <div className="px-4 py-2 bg-black bg-opacity-20 grid grid-cols-5 gap-2 text-center">
           <div>
             <p className="text-2xl font-bold">{stats.idle}</p>
-            <p className="text-xs text-purple-200">Boş</p>
+            <p className="text-xs text-purple-200">{t.idle}</p>
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.active}</p>
-            <p className="text-xs text-purple-200">Aktif</p>
+            <p className="text-xs text-purple-200">{t.active}</p>
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.preparing}</p>
-            <p className="text-xs text-purple-200">Hazırlanıyor</p>
+            <p className="text-xs text-purple-200">{t.preparing}</p>
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.ready}</p>
-            <p className="text-xs text-purple-200">Hazır</p>
+            <p className="text-xs text-purple-200">{t.ready}</p>
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.billRequested}</p>
-            <p className="text-xs text-purple-200">Hesap</p>
+            <p className="text-xs text-purple-200">{t.bill}</p>
           </div>
         </div>
       </header>
@@ -760,7 +876,7 @@ export default function WaiterDashboard() {
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          Tümü ({orders.length})
+{t.all} ({orders.length})
         </button>
         <button
           onClick={() => setActiveFilter('active')}
@@ -770,7 +886,7 @@ export default function WaiterDashboard() {
               : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
           }`}
         >
-          Aktif ({stats.active})
+{t.active} ({stats.active})
         </button>
         <button
           onClick={() => setActiveFilter('preparing')}
@@ -780,7 +896,7 @@ export default function WaiterDashboard() {
               : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
           }`}
         >
-          Hazırlanıyor ({stats.preparing})
+{t.preparing} ({stats.preparing})
         </button>
         <button
           onClick={() => setActiveFilter('ready')}
@@ -790,7 +906,7 @@ export default function WaiterDashboard() {
               : 'bg-green-50 text-green-700 hover:bg-green-100'
           }`}
         >
-          Hazır ({stats.ready})
+{t.ready} ({stats.ready})
         </button>
         <button
           onClick={() => setActiveFilter('bill_requested')}
@@ -800,7 +916,7 @@ export default function WaiterDashboard() {
               : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
           }`}
         >
-          Hesap ({stats.billRequested})
+{t.bill} ({stats.billRequested})
         </button>
       </div>
 

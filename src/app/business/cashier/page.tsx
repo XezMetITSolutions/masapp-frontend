@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useLanguage } from '@/context/LanguageContext';
 import useOrderStore from '@/store/useOrderStore';
 import useCartStore from '@/store/useCartStore';
 import useBillRequestStore from '@/store/useBillRequestStore';
@@ -17,6 +18,73 @@ import { menuData, MenuItem } from '@/data/menu-data';
 export default function CashierDashboard() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { currentLanguage, setLanguage } = useLanguage();
+
+  const getLanguageCode = () => {
+    switch (currentLanguage) {
+      case 'English': return 'en';
+      case 'German': return 'de';
+      default: return 'tr';
+    }
+  };
+
+  const languageCode = getLanguageCode();
+
+  const translations = {
+    en: {
+      title: 'Cashier Panel',
+      subtitle: 'Payment Management',
+      all: 'All',
+      pending: 'Pending',
+      ready: 'Ready',
+      search: 'Search orders...',
+      table: 'Table',
+      orderTime: 'Order Time',
+      total: 'Total',
+      status: 'Status',
+      actions: 'Actions',
+      view: 'View',
+      processPayment: 'Process Payment',
+      noOrders: 'No orders found',
+      logout: 'Logout'
+    },
+    tr: {
+      title: 'Kasa Paneli',
+      subtitle: 'Ödeme Yönetimi',
+      all: 'Tümü',
+      pending: 'Bekleyen',
+      ready: 'Hazır',
+      search: 'Sipariş ara...',
+      table: 'Masa',
+      orderTime: 'Sipariş Zamanı',
+      total: 'Toplam',
+      status: 'Durum',
+      actions: 'İşlemler',
+      view: 'Görüntüle',
+      processPayment: 'Ödeme İşle',
+      noOrders: 'Sipariş bulunamadı',
+      logout: 'Çıkış'
+    },
+    de: {
+      title: 'Kassierer-Panel',
+      subtitle: 'Zahlungsverwaltung',
+      all: 'Alle',
+      pending: 'Ausstehend',
+      ready: 'Bereit',
+      search: 'Bestellungen suchen...',
+      table: 'Tisch',
+      orderTime: 'Bestellzeit',
+      total: 'Gesamt',
+      status: 'Status',
+      actions: 'Aktionen',
+      view: 'Anzeigen',
+      processPayment: 'Zahlung bearbeiten',
+      noOrders: 'Keine Bestellungen gefunden',
+      logout: 'Abmelden'
+    }
+  };
+
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
   const { orders: oldOrders, updateOrderStatus } = useOrderStore();
   const { clearCart } = useCartStore();
   const { 
@@ -819,11 +887,32 @@ export default function CashierDashboard() {
           <div className="flex justify-between items-center py-3 sm:py-4">
             <div className="flex items-center gap-2 sm:gap-4">
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Kasa Paneli</h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Ödemeleri yönet ve kasa işlemlerini takip et</p>
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">{t.title}</h1>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">{t.subtitle}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
+              {/* Language Selector */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setLanguage('Turkish')}
+                  className={`px-2 py-1 rounded text-xs ${languageCode === 'tr' ? 'bg-white text-green-600' : 'text-gray-600'}`}
+                >
+                  TR
+                </button>
+                <button
+                  onClick={() => setLanguage('English')}
+                  className={`px-2 py-1 rounded text-xs ${languageCode === 'en' ? 'bg-white text-green-600' : 'text-gray-600'}`}
+                >
+                  EN
+                </button>
+                <button
+                  onClick={() => setLanguage('German')}
+                  className={`px-2 py-1 rounded text-xs ${languageCode === 'de' ? 'bg-white text-green-600' : 'text-gray-600'}`}
+                >
+                  DE
+                </button>
+              </div>
               <button
                 onClick={() => {
                   logout();
@@ -832,7 +921,7 @@ export default function CashierDashboard() {
                 className="px-2 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
               >
                 <FaSignOutAlt className="text-sm sm:text-base" />
-                <span className="hidden sm:inline">Çıkış</span>
+                <span className="hidden sm:inline">{t.logout}</span>
               </button>
             </div>
           </div>
