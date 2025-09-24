@@ -31,7 +31,7 @@ import SetBrandColor from '@/components/SetBrandColor';
 
 function CartPageContent() {
   const { settings } = useBusinessSettingsStore();
-  const { currentLanguage } = useLanguage();
+  const { currentLanguage, setLanguage } = useLanguage();
   
   // Get language code
   const getLanguageCode = () => {
@@ -478,19 +478,19 @@ function CartPageContent() {
           </div>
           <div className="flex items-center">
             <button 
-              onClick={() => {}}
+              onClick={() => setLanguage('Turkish')}
               className={`mr-2 px-3 py-1 rounded ${languageCode === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               TR
             </button>
             <button 
-              onClick={() => {}}
+              onClick={() => setLanguage('English')}
               className={`mr-2 px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               EN
             </button>
             <button 
-              onClick={() => {}}
+              onClick={() => setLanguage('German')}
               className={`px-3 py-1 rounded ${languageCode === 'de' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               DE
