@@ -659,6 +659,66 @@ export const translations: { [key: string]: { en: string; de: string; tr: string
     en: 'All',
     de: 'Alle',
     tr: 'Tümü'
+  },
+  'WiFi Şifresi': {
+    en: 'WiFi Password',
+    de: 'WiFi-Passwort',
+    tr: 'WiFi Şifresi'
+  },
+  'Google\'da Değerlendir': {
+    en: 'Rate on Google',
+    de: 'Bei Google bewerten',
+    tr: 'Google\'da Değerlendir'
+  },
+  'Yorum Yap': {
+    en: 'Leave Comment',
+    de: 'Kommentar hinterlassen',
+    tr: 'Yorum Yap'
+  },
+  'Çalışma Saatleri': {
+    en: 'Working Hours',
+    de: 'Öffnungszeiten',
+    tr: 'Çalışma Saatleri'
+  },
+  'Instagram\'da Takip Et': {
+    en: 'Follow on Instagram',
+    de: 'Auf Instagram folgen',
+    tr: 'Instagram\'da Takip Et'
+  },
+  'Bugüne Özel!': {
+    en: 'Today\'s Special!',
+    de: 'Heute\'s Spezial!',
+    tr: 'Bugüne Özel!'
+  },
+  'Günün Çorbası': {
+    en: 'Soup of the Day',
+    de: 'Suppe des Tages',
+    tr: 'Günün Çorbası'
+  },
+  'Menü': {
+    en: 'Menu',
+    de: 'Speisekarte',
+    tr: 'Menü'
+  },
+  'Masa': {
+    en: 'Table',
+    de: 'Tisch',
+    tr: 'Masa'
+  },
+  'Popüler': {
+    en: 'Popular',
+    de: 'Beliebt',
+    tr: 'Popüler'
+  },
+  'Detayları Gör': {
+    en: 'View Details',
+    de: 'Details anzeigen',
+    tr: 'Detayları Gör'
+  },
+  'Sepete Ekle': {
+    en: 'Add to Cart',
+    de: 'In den Warenkorb',
+    tr: 'Sepete Ekle'
   }
 };
 

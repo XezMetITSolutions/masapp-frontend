@@ -451,46 +451,52 @@ export const menuData: MenuItem[] = [
     id: 'fresh-lemonade',
     name: {
       en: 'Fresh Lemonade',
-      tr: 'Taze Limonata'
+      tr: 'Taze Limonata',
+      de: 'Frische Limonade'
     },
     description: {
       en: 'Freshly squeezed lemon juice with mint leaves and a hint of honey',
-      tr: 'Nane yaprakları ve bir tutam bal ile taze sıkılmış limon suyu'
+      tr: 'Nane yaprakları ve bir tutam bal ile taze sıkılmış limon suyu',
+      de: 'Frisch gepresster Zitronensaft mit Minzblättern und einem Hauch von Honig'
     },
     price: 35,
     image: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?q=80&w=500',
     category: 'drinks',
     popular: false,
     allergens: [
-      { en: 'Nuts', tr: 'Kuruyemiş' }
+      { en: 'Nuts', tr: 'Kuruyemiş', de: 'Nüsse' }
     ],
     calories: 120,
     servingInfo: {
       en: 'Served with ice',
-      tr: 'Buz ile servis edilir'
+      tr: 'Buz ile servis edilir',
+      de: 'Mit Eis serviert'
     }
   },
   {
     id: 'turkish-coffee',
     name: {
       en: 'Turkish Coffee',
-      tr: 'Türk Kahvesi'
+      tr: 'Türk Kahvesi',
+      de: 'Türkischer Kaffee'
     },
     description: {
       en: 'Traditional Turkish coffee brewed in a copper pot with your choice of sugar',
-      tr: 'Bakır cezvede pişirilmiş, şeker tercihinize göre geleneksel Türk kahvesi'
+      tr: 'Bakır cezvede pişirilmiş, şeker tercihinize göre geleneksel Türk kahvesi',
+      de: 'Traditioneller türkischer Kaffee in einem Kupferkessel gebrüht mit Ihrer Zuckervorliebe'
     },
     price: 25,
     image: 'https://images.unsplash.com/photo-1578374173705-969cbe6f2d6b?q=80&w=500',
     category: 'drinks',
     popular: false,
     allergens: [
-      { en: 'Nuts', tr: 'Kuruyemiş' }
+      { en: 'Nuts', tr: 'Kuruyemiş', de: 'Nüsse' }
     ],
     calories: 5,
     servingInfo: {
       en: 'Served with Turkish delight',
-      tr: 'Lokum ile servis edilir'
+      tr: 'Lokum ile servis edilir',
+      de: 'Mit türkischem Honig serviert'
     }
   },
   
@@ -499,11 +505,13 @@ export const menuData: MenuItem[] = [
     id: 'lobster-thermidor',
     name: {
       en: 'Lobster Thermidor',
-      tr: 'Istakoz Termidor'
+      tr: 'Istakoz Termidor',
+      de: 'Hummer Thermidor'
     },
     description: {
       en: 'Classic French lobster dish with creamy sauce and cheese',
-      tr: 'Klasik Fransız istakoz yemeği, kremalı sos ve peynir ile'
+      tr: 'Klasik Fransız istakoz yemeği, kremalı sos ve peynir ile',
+      de: 'Klassisches französisches Hummergericht mit cremiger Soße und Käse'
     },
     price: 450,
     image: 'https://images.unsplash.com/photo-1551218808-b8f9d5b0a9c5?q=80&w=500',
@@ -511,24 +519,27 @@ export const menuData: MenuItem[] = [
     popular: false,
     isAvailable: false, // TÜKENDİ
     allergens: [
-      { en: 'Shellfish', tr: 'Kabuklu Deniz Ürünleri' },
-      { en: 'Dairy', tr: 'Süt Ürünleri' }
+      { en: 'Shellfish', tr: 'Kabuklu Deniz Ürünleri', de: 'Schalenfrüchte' },
+      { en: 'Dairy', tr: 'Süt Ürünleri', de: 'Milchprodukte' }
     ],
     calories: 650,
     servingInfo: {
       en: 'Served with seasonal vegetables',
-      tr: 'Mevsim sebzeleri ile servis edilir'
+      tr: 'Mevsim sebzeleri ile servis edilir',
+      de: 'Mit saisonalem Gemüse serviert'
     }
   },
   {
     id: 'truffle-pasta',
     name: {
       en: 'Truffle Pasta',
-      tr: 'Trüf Mantarlı Makarna'
+      tr: 'Trüf Mantarlı Makarna',
+      de: 'Trüffel-Pasta'
     },
     description: {
       en: 'Handmade pasta with black truffle and parmesan cheese',
-      tr: 'Siyah trüf mantarlı ve parmesan peynirli el yapımı makarna'
+      tr: 'Siyah trüf mantarlı ve parmesan peynirli el yapımı makarna',
+      de: 'Handgemachte Pasta mit schwarzer Trüffel und Parmesan-Käse'
     },
     price: 280,
     image: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?q=80&w=500',
@@ -536,24 +547,27 @@ export const menuData: MenuItem[] = [
     popular: true,
     isAvailable: false, // TÜKENDİ
     allergens: [
-      { en: 'Gluten', tr: 'Gluten' },
-      { en: 'Dairy', tr: 'Süt Ürünleri' }
+      { en: 'Gluten', tr: 'Gluten', de: 'Gluten' },
+      { en: 'Dairy', tr: 'Süt Ürünleri', de: 'Milchprodukte' }
     ],
     calories: 520,
     servingInfo: {
       en: 'Served with fresh herbs',
-      tr: 'Taze otlar ile servis edilir'
+      tr: 'Taze otlar ile servis edilir',
+      de: 'Mit frischen Kräutern serviert'
     }
   },
   {
     id: 'chocolate-souffle',
     name: {
       en: 'Chocolate Soufflé',
-      tr: 'Çikolatalı Sufle'
+      tr: 'Çikolatalı Sufle',
+      de: 'Schokoladen-Soufflé'
     },
     description: {
       en: 'Warm chocolate soufflé with vanilla ice cream',
-      tr: 'Vanilyalı dondurma ile sıcak çikolatalı sufle'
+      tr: 'Vanilyalı dondurma ile sıcak çikolatalı sufle',
+      de: 'Warmes Schokoladen-Soufflé mit Vanilleeis'
     },
     price: 85,
     image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=500',
@@ -561,13 +575,14 @@ export const menuData: MenuItem[] = [
     popular: false,
     isAvailable: false, // TÜKENDİ
     allergens: [
-      { en: 'Eggs', tr: 'Yumurta' },
-      { en: 'Dairy', tr: 'Süt Ürünleri' }
+      { en: 'Eggs', tr: 'Yumurta', de: 'Eier' },
+      { en: 'Dairy', tr: 'Süt Ürünleri', de: 'Milchprodukte' }
     ],
     calories: 420,
     servingInfo: {
       en: 'Served immediately',
-      tr: 'Hemen servis edilir'
+      tr: 'Hemen servis edilir',
+      de: 'Sofort serviert'
     }
   }
 ];
