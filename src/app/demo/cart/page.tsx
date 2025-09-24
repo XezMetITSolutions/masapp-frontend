@@ -122,18 +122,6 @@ function CartPageContent() {
     moveToPreparing();
   }
   
-  // Use Zustand stores
-  const { language, setLanguage } = useLanguageStore(state => ({
-    language: state.language,
-    setLanguage: state.setLanguage
-  }));
-  
-  // Dil değişimini kontrol et ve varsayılan dil ayarla
-  useEffect(() => {
-    if (language && language !== 'en' && language !== 'tr') {
-      setLanguage('tr'); // Varsayılan dil olarak Türkçe
-    }
-  }, [language, setLanguage]);
   
   // Get translations
   const translations = {
@@ -220,7 +208,7 @@ function CartPageContent() {
     }
   };
   
-  const t = translations[language as 'en' | 'tr' | 'de'];
+  const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
   
   const { 
     items: cartItems, 
