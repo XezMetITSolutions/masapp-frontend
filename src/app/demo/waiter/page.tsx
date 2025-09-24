@@ -221,13 +221,13 @@ function WaiterPageContent() {
           </div>
           <div className="flex items-center">
             <button 
-              onClick={() => () => {}('tr')}
+              onClick={() => {}}
               className={`mr-2 px-3 py-1 rounded ${languageCode === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               TR
             </button>
             <button 
-              onClick={() => () => {}('en')}
+              onClick={() => {}}
               className={`px-3 py-1 rounded ${languageCode === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
               EN
