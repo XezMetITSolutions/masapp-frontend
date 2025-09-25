@@ -18,6 +18,7 @@ import {
   FaPhone,
   FaEnvelope,
   FaGlobe,
+  FaKey,
   FaQrcode
 } from 'react-icons/fa';
 
@@ -33,6 +34,10 @@ export default function RestaurantsPage() {
     subdomain: ''
   });
   const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string} | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
 
   // localStorage'dan restoranları yükle
   useEffect(() => {
@@ -113,6 +118,87 @@ export default function RestaurantsPage() {
       ...prev,
       [name]: value
     }));
+  };
+
+  // Restoran işlemleri
+  const handleViewRestaurant = (restaurant: any) => {
+    setSelectedRestaurant(restaurant);
+    setShowViewModal(true);
+  };
+
+  const handleEditRestaurant = (restaurant: any) => {
+    setSelectedRestaurant(restaurant);
+    setFormData({
+      name: restaurant.name,
+      owner: restaurant.owner,
+      email: restaurant.email,
+      phone: restaurant.phone,
+      address: restaurant.address,
+      subdomain: restaurant.subdomain
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateRestaurant = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRestaurant) return;
+
+    const updatedRestaurants = restaurants.map(restaurant => 
+      restaurant.id === selectedRestaurant.id 
+        ? { ...restaurant, ...formData }
+        : restaurant
+    );
+    
+    setRestaurants(updatedRestaurants);
+    saveRestaurantsToStorage(updatedRestaurants);
+    setShowEditModal(false);
+    setSelectedRestaurant(null);
+    setFormData({
+      name: '',
+      owner: '',
+      email: '',
+      phone: '',
+      address: '',
+      subdomain: ''
+    });
+  };
+
+  const handleDeleteRestaurant = (restaurant: any) => {
+    if (confirm(`${restaurant.name} restoranını silmek istediğinizden emin misiniz?`)) {
+      const updatedRestaurants = restaurants.filter(r => r.id !== restaurant.id);
+      setRestaurants(updatedRestaurants);
+      saveRestaurantsToStorage(updatedRestaurants);
+    }
+  };
+
+  const handleChangePassword = (restaurant: any) => {
+    setSelectedRestaurant(restaurant);
+    setShowPasswordModal(true);
+  };
+
+  const handleUpdatePassword = () => {
+    if (!selectedRestaurant) return;
+
+    const newPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+    
+    const updatedRestaurants = restaurants.map(restaurant => 
+      restaurant.id === selectedRestaurant.id 
+        ? { 
+            ...restaurant, 
+            credentials: {
+              ...restaurant.credentials,
+              password: newPassword
+            }
+          }
+        : restaurant
+    );
+    
+    setRestaurants(updatedRestaurants);
+    saveRestaurantsToStorage(updatedRestaurants);
+    setShowPasswordModal(false);
+    setSelectedRestaurant(null);
+    
+    alert(`Yeni şifre: ${newPassword}\n\nBu şifreyi kaydedin!`);
   };
 
   return (
@@ -445,13 +531,32 @@ export default function RestaurantsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 p-1">
+                      <button 
+                        onClick={() => handleViewRestaurant(restaurant)}
+                        className="text-blue-600 hover:text-blue-900 p-1"
+                        title="Görüntüle"
+                      >
                         <FaEye className="w-4 h-4" />
                       </button>
-                      <button className="text-green-600 hover:text-green-900 p-1">
+                      <button 
+                        onClick={() => handleEditRestaurant(restaurant)}
+                        className="text-green-600 hover:text-green-900 p-1"
+                        title="Düzenle"
+                      >
                         <FaEdit className="w-4 h-4" />
                       </button>
-                      <button className="text-red-600 hover:text-red-900 p-1">
+                      <button 
+                        onClick={() => handleChangePassword(restaurant)}
+                        className="text-yellow-600 hover:text-yellow-900 p-1"
+                        title="Şifre Değiştir"
+                      >
+                        <FaKey className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteRestaurant(restaurant)}
+                        className="text-red-600 hover:text-red-900 p-1"
+                        title="Sil"
+                      >
                         <FaTrash className="w-4 h-4" />
                       </button>
                     </div>
@@ -462,6 +567,225 @@ export default function RestaurantsPage() {
           </table>
         </div>
       </div>
+
+      {/* View Restaurant Modal */}
+      {showViewModal && selectedRestaurant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-900">Restoran Detayları</h3>
+                <button
+                  onClick={() => setShowViewModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <FaTimes className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Restoran Adı</label>
+                    <p className="text-gray-900">{selectedRestaurant.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Sahip</label>
+                    <p className="text-gray-900">{selectedRestaurant.owner}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                    <p className="text-gray-900">{selectedRestaurant.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                    <p className="text-gray-900">{selectedRestaurant.phone}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Adres</label>
+                    <p className="text-gray-900">{selectedRestaurant.address}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain</label>
+                    <p className="text-gray-900">{selectedRestaurant.subdomain}.masapp.com</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Durum</label>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedRestaurant.status)}`}>
+                      {getStatusText(selectedRestaurant.status)}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Oluşturulma Tarihi</label>
+                    <p className="text-gray-900">{selectedRestaurant.createdAt}</p>
+                  </div>
+                </div>
+              </div>
+
+              {selectedRestaurant.credentials && (
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3">Giriş Bilgileri</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Adı</label>
+                      <p className="font-mono text-gray-900">{selectedRestaurant.credentials.username}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
+                      <p className="font-mono text-gray-900">{selectedRestaurant.credentials.password}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Restaurant Modal */}
+      {showEditModal && selectedRestaurant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-900">Restoran Düzenle</h3>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <FaTimes className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateRestaurant} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Restoran Adı</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Sahip</label>
+                    <input
+                      type="text"
+                      name="owner"
+                      value={formData.owner}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Adres</label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Subdomain</label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        name="subdomain"
+                        value={formData.subdomain}
+                        onChange={handleInputChange}
+                        required
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <span className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-gray-600">
+                        .masapp.com
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    İptal
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Güncelle
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {showPasswordModal && selectedRestaurant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaKey className="w-8 h-8 text-yellow-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Şifre Değiştir</h3>
+                <p className="text-gray-600">{selectedRestaurant.name} restoranının şifresini değiştirmek istediğinizden emin misiniz?</p>
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowPasswordModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={handleUpdatePassword}
+                  className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Şifre Değiştir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </ModernAdminLayout>
   );
 }
