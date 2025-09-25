@@ -32,8 +32,8 @@ export default function LoginPage() {
       kitchenDesc: 'Prepare orders and update statuses',
       cashierPanel: 'Cashier Panel',
       cashierDesc: 'Take payments and manage cash operations',
-      adminPanel: 'Business Panel',
-      adminDesc: 'Manage restaurant and view statistics',
+      adminPanel: 'Admin Panel',
+      adminDesc: 'Manage restaurants, users and system settings',
       selectRole: 'You can select any role for MasApp'
     },
     tr: {
@@ -45,8 +45,8 @@ export default function LoginPage() {
       kitchenDesc: 'Siparişleri hazırla ve durumları güncelle',
       cashierPanel: 'Kasa Paneli',
       cashierDesc: 'Ödemeleri al ve kasa işlemlerini yönet',
-      adminPanel: 'İşletme Paneli',
-      adminDesc: 'Restoranı yönet ve istatistikleri gör',
+      adminPanel: 'Admin Paneli',
+      adminDesc: 'Restoranları, kullanıcıları ve sistem ayarlarını yönet',
       selectRole: 'MasApp için herhangi bir rol seçebilirsiniz'
     },
     de: {
@@ -58,8 +58,8 @@ export default function LoginPage() {
       kitchenDesc: 'Bestellungen zubereiten und Status aktualisieren',
       cashierPanel: 'Kassierer-Panel',
       cashierDesc: 'Zahlungen entgegennehmen und Kassenvorgänge verwalten',
-      adminPanel: 'Geschäfts-Panel',
-      adminDesc: 'Restaurant verwalten und Statistiken anzeigen',
+      adminPanel: 'Admin-Panel',
+      adminDesc: 'Restaurants, Benutzer und Systemeinstellungen verwalten',
       selectRole: 'Sie können jede Rolle für MasApp auswählen'
     }
   };
@@ -98,8 +98,8 @@ export default function LoginPage() {
         console.log('Redirecting to cashier panel');
         router.push('/business/cashier');
       } else if (role === 'restaurant_owner') {
-        console.log('Redirecting to dashboard');
-        router.push('/business/dashboard');
+        console.log('Redirecting to admin panel');
+        router.push('/admin');
       }
     } catch (error) {
       console.error('Login error:', error);

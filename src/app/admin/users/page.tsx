@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaUsers, 
@@ -22,68 +23,7 @@ import {
 } from 'react-icons/fa';
 
 export default function UsersPage() {
-  const users = [
-    {
-      id: 1,
-      name: 'Ahmet Yılmaz',
-      email: 'ahmet@example.com',
-      phone: '+90 212 555 0123',
-      role: 'restaurant_owner',
-      status: 'active',
-      restaurant: 'Pizza Palace',
-      lastLogin: '2 saat önce',
-      createdAt: '2024-01-15',
-      location: 'İstanbul, Türkiye'
-    },
-    {
-      id: 2,
-      name: 'Ayşe Demir',
-      email: 'ayse@example.com',
-      phone: '+90 216 555 0456',
-      role: 'restaurant_owner',
-      status: 'pending',
-      restaurant: 'Cafe Central',
-      lastLogin: '1 gün önce',
-      createdAt: '2024-01-20',
-      location: 'İstanbul, Türkiye'
-    },
-    {
-      id: 3,
-      name: 'Mehmet Kaya',
-      email: 'mehmet@example.com',
-      phone: '+90 312 555 0789',
-      role: 'admin',
-      status: 'active',
-      restaurant: null,
-      lastLogin: '30 dakika önce',
-      createdAt: '2024-01-10',
-      location: 'Ankara, Türkiye'
-    },
-    {
-      id: 4,
-      name: 'Zeynep Özkan',
-      email: 'zeynep@example.com',
-      phone: '+90 232 555 0321',
-      role: 'restaurant_owner',
-      status: 'suspended',
-      restaurant: 'Sushi Master',
-      lastLogin: '3 gün önce',
-      createdAt: '2024-01-25',
-      location: 'İzmir, Türkiye'
-    },
-    {
-      id: 5,
-      name: 'Ali Veli',
-      email: 'ali@example.com',
-      phone: '+90 532 555 0654',
-      role: 'customer',
-      status: 'active',
-      restaurant: null,
-      lastLogin: '1 saat önce',
-      createdAt: '2024-02-01',
-      location: 'Bursa, Türkiye'
-    }
-  ];
+  const [users, setUsers] = useState<any[]>([]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

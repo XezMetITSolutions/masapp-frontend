@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaBell, 
@@ -20,44 +21,7 @@ import {
 } from 'react-icons/fa';
 
 export default function NotificationsPage() {
-  const notifications = [
-    {
-      id: 1,
-      title: 'Yeni Restoran Kaydı',
-      message: 'Pizza Palace restoranı sisteme kaydoldu ve onay bekliyor.',
-      type: 'restaurant',
-      status: 'unread',
-      createdAt: '2 saat önce',
-      priority: 'high'
-    },
-    {
-      id: 2,
-      title: 'Ödeme Hatası',
-      message: 'Cafe Central restoranının ödeme işleminde sorun oluştu.',
-      type: 'payment',
-      status: 'read',
-      createdAt: '4 saat önce',
-      priority: 'high'
-    },
-    {
-      id: 3,
-      title: 'Kullanıcı Onayı',
-      message: 'John Doe hesabı başarıyla onaylandı.',
-      type: 'user',
-      status: 'read',
-      createdAt: '6 saat önce',
-      priority: 'medium'
-    },
-    {
-      id: 4,
-      title: 'Sistem Güncellemesi',
-      message: 'Yeni sistem güncellemesi başarıyla yüklendi.',
-      type: 'system',
-      status: 'unread',
-      createdAt: '1 gün önce',
-      priority: 'low'
-    }
-  ];
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const getTypeIcon = (type: string) => {
     switch (type) {

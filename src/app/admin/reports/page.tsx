@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaChartBar, 
@@ -17,48 +18,7 @@ import {
 } from 'react-icons/fa';
 
 export default function ReportsPage() {
-  const reports = [
-    {
-      id: 1,
-      name: 'Aylık Gelir Raporu',
-      type: 'revenue',
-      period: 'Ocak 2024',
-      status: 'completed',
-      generatedAt: '2024-01-31 23:59',
-      size: '2.4 MB',
-      downloads: 15
-    },
-    {
-      id: 2,
-      name: 'Restoran Performans Raporu',
-      type: 'performance',
-      period: 'Son 30 Gün',
-      status: 'completed',
-      generatedAt: '2024-01-30 14:30',
-      size: '1.8 MB',
-      downloads: 8
-    },
-    {
-      id: 3,
-      name: 'Kullanıcı Aktivite Raporu',
-      type: 'users',
-      period: 'Ocak 2024',
-      status: 'generating',
-      generatedAt: null,
-      size: null,
-      downloads: 0
-    },
-    {
-      id: 4,
-      name: 'QR Kod Kullanım Raporu',
-      type: 'qr',
-      period: 'Son 7 Gün',
-      status: 'completed',
-      generatedAt: '2024-01-29 09:15',
-      size: '956 KB',
-      downloads: 3
-    }
-  ];
+  const [reports, setReports] = useState<any[]>([]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

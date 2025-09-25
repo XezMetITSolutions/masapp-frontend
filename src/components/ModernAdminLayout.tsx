@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { 
   FaBars, 
   FaTimes, 
@@ -28,9 +29,10 @@ interface ModernAdminLayoutProps {
 
 export default function ModernAdminLayout({ children, title, description }: ModernAdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   const menuItems = [
-    { name: 'Dashboard', href: '/admin', icon: FaHome, current: true },
+    { name: 'Dashboard', href: '/admin', icon: FaHome },
     { name: 'Restoranlar', href: '/admin/restaurants', icon: FaStore },
     { name: 'Kullanıcılar', href: '/admin/users', icon: FaUsers },
     { name: 'Raporlar', href: '/admin/reports', icon: FaChartBar },
@@ -79,12 +81,13 @@ export default function ModernAdminLayout({ children, title, description }: Mode
           <nav className="flex-1 px-4 py-6 space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
+              const isActive = pathname === item.href;
               return (
                 <a
                   key={item.name}
                   href={item.href}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    item.current
+                    isActive
                       ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}

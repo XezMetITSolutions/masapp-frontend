@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaShieldAlt, 
@@ -18,48 +19,7 @@ import {
 } from 'react-icons/fa';
 
 export default function SecurityPage() {
-  const securityEvents = [
-    {
-      id: 1,
-      type: 'login',
-      description: 'Başarılı giriş yapıldı',
-      user: 'admin@masapp.com',
-      ip: '192.168.1.100',
-      location: 'İstanbul, Türkiye',
-      timestamp: '2 saat önce',
-      status: 'success'
-    },
-    {
-      id: 2,
-      type: 'failed_login',
-      description: 'Başarısız giriş denemesi',
-      user: 'hacker@example.com',
-      ip: '192.168.1.200',
-      location: 'Bilinmiyor',
-      timestamp: '4 saat önce',
-      status: 'failed'
-    },
-    {
-      id: 3,
-      type: 'password_change',
-      description: 'Şifre değiştirildi',
-      user: 'admin@masapp.com',
-      ip: '192.168.1.100',
-      location: 'İstanbul, Türkiye',
-      timestamp: '1 gün önce',
-      status: 'success'
-    },
-    {
-      id: 4,
-      type: 'suspicious_activity',
-      description: 'Şüpheli aktivite tespit edildi',
-      user: 'user@example.com',
-      ip: '192.168.1.300',
-      location: 'Ankara, Türkiye',
-      timestamp: '2 gün önce',
-      status: 'warning'
-    }
-  ];
+  const [securityEvents, setSecurityEvents] = useState<any[]>([]);
 
   const getEventIcon = (type: string) => {
     switch (type) {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaCreditCard, 
@@ -18,52 +19,7 @@ import {
 } from 'react-icons/fa';
 
 export default function PaymentsPage() {
-  const payments = [
-    {
-      id: 1,
-      restaurant: 'Pizza Palace',
-      amount: 299.99,
-      currency: 'TRY',
-      status: 'completed',
-      method: 'credit_card',
-      transactionId: 'TXN001234567',
-      createdAt: '2024-01-25 14:30',
-      description: 'Aylık abonelik ücreti'
-    },
-    {
-      id: 2,
-      restaurant: 'Cafe Central',
-      amount: 199.99,
-      currency: 'TRY',
-      status: 'failed',
-      method: 'bank_transfer',
-      transactionId: 'TXN001234568',
-      createdAt: '2024-01-25 12:15',
-      description: 'Aylık abonelik ücreti'
-    },
-    {
-      id: 3,
-      restaurant: 'Burger King',
-      amount: 399.99,
-      currency: 'TRY',
-      status: 'pending',
-      method: 'credit_card',
-      transactionId: 'TXN001234569',
-      createdAt: '2024-01-25 10:45',
-      description: 'Aylık abonelik ücreti'
-    },
-    {
-      id: 4,
-      restaurant: 'Sushi Master',
-      amount: 149.99,
-      currency: 'TRY',
-      status: 'completed',
-      method: 'paypal',
-      transactionId: 'TXN001234570',
-      createdAt: '2024-01-24 16:20',
-      description: 'Aylık abonelik ücreti'
-    }
-  ];
+  const [payments, setPayments] = useState<any[]>([]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
