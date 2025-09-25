@@ -103,7 +103,14 @@ export default function LoginPage() {
         }));
       }
 
-      const allUsers = [...demoUsers, ...restaurantUsers];
+      // localStorage'dan oluşturulan restoran personelini al
+      const savedStaff = localStorage.getItem('masapp-restaurant-staff');
+      let staffUsers: any[] = [];
+      if (savedStaff) {
+        staffUsers = JSON.parse(savedStaff);
+      }
+
+      const allUsers = [...demoUsers, ...restaurantUsers, ...staffUsers];
 
       const user = allUsers.find(u => 
         u.username === formData.username && u.password === formData.password
@@ -131,7 +138,8 @@ export default function LoginPage() {
         } else if (user.role === 'cashier') {
         router.push('/business/cashier');
         } else if (user.role === 'restaurant_owner') {
-          router.push('/admin');
+          // Restoran sahipleri kendi restoran paneline yönlendirilmeli
+          router.push('/business/dashboard');
         }
       } else {
         setError('Kullanıcı adı veya şifre hatalı');

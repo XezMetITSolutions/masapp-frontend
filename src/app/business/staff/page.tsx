@@ -101,6 +101,12 @@ export default function StaffPage() {
       }
     }, 100);
 
+    // localStorage'dan staff verilerini yükle
+    const savedStaff = localStorage.getItem('masapp-restaurant-staff');
+    if (savedStaff) {
+      setStaff(JSON.parse(savedStaff));
+    }
+
     return () => clearTimeout(timer);
   }, [user]);
 
@@ -295,6 +301,11 @@ export default function StaffPage() {
     if (!email) { alert('E-posta zorunludur.'); return; }
 
     const now = new Date();
+    
+    // Kimlik bilgileri oluştur
+    const username = email.split('@')[0].toLowerCase();
+    const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+    
     const newMember: any = {
       id: Date.now(),
       name: name,
@@ -309,10 +320,19 @@ export default function StaffPage() {
       totalOrders: 0,
       rating: 0,
       notes: newStaff.notes,
-      avatar: null
+      avatar: null,
+      credentials: {
+        username: username,
+        password: password
+      }
     };
 
-    setStaff(prev => [newMember, ...prev]);
+    const updatedStaff = [newMember, ...staff];
+    setStaff(updatedStaff);
+    
+    // localStorage'a kaydet
+    localStorage.setItem('masapp-restaurant-staff', JSON.stringify(updatedStaff));
+    
     setShowAddModal(false);
     setNewStaff({
       name: '',
@@ -324,6 +344,9 @@ export default function StaffPage() {
       startDate: '',
       notes: ''
     });
+    
+    // Kimlik bilgilerini göster
+    alert(`Yeni personel eklendi!\n\nKullanıcı Adı: ${username}\nŞifre: ${password}\n\nBu bilgileri kaydedin!`);
   };
 
   const handleEditStaff = (staffMember: any) => {
