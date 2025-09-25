@@ -4,13 +4,19 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/context/LanguageContext';
-// React Icons yerine emoji kullanıyoruz
+import { FaEye, FaEyeSlash, FaUser, FaLock, FaSignInAlt } from 'react-icons/fa';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuthStore();
   const { currentLanguage, setLanguage } = useLanguage();
-  const [selectedRole, setSelectedRole] = useState<'waiter' | 'kitchen' | 'cashier' | null>(null);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const getLanguageCode = () => {
     switch (currentLanguage) {
@@ -25,84 +31,99 @@ export default function LoginPage() {
   const translations = {
     en: {
       title: 'MasApp Business',
-      subtitle: 'MasApp Login Panel',
-      waiterPanel: 'Waiter Panel',
-      waiterDesc: 'Manage orders and view customer calls',
-      kitchenPanel: 'Kitchen Panel', 
-      kitchenDesc: 'Prepare orders and update statuses',
-      cashierPanel: 'Cashier Panel',
-      cashierDesc: 'Take payments and manage cash operations',
-      adminPanel: 'Admin Panel',
-      adminDesc: 'Manage restaurants, users and system settings',
-      selectRole: 'You can select any role for MasApp'
+      subtitle: 'Login to your account',
+      username: 'Username / Email',
+      password: 'Password',
+      login: 'Login',
+      quickAccess: 'Quick Access',
+      forgotPassword: 'Forgot Password?',
+      noAccount: "Don't have an account?",
+      contactAdmin: 'Contact Administrator'
     },
     tr: {
       title: 'MasApp Business',
-      subtitle: 'MasApp Giriş Paneli',
-      waiterPanel: 'Garson Paneli',
-      waiterDesc: 'Siparişleri yönet ve müşteri çağrılarını gör',
-      kitchenPanel: 'Mutfak Paneli',
-      kitchenDesc: 'Siparişleri hazırla ve durumları güncelle',
-      cashierPanel: 'Kasa Paneli',
-      cashierDesc: 'Ödemeleri al ve kasa işlemlerini yönet',
-      adminPanel: 'Admin Paneli',
-      adminDesc: 'Restoranları, kullanıcıları ve sistem ayarlarını yönet',
-      selectRole: 'MasApp için herhangi bir rol seçebilirsiniz'
+      subtitle: 'Hesabınıza giriş yapın',
+      username: 'Kullanıcı Adı / E-posta',
+      password: 'Şifre',
+      login: 'Giriş Yap',
+      quickAccess: 'Hızlı Erişim',
+      forgotPassword: 'Şifremi Unuttum?',
+      noAccount: 'Hesabınız yok mu?',
+      contactAdmin: 'Yönetici ile İletişim'
     },
     de: {
       title: 'MasApp Business',
-      subtitle: 'MasApp Anmelde-Panel',
-      waiterPanel: 'Kellner-Panel',
-      waiterDesc: 'Bestellungen verwalten und Kundenanrufe anzeigen',
-      kitchenPanel: 'Küchen-Panel',
-      kitchenDesc: 'Bestellungen zubereiten und Status aktualisieren',
-      cashierPanel: 'Kassierer-Panel',
-      cashierDesc: 'Zahlungen entgegennehmen und Kassenvorgänge verwalten',
-      adminPanel: 'Admin-Panel',
-      adminDesc: 'Restaurants, Benutzer und Systemeinstellungen verwalten',
-      selectRole: 'Sie können jede Rolle für MasApp auswählen'
+      subtitle: 'Bei Ihrem Konto anmelden',
+      username: 'Benutzername / E-Mail',
+      password: 'Passwort',
+      login: 'Anmelden',
+      quickAccess: 'Schnellzugriff',
+      forgotPassword: 'Passwort vergessen?',
+      noAccount: 'Kein Konto?',
+      contactAdmin: 'Administrator kontaktieren'
     }
   };
 
   const t = translations[languageCode as 'en' | 'tr' | 'de'] || translations.tr;
 
-  const handleDemoLogin = async (role: 'waiter' | 'kitchen' | 'cashier' | 'restaurant_owner') => {
-    console.log('handleDemoLogin called with role:', role);
-    
-    const demoUser = {
-      id: `demo-${role}-1`,
-      name: role === 'waiter' ? 'MasApp Garson' : 
-            role === 'kitchen' ? 'MasApp Mutfak' : 
-            role === 'cashier' ? 'MasApp Kasa' : 'MasApp İşletme',
-      email: `demo@${role === 'restaurant_owner' ? 'restaurant' : role}.com`,
-      role: role,
-      restaurantId: 'demo-restaurant-1',
-      status: 'active' as const,
-      createdAt: new Date(),
-      lastLogin: new Date()
-    };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setError('');
+  };
 
-    console.log('Demo user created:', demoUser);
-    
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
     try {
-      await login(demoUser, 'demo-access-token', 'demo-refresh-token');
-      console.log('Login successful');
-      
-      if (role === 'waiter') {
-        console.log('Redirecting to waiter panel');
-        router.push('/business/waiter');
-      } else if (role === 'kitchen') {
-        console.log('Redirecting to kitchen panel');
-        router.push('/business/kitchen');
-      } else if (role === 'cashier') {
-        console.log('Redirecting to cashier panel');
-        router.push('/business/cashier');
-      } else if (role === 'restaurant_owner') {
-        console.log('Redirecting to admin panel');
-        router.push('/admin');
+      // Demo kullanıcı kontrolü (gerçek uygulamada API'den gelecek)
+      const demoUsers = [
+        { username: 'admin', password: 'admin123', role: 'restaurant_owner', name: 'Admin User' },
+        { username: 'waiter', password: 'waiter123', role: 'waiter', name: 'Waiter User' },
+        { username: 'kitchen', password: 'kitchen123', role: 'kitchen', name: 'Kitchen User' },
+        { username: 'cashier', password: 'cashier123', role: 'cashier', name: 'Cashier User' }
+      ];
+
+      const user = demoUsers.find(u => 
+        u.username === formData.username && u.password === formData.password
+      );
+
+      if (user) {
+        const userData = {
+          id: `user-${user.username}`,
+          name: user.name,
+          email: `${user.username}@masapp.com`,
+          role: user.role as 'waiter' | 'kitchen' | 'cashier' | 'restaurant_owner',
+          restaurantId: 'demo-restaurant-1',
+          status: 'active' as const,
+          createdAt: new Date(),
+          lastLogin: new Date()
+        };
+
+        await login(userData, 'demo-access-token', 'demo-refresh-token');
+
+        // Rol bazlı yönlendirme
+        if (user.role === 'waiter') {
+          router.push('/business/waiter');
+        } else if (user.role === 'kitchen') {
+          router.push('/business/kitchen');
+        } else if (user.role === 'cashier') {
+          router.push('/business/cashier');
+        } else if (user.role === 'restaurant_owner') {
+          router.push('/admin');
+        }
+      } else {
+        setError('Kullanıcı adı veya şifre hatalı');
       }
     } catch (error) {
-      console.error('Login error:', error);
+      setError('Giriş yapılırken bir hata oluştu');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -141,61 +162,102 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">{t.subtitle}</p>
         </div>
 
-        <div className="space-y-4">
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t.username}
+            </label>
+            <div className="relative">
+              <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Kullanıcı adı veya e-posta"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t.password}
+            </label>
+            <div className="relative">
+              <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Şifrenizi girin"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Waiter button clicked');
-              handleDemoLogin('waiter');
-            }}
-            className="w-full p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className="text-xl">🔔</span>
-            <div className="text-left">
-              <div className="font-semibold">{t.waiterPanel}</div>
-              <div className="text-sm opacity-90">{t.waiterDesc}</div>
-            </div>
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <FaSignInAlt className="w-5 h-5" />
+            )}
+            {isLoading ? 'Giriş yapılıyor...' : t.login}
           </button>
+        </form>
 
-                <button
-            onClick={() => handleDemoLogin('kitchen')}
-            className="w-full p-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
+        {/* Quick Access Link */}
+        <div className="mt-6 text-center">
+          <a
+            href="/business/quick-access"
+            className="text-purple-600 hover:text-purple-700 text-sm font-medium"
           >
-            <span className="text-xl">👨‍🍳</span>
-            <div className="text-left">
-              <div className="font-semibold">{t.kitchenPanel}</div>
-              <div className="text-sm opacity-90">{t.kitchenDesc}</div>
-            </div>
-          </button>
+            {t.quickAccess} →
+          </a>
+        </div>
 
-          <button
-            onClick={() => handleDemoLogin('cashier')}
-            className="w-full p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
-          >
-            <span className="text-xl">💰</span>
-            <div className="text-left">
-              <div className="font-semibold">{t.cashierPanel}</div>
-              <div className="text-sm opacity-90">{t.cashierDesc}</div>
-            </div>
-          </button>
-
-            <button
-            onClick={() => handleDemoLogin('restaurant_owner')}
-            className="w-full p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
-          >
-            <span className="text-xl">🏪</span>
-            <div className="text-left">
-              <div className="font-semibold">{t.adminPanel}</div>
-              <div className="text-sm opacity-90">{t.adminDesc}</div>
-            </div>
-          </button>
-            </div>
-
-        <div className="mt-8 text-center">
+        {/* Help Links */}
+        <div className="mt-8 text-center space-y-2">
           <p className="text-sm text-gray-500">
-            {t.selectRole}
+            <a href="#" className="text-purple-600 hover:text-purple-700">
+              {t.forgotPassword}
+            </a>
           </p>
+          <p className="text-sm text-gray-500">
+            {t.noAccount} <a href="#" className="text-purple-600 hover:text-purple-700">{t.contactAdmin}</a>
+          </p>
+        </div>
+
+        {/* Demo Credentials */}
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <h4 className="text-sm font-medium text-gray-900 mb-2">Demo Giriş Bilgileri:</h4>
+          <div className="text-xs text-gray-600 space-y-1">
+            <p><strong>Admin:</strong> admin / admin123</p>
+            <p><strong>Garson:</strong> waiter / waiter123</p>
+            <p><strong>Mutfak:</strong> kitchen / kitchen123</p>
+            <p><strong>Kasa:</strong> cashier / cashier123</p>
+          </div>
         </div>
       </div>
     </div>
