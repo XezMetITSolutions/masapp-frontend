@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import SetBrandColor from '@/components/SetBrandColor';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -35,8 +36,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)" />
       </head>
       <body className={`${inter.variable} font-sans`}>
-        <SetBrandColor />
-        {children}
+        <LanguageProvider>
+          <SetBrandColor />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

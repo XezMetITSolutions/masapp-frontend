@@ -29,7 +29,6 @@ import {
   FaExclamationTriangle,
   FaServer,
   FaLanguage,
-  FaBackup,
   FaHeadset,
   FaClipboardList,
   FaRocket,
