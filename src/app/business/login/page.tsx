@@ -81,7 +81,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Demo kullanıcı kontrolü (gerçek uygulamada API'den gelecek)
+      // Demo kullanıcılar + localStorage'dan oluşturulan kullanıcılar
       const demoUsers = [
         { username: 'admin', password: 'admin123', role: 'restaurant_owner', name: 'Admin User' },
         { username: 'waiter', password: 'waiter123', role: 'waiter', name: 'Waiter User' },
@@ -89,7 +89,23 @@ export default function LoginPage() {
         { username: 'cashier', password: 'cashier123', role: 'cashier', name: 'Cashier User' }
       ];
 
-      const user = demoUsers.find(u => 
+      // localStorage'dan oluşturulan restoran kullanıcılarını al
+      const savedRestaurants = localStorage.getItem('masapp-restaurants');
+      let restaurantUsers: any[] = [];
+      if (savedRestaurants) {
+        const restaurants = JSON.parse(savedRestaurants);
+        restaurantUsers = restaurants.map((restaurant: any) => ({
+          username: restaurant.credentials?.username || restaurant.subdomain,
+          password: restaurant.credentials?.password || 'default123',
+          role: 'restaurant_owner',
+          name: restaurant.owner,
+          restaurantName: restaurant.name
+        }));
+      }
+
+      const allUsers = [...demoUsers, ...restaurantUsers];
+
+      const user = allUsers.find(u => 
         u.username === formData.username && u.password === formData.password
       );
 

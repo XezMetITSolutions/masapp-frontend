@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaStore, 
@@ -33,6 +33,19 @@ export default function RestaurantsPage() {
     subdomain: ''
   });
   const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string} | null>(null);
+
+  // localStorage'dan restoranları yükle
+  useEffect(() => {
+    const savedRestaurants = localStorage.getItem('masapp-restaurants');
+    if (savedRestaurants) {
+      setRestaurants(JSON.parse(savedRestaurants));
+    }
+  }, []);
+
+  // Restoranları localStorage'a kaydet
+  const saveRestaurantsToStorage = (newRestaurants: any[]) => {
+    localStorage.setItem('masapp-restaurants', JSON.stringify(newRestaurants));
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -79,7 +92,9 @@ export default function RestaurantsPage() {
       credentials
     };
     
-    setRestaurants([...restaurants, newRestaurant]);
+    const updatedRestaurants = [...restaurants, newRestaurant];
+    setRestaurants(updatedRestaurants);
+    saveRestaurantsToStorage(updatedRestaurants);
     setGeneratedCredentials(credentials);
     setFormData({
       name: '',
