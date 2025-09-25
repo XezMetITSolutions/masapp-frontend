@@ -19,7 +19,9 @@ import {
   FaEnvelope,
   FaGlobe,
   FaKey,
-  FaQrcode
+  FaQrcode,
+  FaEyeSlash,
+  FaCopy
 } from 'react-icons/fa';
 
 export default function RestaurantsPage() {
@@ -38,6 +40,8 @@ export default function RestaurantsPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   // localStorage'dan restoranları yükle
   useEffect(() => {
@@ -173,21 +177,45 @@ export default function RestaurantsPage() {
 
   const handleChangePassword = (restaurant: any) => {
     setSelectedRestaurant(restaurant);
+    setNewPassword('');
+    setShowNewPassword(false);
     setShowPasswordModal(true);
   };
 
-  const handleUpdatePassword = () => {
-    if (!selectedRestaurant) return;
+  const generateRandomPassword = () => {
+    const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+    setNewPassword(password);
+  };
 
-    const newPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
-    
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Şifre panoya kopyalandı!');
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Şifre panoya kopyalandı!');
+    }
+  };
+
+  const handleUpdatePassword = () => {
+    if (!selectedRestaurant || !newPassword.trim()) {
+      alert('Lütfen bir şifre girin!');
+      return;
+    }
+
     const updatedRestaurants = restaurants.map(restaurant => 
       restaurant.id === selectedRestaurant.id 
         ? { 
             ...restaurant, 
             credentials: {
               ...restaurant.credentials,
-              password: newPassword
+              password: newPassword.trim()
             }
           }
         : restaurant
@@ -197,8 +225,9 @@ export default function RestaurantsPage() {
     saveRestaurantsToStorage(updatedRestaurants);
     setShowPasswordModal(false);
     setSelectedRestaurant(null);
+    setNewPassword('');
     
-    alert(`Yeni şifre: ${newPassword}\n\nBu şifreyi kaydedin!`);
+    alert(`Şifre başarıyla güncellendi!\n\nYeni şifre: ${newPassword}`);
   };
 
   return (
@@ -765,12 +794,55 @@ export default function RestaurantsPage() {
                   <FaKey className="w-8 h-8 text-yellow-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Şifre Değiştir</h3>
-                <p className="text-gray-600">{selectedRestaurant.name} restoranının şifresini değiştirmek istediğinizden emin misiniz?</p>
+                <p className="text-gray-600">{selectedRestaurant.name} restoranı için yeni şifre belirleyin</p>
               </div>
 
-              <div className="flex space-x-3">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Yeni Şifre</label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Yeni şifreyi girin..."
+                      className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showNewPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex space-x-2">
+                  <button
+                    onClick={generateRandomPassword}
+                    className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  >
+                    Rastgele Oluştur
+                  </button>
+                  {newPassword && (
+                    <button
+                      onClick={() => copyToClipboard(newPassword)}
+                      className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                    >
+                      <FaCopy className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
                 <button
-                  onClick={() => setShowPasswordModal(false)}
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setNewPassword('');
+                    setSelectedRestaurant(null);
+                  }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   İptal
