@@ -43,85 +43,69 @@ export default function RestaurantsManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    hasNext: false,
+    hasPrev: false
+  });
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    pending: 0,
+    suspended: 0,
+    totalOrders: 0,
+    totalRevenue: 0
+  });
+  const [selectedRestaurants, setSelectedRestaurants] = useState<string[]>([]);
 
-  const restaurants: Restaurant[] = [
-    {
-      id: 'rest-1',
-      name: 'Pizza Palace',
-      category: 'İtalyan',
-      address: 'Kadıköy, İstanbul',
-      phone: '+90 555 123 4567',
-      email: 'info@pizzapalace.com',
-      status: 'active',
-      rating: 4.5,
-      totalOrders: 1250,
-      monthlyRevenue: 45000,
-      owner: 'Ahmet Yılmaz',
-      createdAt: '2024-01-15T08:00:00Z',
-      lastActivity: '2024-03-15T10:30:00Z'
-    },
-    {
-      id: 'rest-2',
-      name: 'Burger King',
-      category: 'Fast Food',
-      address: 'Beşiktaş, İstanbul',
-      phone: '+90 555 234 5678',
-      email: 'info@burgerking.com',
-      status: 'active',
-      rating: 4.2,
-      totalOrders: 2100,
-      monthlyRevenue: 78000,
-      owner: 'Ayşe Demir',
-      createdAt: '2024-01-20T10:30:00Z',
-      lastActivity: '2024-03-15T09:15:00Z'
-    },
-    {
-      id: 'rest-3',
-      name: 'Sushi Master',
-      category: 'Japon',
-      address: 'Şişli, İstanbul',
-      phone: '+90 555 345 6789',
-      email: 'info@sushimaster.com',
-      status: 'pending',
-      rating: 0,
-      totalOrders: 0,
-      monthlyRevenue: 0,
-      owner: 'Mehmet Kaya',
-      createdAt: '2024-03-10T14:30:00Z',
-      lastActivity: '2024-03-10T14:30:00Z'
-    },
-    {
-      id: 'rest-4',
-      name: 'Coffee Corner',
-      category: 'Kahve',
-      address: 'Beyoğlu, İstanbul',
-      phone: '+90 555 456 7890',
-      email: 'info@coffeecorner.com',
-      status: 'active',
-      rating: 4.8,
-      totalOrders: 890,
-      monthlyRevenue: 32000,
-      owner: 'Fatma Özkan',
-      createdAt: '2024-02-01T12:00:00Z',
-      lastActivity: '2024-03-15T08:45:00Z'
-    },
-    {
-      id: 'rest-5',
-      name: 'Steak House',
-      category: 'Et Restoranı',
-      address: 'Etiler, İstanbul',
-      phone: '+90 555 567 8901',
-      email: 'info@steakhouse.com',
-      status: 'suspended',
-      rating: 3.9,
-      totalOrders: 650,
-      monthlyRevenue: 28000,
-      owner: 'Ali Veli',
-      createdAt: '2024-01-25T16:20:00Z',
-      lastActivity: '2024-03-05T18:30:00Z'
+  useEffect(() => {
+    loadRestaurants();
+  }, [searchTerm, categoryFilter, statusFilter, sortBy, sortOrder, currentPage]);
+
+  const loadRestaurants = async () => {
+    try {
+      setIsLoading(true);
+      const params = new URLSearchParams({
+        search: searchTerm,
+        category: categoryFilter,
+        status: statusFilter,
+        sortBy,
+        sortOrder,
+        page: currentPage.toString(),
+        limit: '10'
+      });
+
+      const response = await fetch(`/api/admin/restaurants/list?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setRestaurants(result.data);
+          setPagination(result.pagination);
+          setStats(result.stats);
+        }
+      } else {
+        console.error('Restoranlar yüklenemedi:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Restoranlar yükleme hatası:', error);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   const getStatusClass = (status: string) => {
     switch(status) {
@@ -217,15 +201,52 @@ export default function RestaurantsManagement() {
     }
   ];
 
-  const filteredRestaurants = restaurants.filter(restaurant => {
-    const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.owner.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || restaurant.category === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || restaurant.status === statusFilter;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const handleBulkAction = async (action: string) => {
+    if (selectedRestaurants.length === 0) {
+      alert('Lütfen işlem yapmak için restoran seçin');
+      return;
+    }
+
+    const confirmMessage = {
+      approve: 'Seçili restoranları onaylamak istediğinizden emin misiniz?',
+      suspend: 'Seçili restoranları askıya almak istediğinizden emin misiniz?',
+      activate: 'Seçili restoranları aktifleştirmek istediğinizden emin misiniz?',
+      delete: 'Seçili restoranları silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!'
+    }[action];
+
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/admin/restaurants/bulk', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action,
+          restaurantIds: selectedRestaurants
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          alert(`${result.data.success.length} restoran başarıyla işlendi`);
+          setSelectedRestaurants([]);
+          await loadRestaurants();
+        }
+      } else {
+        alert('İşlem başarısız oldu');
+      }
+    } catch (error) {
+      console.error('Bulk action error:', error);
+      alert('İşlem sırasında hata oluştu');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleRestaurantAction = async (action: string, restaurant: Restaurant) => {
     setIsLoading(true);
@@ -409,7 +430,9 @@ export default function RestaurantsManagement() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Toplam Restoran</p>
-                <p className="text-2xl font-bold text-gray-900">{restaurants.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {isLoading ? '...' : stats.total}
+                </p>
               </div>
             </div>
           </div>
@@ -421,7 +444,9 @@ export default function RestaurantsManagement() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Aktif Restoran</p>
-                <p className="text-2xl font-bold text-gray-900">{restaurants.filter(r => r.status === 'active').length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {isLoading ? '...' : stats.active}
+                </p>
               </div>
             </div>
           </div>
@@ -456,7 +481,7 @@ export default function RestaurantsManagement() {
       <div className="px-8">
         <ResponsiveTable
           columns={columns}
-          data={filteredRestaurants}
+          data={restaurants}
           onAction={handleRestaurantAction}
           mobileView="card"
           isLoading={isLoading}
