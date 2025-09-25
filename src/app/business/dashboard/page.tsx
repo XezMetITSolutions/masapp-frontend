@@ -79,6 +79,109 @@ export default function BusinessDashboard() {
   const [showAnnModal, setShowAnnModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'premium' | 'corporate'>('premium');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState({
+    todayOrders: 0,
+    activeOrders: 0,
+    todayRevenue: 0,
+    monthlyRevenue: 0,
+    totalMenuItems: 0,
+    activeCategories: 0,
+    totalWaiters: 0,
+    activeTables: 0
+  });
+  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+
+  // localStorage'dan gerçek verileri yükle
+  useEffect(() => {
+    const loadDashboardData = () => {
+      // Siparişlerden istatistikleri hesapla
+      const savedOrders = localStorage.getItem('central-order-store');
+      let orders = [];
+      if (savedOrders) {
+        try {
+          const orderData = JSON.parse(savedOrders);
+          orders = orderData.state?.orders || [];
+        } catch (e) {
+          console.error('Sipariş verileri yüklenemedi:', e);
+        }
+      }
+
+      // Personel verilerini yükle
+      const savedStaff = localStorage.getItem('masapp-restaurant-staff');
+      let staff = [];
+      if (savedStaff) {
+        try {
+          staff = JSON.parse(savedStaff);
+        } catch (e) {
+          console.error('Personel verileri yüklenemedi:', e);
+        }
+      }
+
+      // Bugünkü siparişleri hesapla
+      const today = new Date().toISOString().split('T')[0];
+      const todayOrders = orders.filter((order: any) => 
+        order.createdAt && order.createdAt.startsWith(today)
+      );
+
+      // Aktif siparişleri hesapla
+      const activeOrdersList = orders.filter((order: any) => 
+        ['pending', 'preparing', 'ready'].includes(order.status)
+      );
+
+      // Bugünkü ciroyu hesapla
+      const todayRevenue = todayOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+
+      // Aylık ciroyu hesapla
+      const currentMonth = new Date().toISOString().substring(0, 7);
+      const monthlyOrders = orders.filter((order: any) => 
+        order.createdAt && order.createdAt.startsWith(currentMonth)
+      );
+      const monthlyRevenue = monthlyOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+
+      // Menü ürünlerini hesapla (tüm siparişlerdeki benzersiz ürünler)
+      const allItems = orders.flatMap((order: any) => order.items || []);
+      const uniqueItems = new Set(allItems.map((item: any) => item.name));
+      const totalMenuItems = uniqueItems.size;
+
+      // Aktif kategorileri hesapla
+      const categories = new Set(allItems.map((item: any) => item.category));
+      const activeCategories = categories.size;
+
+      // Aktif garsonları hesapla
+      const activeWaiters = staff.filter((member: any) => 
+        member.role === 'waiter' && member.status === 'active'
+      ).length;
+
+      // Aktif masaları hesapla (siparişi olan masalar)
+      const activeTableNumbers = new Set(activeOrdersList.map((order: any) => order.tableNumber));
+      const activeTables = activeTableNumbers.size;
+
+      setDashboardStats({
+        todayOrders: todayOrders.length,
+        activeOrders: activeOrdersList.length,
+        todayRevenue,
+        monthlyRevenue,
+        totalMenuItems,
+        activeCategories,
+        totalWaiters: activeWaiters,
+        activeTables
+      });
+
+      // Aktif siparişleri formatla
+      const formattedActiveOrders = activeOrdersList.slice(0, 3).map((order: any) => ({
+        id: order.id,
+        table: order.tableNumber,
+        items: order.items?.length || 0,
+        total: order.totalAmount || 0,
+        status: order.status,
+        time: order.estimatedTime ? `${order.estimatedTime} dk` : 'Bilinmiyor'
+      }));
+
+      setActiveOrders(formattedActiveOrders);
+    };
+
+    loadDashboardData();
+  }, []);
   
   // Restoranlar sayfasından alınan planlar ve fiyatlar
   const plans = {
@@ -277,23 +380,7 @@ export default function BusinessDashboard() {
   };
 
   // Demo istatistikler
-  const stats = {
-    todayOrders: 24,
-    activeOrders: 3,
-    todayRevenue: 2450,
-    monthlyRevenue: 48500,
-    totalMenuItems: 45,
-    activeCategories: 8,
-    totalWaiters: 5,
-    activeTables: 12
-  };
-
-  // Demo aktif siparişler
-  const activeOrders = [
-    { id: 1, table: 5, items: 3, total: 145, status: 'preparing', time: '10 dk' },
-    { id: 2, table: 8, items: 2, total: 89, status: 'ready', time: '2 dk' },
-    { id: 3, table: 3, items: 5, total: 210, status: 'preparing', time: '15 dk' }
-  ];
+  // Gerçek veriler artık dashboardStats state'inde
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -460,7 +547,7 @@ export default function BusinessDashboard() {
                 </div>
                 <span className="text-xs sm:text-sm text-green-600 font-medium">+12%</span>
               </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.todayOrders}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.todayOrders}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
             </div>
 
@@ -471,7 +558,7 @@ export default function BusinessDashboard() {
                 </div>
                 <span className="text-xs sm:text-sm text-green-600 font-medium">+8%</span>
               </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{stats.todayRevenue.toLocaleString('tr-TR')}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.todayRevenue.toLocaleString('tr-TR')}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
             </div>
 
@@ -480,9 +567,9 @@ export default function BusinessDashboard() {
                 <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
                   <FaUtensils className="text-lg sm:text-xl text-purple-600" />
                 </div>
-                <span className="text-xs sm:text-sm text-gray-600">{stats.activeCategories} kategori</span>
+                <span className="text-xs sm:text-sm text-gray-600">{dashboardStats.activeCategories} kategori</span>
               </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.totalMenuItems}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.totalMenuItems}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
             </div>
 
@@ -491,7 +578,7 @@ export default function BusinessDashboard() {
                 <div className="p-2 sm:p-3 bg-orange-100 rounded-lg">
                   <FaUsers className="text-lg sm:text-xl text-orange-600" />
                 </div>
-                <span className="text-xs sm:text-sm text-orange-600 font-medium">{stats.activeTables} aktif</span>
+                <span className="text-xs sm:text-sm text-orange-600 font-medium">{dashboardStats.activeTables} aktif</span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{currentRestaurant?.tableCount || 15}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Masa</p>
@@ -576,11 +663,11 @@ export default function BusinessDashboard() {
                 <p className="text-purple-200 mb-4">Bu ay harika gidiyorsunuz!</p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
-                    <p className="text-3xl font-bold">₺{stats.monthlyRevenue.toLocaleString('tr-TR')}</p>
+                    <p className="text-3xl font-bold">₺{dashboardStats.monthlyRevenue.toLocaleString('tr-TR')}</p>
                     <p className="text-purple-200 text-sm">Toplam Ciro</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">486</p>
+                    <p className="text-3xl font-bold">{dashboardStats.monthlyRevenue > 0 ? Math.floor(dashboardStats.monthlyRevenue / 100) : 0}</p>
                     <p className="text-purple-200 text-sm">Toplam Sipariş</p>
                   </div>
                   <div>

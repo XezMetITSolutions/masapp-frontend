@@ -21,7 +21,8 @@ import {
   FaKey,
   FaQrcode,
   FaEyeSlash,
-  FaCopy
+  FaCopy,
+  FaExternalLinkAlt
 } from 'react-icons/fa';
 
 export default function RestaurantsPage() {
@@ -91,19 +92,35 @@ export default function RestaurantsPage() {
   const handleAddRestaurant = (e: React.FormEvent) => {
     e.preventDefault();
     const credentials = generateCredentials();
+    const restaurantId = `restaurant-${Date.now()}`;
+    
     const newRestaurant = {
-      id: Date.now(),
+      id: restaurantId,
       ...formData,
       status: 'active',
       qrCount: 0,
       createdAt: new Date().toISOString().split('T')[0],
       lastOrder: 'Henüz sipariş yok',
-      credentials
+      credentials,
+      subdomain: formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      panelUrls: {
+        dashboard: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/dashboard`,
+        waiter: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/waiter`,
+        kitchen: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/kitchen`,
+        cashier: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/cashier`,
+        menu: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/menu`,
+        qr: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/qr-codes`
+      }
     };
     
+    // Restoranı kaydet
     const updatedRestaurants = [...restaurants, newRestaurant];
     setRestaurants(updatedRestaurants);
     saveRestaurantsToStorage(updatedRestaurants);
+    
+    // Restoran için otomatik panel kurulumu yap
+    setupRestaurantPanels(newRestaurant);
+    
     setGeneratedCredentials(credentials);
     setFormData({
       name: '',
@@ -114,6 +131,118 @@ export default function RestaurantsPage() {
       subdomain: ''
     });
     setShowAddForm(false);
+  };
+
+  // Restoran panellerini otomatik kurulum
+  const setupRestaurantPanels = (restaurant: any) => {
+    // Restoran için varsayılan menü oluştur
+    const defaultMenu = [
+      {
+        id: 'menu-1',
+        name: 'Ana Yemekler',
+        items: [
+          { id: 'item-1', name: 'Adana Kebap', price: 45, category: 'food', prepTime: 15 },
+          { id: 'item-2', name: 'Döner', price: 35, category: 'food', prepTime: 10 },
+          { id: 'item-3', name: 'Lahmacun', price: 25, category: 'food', prepTime: 12 }
+        ]
+      },
+      {
+        id: 'menu-2',
+        name: 'İçecekler',
+        items: [
+          { id: 'item-4', name: 'Ayran', price: 8, category: 'drink', prepTime: 2 },
+          { id: 'item-5', name: 'Çay', price: 5, category: 'drink', prepTime: 3 },
+          { id: 'item-6', name: 'Kola', price: 12, category: 'drink', prepTime: 1 }
+        ]
+      }
+    ];
+
+    // Restoran için varsayılan personel oluştur
+    const defaultStaff = [
+      {
+        id: 'staff-1',
+        name: 'Garson 1',
+        email: 'garson1@' + restaurant.subdomain + '.com',
+        phone: '+90 555 000 0001',
+        role: 'waiter',
+        department: 'service',
+        salary: 5000,
+        startDate: new Date().toISOString().split('T')[0],
+        status: 'active',
+        credentials: {
+          username: 'garson1',
+          password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase()
+        }
+      },
+      {
+        id: 'staff-2',
+        name: 'Aşçı 1',
+        email: 'ascı1@' + restaurant.subdomain + '.com',
+        phone: '+90 555 000 0002',
+        role: 'chef',
+        department: 'kitchen',
+        salary: 6000,
+        startDate: new Date().toISOString().split('T')[0],
+        status: 'active',
+        credentials: {
+          username: 'ascı1',
+          password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase()
+        }
+      },
+      {
+        id: 'staff-3',
+        name: 'Kasiyer 1',
+        email: 'kasiyer1@' + restaurant.subdomain + '.com',
+        phone: '+90 555 000 0003',
+        role: 'cashier',
+        department: 'cashier',
+        salary: 5500,
+        startDate: new Date().toISOString().split('T')[0],
+        status: 'active',
+        credentials: {
+          username: 'kasiyer1',
+          password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase()
+        }
+      }
+    ];
+
+    // Restoran için varsayılan ayarlar oluştur
+    const defaultSettings = {
+      restaurantId: restaurant.id,
+      subdomain: restaurant.subdomain,
+      basicInfo: {
+        restaurantName: restaurant.name,
+        ownerName: restaurant.owner,
+        email: restaurant.email,
+        phone: restaurant.phone,
+        address: restaurant.address,
+        subdomain: restaurant.subdomain
+      },
+      businessHours: {
+        monday: { open: '09:00', close: '23:00', closed: false },
+        tuesday: { open: '09:00', close: '23:00', closed: false },
+        wednesday: { open: '09:00', close: '23:00', closed: false },
+        thursday: { open: '09:00', close: '23:00', closed: false },
+        friday: { open: '09:00', close: '23:00', closed: false },
+        saturday: { open: '09:00', close: '23:00', closed: false },
+        sunday: { open: '09:00', close: '23:00', closed: false }
+      },
+      tableCount: 15,
+      taxRate: 0.18,
+      serviceCharge: 0.10
+    };
+
+    // localStorage'a restoran verilerini kaydet
+    localStorage.setItem(`masapp-restaurant-${restaurant.id}-menu`, JSON.stringify(defaultMenu));
+    localStorage.setItem(`masapp-restaurant-${restaurant.id}-staff`, JSON.stringify(defaultStaff));
+    localStorage.setItem(`masapp-restaurant-${restaurant.id}-settings`, JSON.stringify(defaultSettings));
+    
+    // Restoran için sipariş store'unu başlat
+    const initialOrders: any[] = [];
+    localStorage.setItem(`masapp-restaurant-${restaurant.id}-orders`, JSON.stringify(initialOrders));
+
+    console.log(`✅ Restoran panelleri kuruldu: ${restaurant.name}`);
+    console.log(`🌐 Panel URL'leri:`, restaurant.panelUrls);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -581,6 +710,17 @@ export default function RestaurantsPage() {
                       >
                         <FaKey className="w-4 h-4" />
                       </button>
+                      {restaurant.panelUrls && (
+                        <a
+                          href={restaurant.panelUrls.dashboard}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-orange-600 hover:text-orange-900 p-1"
+                          title="Panele Git"
+                        >
+                          <FaExternalLinkAlt className="w-4 h-4" />
+                        </a>
+                      )}
                       <button 
                         onClick={() => handleDeleteRestaurant(restaurant)}
                         className="text-red-600 hover:text-red-900 p-1"
@@ -664,6 +804,80 @@ export default function RestaurantsPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
                       <p className="font-mono text-gray-900">{selectedRestaurant.credentials.password}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedRestaurant.panelUrls && (
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3">Panel URL'leri</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Dashboard:</span>
+                      <a 
+                        href={selectedRestaurant.panelUrls.dashboard} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-mono"
+                      >
+                        {selectedRestaurant.panelUrls.dashboard}
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Garson Paneli:</span>
+                      <a 
+                        href={selectedRestaurant.panelUrls.waiter} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-mono"
+                      >
+                        {selectedRestaurant.panelUrls.waiter}
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Mutfak Paneli:</span>
+                      <a 
+                        href={selectedRestaurant.panelUrls.kitchen} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-mono"
+                      >
+                        {selectedRestaurant.panelUrls.kitchen}
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Kasa Paneli:</span>
+                      <a 
+                        href={selectedRestaurant.panelUrls.cashier} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-mono"
+                      >
+                        {selectedRestaurant.panelUrls.cashier}
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">Menü Yönetimi:</span>
+                      <a 
+                        href={selectedRestaurant.panelUrls.menu} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-mono"
+                      >
+                        {selectedRestaurant.panelUrls.menu}
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-700">QR Kodlar:</span>
+                      <a 
+                        href={selectedRestaurant.panelUrls.qr} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-mono"
+                      >
+                        {selectedRestaurant.panelUrls.qr}
+                      </a>
                     </div>
                   </div>
                 </div>
