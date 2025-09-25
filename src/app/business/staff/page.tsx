@@ -1140,6 +1140,13 @@ export default function StaffPage() {
                           </button>
                         )}
                         <button
+                          onClick={() => handleChangeStaffPassword(member)}
+                          className="p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                          title="Şifre Değiştir"
+                        >
+                          <FaKey className="text-sm" />
+                        </button>
+                        <button
                           onClick={() => handleEditStaff(member)}
                           className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="Düzenle"
