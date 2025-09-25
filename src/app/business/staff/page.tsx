@@ -41,7 +41,8 @@ import {
   FaEyeSlash,
   FaSync,
   FaBars,
-  FaMoneyBillWave
+  FaMoneyBillWave,
+  FaKey
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
@@ -70,6 +71,10 @@ export default function StaffPage() {
     waiter: false,
     cashier: false
   });
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedStaffForPassword, setSelectedStaffForPassword] = useState<any>(null);
+  const [newStaffPassword, setNewStaffPassword] = useState('');
+  const [showNewStaffPassword, setShowNewStaffPassword] = useState(false);
   const [newStaff, setNewStaff] = useState({
     name: '',
     email: '',
@@ -372,9 +377,66 @@ export default function StaffPage() {
 
   const handleDeleteStaff = (staffId: number) => {
     if (confirm('Bu personeli silmek istediğinizden emin misiniz?')) {
-      setStaff(staff.filter(s => s.id !== staffId));
+      const updatedStaff = staff.filter(s => s.id !== staffId);
+      setStaff(updatedStaff);
+      localStorage.setItem('masapp-restaurant-staff', JSON.stringify(updatedStaff));
       console.log('Personel silindi:', staffId);
     }
+  };
+
+  // Şifre değiştirme fonksiyonları
+  const handleChangeStaffPassword = (staffMember: any) => {
+    setSelectedStaffForPassword(staffMember);
+    setNewStaffPassword('');
+    setShowNewStaffPassword(false);
+    setShowPasswordModal(true);
+  };
+
+  const generateRandomStaffPassword = () => {
+    const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase();
+    setNewStaffPassword(password);
+  };
+
+  const copyStaffPasswordToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('Şifre panoya kopyalandı!');
+    } catch (err) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Şifre panoya kopyalandı!');
+    }
+  };
+
+  const handleUpdateStaffPassword = () => {
+    if (!selectedStaffForPassword || !newStaffPassword.trim()) {
+      alert('Lütfen bir şifre girin!');
+      return;
+    }
+
+    const updatedStaff = staff.map(staffMember => 
+      staffMember.id === selectedStaffForPassword.id 
+        ? { 
+            ...staffMember, 
+            credentials: {
+              ...staffMember.credentials,
+              password: newStaffPassword.trim()
+            }
+          }
+        : staffMember
+    );
+    
+    setStaff(updatedStaff);
+    localStorage.setItem('masapp-restaurant-staff', JSON.stringify(updatedStaff));
+    setShowPasswordModal(false);
+    setSelectedStaffForPassword(null);
+    setNewStaffPassword('');
+    
+    alert(`Şifre başarıyla güncellendi!\n\nYeni şifre: ${newStaffPassword}`);
   };
 
   return (
@@ -938,6 +1000,13 @@ export default function StaffPage() {
                           <FaCog />
                         </button>
                         )}
+                        <button
+                          onClick={() => handleChangeStaffPassword(member)}
+                          className="p-2 text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                          title="Şifre Değiştir"
+                        >
+                          <FaKey />
+                        </button>
                         <button
                           onClick={() => handleEditStaff(member)}
                           className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -1620,6 +1689,81 @@ export default function StaffPage() {
                     Kapat
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Staff Password Change Modal */}
+      {showPasswordModal && selectedStaffForPassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaKey className="w-8 h-8 text-yellow-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Personel Şifre Değiştir</h3>
+                <p className="text-gray-600">{selectedStaffForPassword.name} için yeni şifre belirleyin</p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Yeni Şifre</label>
+                  <div className="relative">
+                    <input
+                      type={showNewStaffPassword ? "text" : "password"}
+                      value={newStaffPassword}
+                      onChange={(e) => setNewStaffPassword(e.target.value)}
+                      placeholder="Yeni şifreyi girin..."
+                      className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewStaffPassword(!showNewStaffPassword)}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showNewStaffPassword ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex space-x-2">
+                  <button
+                    onClick={generateRandomStaffPassword}
+                    className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  >
+                    Rastgele Oluştur
+                  </button>
+                  {newStaffPassword && (
+                    <button
+                      onClick={() => copyStaffPasswordToClipboard(newStaffPassword)}
+                      className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                    >
+                      <FaCopy className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setNewStaffPassword('');
+                    setSelectedStaffForPassword(null);
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  İptal
+                </button>
+                <button
+                  onClick={handleUpdateStaffPassword}
+                  className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                >
+                  Şifre Değiştir
+                </button>
               </div>
             </div>
           </div>
