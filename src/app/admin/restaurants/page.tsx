@@ -9,7 +9,7 @@ import {
   FaFilter, 
   FaEdit, 
   FaTrash, 
-  FaEye, 
+  FaEye,
   FaCheckCircle, 
   FaTimesCircle,
   FaTimes,
@@ -124,21 +124,21 @@ export default function RestaurantsPage() {
           <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
             {restaurants.length} Restoran
           </span>
-        </div>
+            </div>
         <div className="flex items-center space-x-3">
           <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
             <FaFilter className="w-4 h-4" />
             <span>Filtrele</span>
-          </button>
-          <button 
+              </button>
+              <button 
             onClick={() => setShowAddForm(true)}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <FaPlus className="w-4 h-4" />
             <span>Yeni Restoran</span>
-          </button>
-        </div>
-      </div>
+              </button>
+            </div>
+          </div>
 
       {/* Search Bar */}
       <div className="mb-6">
@@ -181,18 +181,18 @@ export default function RestaurantsPage() {
                   />
                 </div>
                 
-                <div>
+            <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Adı</label>
-                  <input
-                    type="text"
+                <input
+                  type="text"
                     name="owner"
                     value={formData.owner}
                     onChange={handleInputChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Örn: Ahmet Yılmaz"
-                  />
-                </div>
+                />
+              </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
@@ -205,9 +205,9 @@ export default function RestaurantsPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="ornek@email.com"
                   />
-                </div>
-                
-                <div>
+            </div>
+            
+            <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
                   <input
                     type="tel"
@@ -215,12 +215,12 @@ export default function RestaurantsPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="+90 212 555 0123"
                   />
-                </div>
-                
-                <div>
+            </div>
+            
+            <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Adres</label>
                   <input
                     type="text"
@@ -228,7 +228,7 @@ export default function RestaurantsPage() {
                     value={formData.address}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Kadıköy, İstanbul"
                   />
                 </div>
@@ -249,8 +249,8 @@ export default function RestaurantsPage() {
                       .masapp.com
                     </span>
                   </div>
-                </div>
-                
+            </div>
+            
                 <div className="flex space-x-3 pt-4">
                   <button
                     type="button"
@@ -259,12 +259,12 @@ export default function RestaurantsPage() {
                   >
                     İptal
                   </button>
-                  <button
+              <button 
                     type="submit"
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
+              >
                     Restoran Ekle
-                  </button>
+              </button>
                 </div>
               </form>
             </div>
@@ -283,8 +283,8 @@ export default function RestaurantsPage() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Restoran Başarıyla Eklendi!</h3>
                 <p className="text-gray-600">Restoran giriş bilgileri oluşturuldu</p>
-              </div>
-              
+      </div>
+
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Giriş Bilgileri</h4>
                 <div className="space-y-2">
@@ -336,10 +336,10 @@ export default function RestaurantsPage() {
             </div>
             <FaStore className="w-8 h-8 text-blue-600" />
           </div>
-        </div>
+              </div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
+              <div>
               <p className="text-sm font-medium text-gray-600">Aktif Restoran</p>
               <p className="text-3xl font-bold text-green-600">
                 {restaurants.filter(r => r.status === 'active').length}
@@ -347,10 +347,10 @@ export default function RestaurantsPage() {
             </div>
             <FaCheckCircle className="w-8 h-8 text-green-600" />
           </div>
-        </div>
+              </div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
+              <div>
               <p className="text-sm font-medium text-gray-600">Beklemede</p>
               <p className="text-3xl font-bold text-yellow-600">
                 {restaurants.filter(r => r.status === 'pending').length}
@@ -358,10 +358,10 @@ export default function RestaurantsPage() {
             </div>
             <FaClock className="w-8 h-8 text-yellow-600" />
           </div>
-        </div>
+              </div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
+              <div>
               <p className="text-sm font-medium text-gray-600">Askıya Alınan</p>
               <p className="text-3xl font-bold text-red-600">
                 {restaurants.filter(r => r.status === 'suspended').length}

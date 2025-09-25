@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaChartBar, 
@@ -19,6 +19,19 @@ import {
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<any[]>([]);
+
+  // localStorage'dan raporları yükle
+  useEffect(() => {
+    const savedReports = localStorage.getItem('masapp-reports');
+    if (savedReports) {
+      setReports(JSON.parse(savedReports));
+    }
+  }, []);
+
+  // Raporları localStorage'a kaydet
+  const saveReportsToStorage = (newReports: any[]) => {
+    localStorage.setItem('masapp-reports', JSON.stringify(newReports));
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

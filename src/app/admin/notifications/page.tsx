@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaBell, 
@@ -22,6 +22,19 @@ import {
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
+
+  // localStorage'dan bildirimleri yükle
+  useEffect(() => {
+    const savedNotifications = localStorage.getItem('masapp-notifications');
+    if (savedNotifications) {
+      setNotifications(JSON.parse(savedNotifications));
+    }
+  }, []);
+
+  // Bildirimleri localStorage'a kaydet
+  const saveNotificationsToStorage = (newNotifications: any[]) => {
+    localStorage.setItem('masapp-notifications', JSON.stringify(newNotifications));
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {

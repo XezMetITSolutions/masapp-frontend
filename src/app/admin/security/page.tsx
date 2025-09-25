@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaShieldAlt, 
@@ -20,6 +20,19 @@ import {
 
 export default function SecurityPage() {
   const [securityEvents, setSecurityEvents] = useState<any[]>([]);
+
+  // localStorage'dan güvenlik olaylarını yükle
+  useEffect(() => {
+    const savedSecurityEvents = localStorage.getItem('masapp-security-events');
+    if (savedSecurityEvents) {
+      setSecurityEvents(JSON.parse(savedSecurityEvents));
+    }
+  }, []);
+
+  // Güvenlik olaylarını localStorage'a kaydet
+  const saveSecurityEventsToStorage = (newEvents: any[]) => {
+    localStorage.setItem('masapp-security-events', JSON.stringify(newEvents));
+  };
 
   const getEventIcon = (type: string) => {
     switch (type) {

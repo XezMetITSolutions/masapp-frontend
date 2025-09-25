@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaCreditCard, 
@@ -20,6 +20,19 @@ import {
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
+
+  // localStorage'dan ödemeleri yükle
+  useEffect(() => {
+    const savedPayments = localStorage.getItem('masapp-payments');
+    if (savedPayments) {
+      setPayments(JSON.parse(savedPayments));
+    }
+  }, []);
+
+  // Ödemeleri localStorage'a kaydet
+  const savePaymentsToStorage = (newPayments: any[]) => {
+    localStorage.setItem('masapp-payments', JSON.stringify(newPayments));
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

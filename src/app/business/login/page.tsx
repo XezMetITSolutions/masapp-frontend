@@ -115,21 +115,21 @@ export default function LoginPage() {
           name: user.name,
           email: `${user.username}@masapp.com`,
           role: user.role as 'waiter' | 'kitchen' | 'cashier' | 'restaurant_owner',
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date(),
-          lastLogin: new Date()
-        };
+      restaurantId: 'demo-restaurant-1',
+      status: 'active' as const,
+      createdAt: new Date(),
+      lastLogin: new Date()
+    };
 
         await login(userData, 'demo-access-token', 'demo-refresh-token');
 
         // Rol bazlı yönlendirme
         if (user.role === 'waiter') {
-          router.push('/business/waiter');
+        router.push('/business/waiter');
         } else if (user.role === 'kitchen') {
-          router.push('/business/kitchen');
+        router.push('/business/kitchen');
         } else if (user.role === 'cashier') {
-          router.push('/business/cashier');
+        router.push('/business/cashier');
         } else if (user.role === 'restaurant_owner') {
           router.push('/admin');
         }
@@ -219,7 +219,7 @@ export default function LoginPage() {
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 placeholder="Şifrenizi girin"
               />
-              <button
+                <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -251,7 +251,7 @@ export default function LoginPage() {
           >
             {t.quickAccess} →
           </a>
-        </div>
+            </div>
 
         {/* Help Links */}
         <div className="mt-8 text-center space-y-2">

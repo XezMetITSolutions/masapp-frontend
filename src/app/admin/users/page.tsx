@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaUsers, 
@@ -24,6 +24,19 @@ import {
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
+
+  // localStorage'dan kullanıcıları yükle
+  useEffect(() => {
+    const savedUsers = localStorage.getItem('masapp-users');
+    if (savedUsers) {
+      setUsers(JSON.parse(savedUsers));
+    }
+  }, []);
+
+  // Kullanıcıları localStorage'a kaydet
+  const saveUsersToStorage = (newUsers: any[]) => {
+    localStorage.setItem('masapp-users', JSON.stringify(newUsers));
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
