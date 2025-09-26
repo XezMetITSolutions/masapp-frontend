@@ -45,9 +45,9 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             // Restoran bilgilerini localStorage'a kaydet
             localStorage.setItem('current-restaurant', JSON.stringify(restaurant));
             
-            // Restoran menüsüne yönlendir (ana sayfa yerine)
+            // Restoran ana sayfasına yönlendir
             if (pathname === '/' || pathname === '') {
-              router.push('/demo/menu');
+              router.push('/restaurant');
               return;
             }
             
