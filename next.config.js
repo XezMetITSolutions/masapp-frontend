@@ -2,6 +2,15 @@
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
+  // Subdomain support
+  async rewrites() {
+    return [
+      {
+        source: '/:path*',
+        destination: '/:path*',
+      },
+    ];
+  },
   images: {
     unoptimized: true,
     formats: ['image/webp', 'image/avif'],
