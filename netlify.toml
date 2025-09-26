@@ -1,45 +1,15 @@
 [build]
-  publish = "out"
   command = "npm run build"
+  publish = "out"
 
-[[redirects]]
-  from = "https://admin.guzellestir.com/*"
-  to = "/admin/:splat"
-  status = 200
-  force = true
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
 
-[[redirects]]
-  from = "https://*.guzellestir.com/business/*"
-  to = "/business/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://*.guzellestir.com/kitchen/*"
-  to = "/kitchen/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://*.guzellestir.com/*"
-  to = "/business/dashboard"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://guzellestir.com/*"
-  to = "/admin/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "https://www.guzellestir.com/*"
-  to = "/admin/:splat"
-  status = 200
-  force = true
-
-# Fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+
+

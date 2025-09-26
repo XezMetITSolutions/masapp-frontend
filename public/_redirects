@@ -1,15 +1,12 @@
-# Subdomain yönlendirmeleri
+# Ana domain yönlendirmeleri
+guzellestir.com/* /:splat 200
+www.guzellestir.com/* /:splat 200
+
 # Admin subdomain
-admin.guzellestir.com/* /admin/:splat 200
+admin.guzellestir.com/* /:splat 200
 
 # Restoran subdomain'leri (wildcard)
-*.guzellestir.com/business/* /business/:splat 200
-*.guzellestir.com/kitchen/* /kitchen/:splat 200
-*.guzellestir.com/* /business/dashboard 200
+*.guzellestir.com/* /:splat 200
 
-# Ana domain yönlendirmeleri
-guzellestir.com/* /admin/:splat 200
-www.guzellestir.com/* /admin/:splat 200
-
-# Fallback
+# Fallback - tüm istekleri ana sayfaya yönlendir
 /* /index.html 200

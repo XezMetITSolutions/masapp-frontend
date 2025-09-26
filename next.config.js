@@ -24,23 +24,6 @@ const nextConfig = {
   // Performance optimizations
   poweredByHeader: false,
   generateEtags: false,
-  // Subdomain desteği için
-  async rewrites() {
-    return [
-      {
-        source: '/admin/:path*',
-        destination: '/admin/:path*',
-      },
-      {
-        source: '/business/:path*',
-        destination: '/business/:path*',
-      },
-      {
-        source: '/kitchen/:path*',
-        destination: '/kitchen/:path*',
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
