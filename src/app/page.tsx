@@ -13,8 +13,8 @@ export default function Home() {
   useEffect(() => {
     const subdomain = getSubdomain();
     
-    // Eğer subdomain varsa yönlendirme yap
-    if (subdomain) {
+    // Sadece subdomain varsa yönlendirme yap (ana domain için yönlendirme yok)
+    if (subdomain && subdomain !== 'www') {
       if (isAdminSubdomain()) {
         window.location.href = '/admin';
       } else if (isRestaurantSubdomain()) {

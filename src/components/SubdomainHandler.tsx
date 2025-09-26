@@ -18,16 +18,10 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
     const handleSubdomain = async () => {
       const subdomain = getSubdomain();
       
-      // Ana domain (guzellestir.com) - admin panel'e yönlendir
+      // Ana domain (guzellestir.com) - ana sayfa göster
       if (!subdomain) {
-        if (pathname.startsWith('/admin')) {
-          // Zaten admin sayfasındayız
-          setIsLoading(false);
-          return;
-        }
-        
-        // Admin panel'e yönlendir
-        router.push('/admin');
+        // Ana sayfa için yönlendirme yapma, sadece yükle
+        setIsLoading(false);
         return;
       }
       
