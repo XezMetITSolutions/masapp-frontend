@@ -8,5 +8,10 @@ admin.guzellestir.com/* /:splat 200
 # Restoran subdomain'leri (wildcard)
 *.guzellestir.com/* /:splat 200
 
+# Geçici test yönlendirmeleri (DNS yayılması için)
+/admin/* /admin/:splat 200
+/business/* /business/:splat 200
+/kitchen/* /kitchen/:splat 200
+
 # Fallback - tüm istekleri ana sayfaya yönlendir
 /* /index.html 200
