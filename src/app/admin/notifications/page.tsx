@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaBell, 
   FaTicketAlt, 
@@ -12,7 +13,8 @@ import {
   FaReply,
   FaTimes,
   FaFilter,
-  FaSearch
+  FaSearch,
+  FaPlus
 } from 'react-icons/fa';
 
 interface AdminNotification {
@@ -36,6 +38,14 @@ export default function AdminNotificationsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedNotification, setSelectedNotification] = useState<AdminNotification | null>(null);
+  const [showNewNotificationModal, setShowNewNotificationModal] = useState(false);
+  const [newNotification, setNewNotification] = useState({
+    title: '',
+    message: '',
+    type: 'system_alert' as const,
+    priority: 'medium' as const,
+    category: ''
+  });
 
   useEffect(() => {
     const loadNotifications = () => {
@@ -110,6 +120,40 @@ export default function AdminNotificationsPage() {
     localStorage.setItem('admin-notifications', JSON.stringify(updatedNotifications));
   };
 
+  const handleCreateNotification = () => {
+    if (!newNotification.title || !newNotification.message) {
+      alert('Lütfen başlık ve mesaj alanlarını doldurun.');
+      return;
+    }
+
+    const notification: AdminNotification = {
+      id: `notif-${Date.now()}`,
+      title: newNotification.title,
+      message: newNotification.message,
+      type: newNotification.type,
+      priority: newNotification.priority,
+      category: newNotification.category,
+      createdAt: new Date().toISOString(),
+      isRead: false
+    };
+
+    const updatedNotifications = [notification, ...notifications];
+    setNotifications(updatedNotifications);
+    setFilteredNotifications(updatedNotifications);
+    localStorage.setItem('admin-notifications', JSON.stringify(updatedNotifications));
+    
+    setNewNotification({
+      title: '',
+      message: '',
+      type: 'system_alert',
+      priority: 'medium',
+      category: ''
+    });
+    setShowNewNotificationModal(false);
+    
+    alert('Bildirim başarıyla oluşturuldu!');
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'new_ticket': return <FaTicketAlt className="text-blue-600" />;
@@ -143,34 +187,43 @@ export default function AdminNotificationsPage() {
   const unreadCount = notifications.filter(notif => !notif.isRead).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <FaBell className="text-purple-600" />
-                Super Admin Bildirimleri
-              </h1>
-              <p className="text-gray-500 mt-1">
-                {unreadCount > 0 ? `${unreadCount} okunmamış bildirim` : 'Tüm bildirimler okundu'}
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-                >
-                  <FaCheckCircle />
-                  Tümünü Okundu İşaretle
-                </button>
-              )}
-            </div>
-          </div>
+    <ModernAdminLayout title="Bildirimler" description="Sistem bildirimlerini yönetin">
+      {/* Header Actions */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+        <div className="flex items-center space-x-4">
+          <h2 className="text-2xl font-bold text-gray-900">Bildirim Merkezi</h2>
+          <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+            {notifications.length} Bildirim
+          </span>
+          {unreadCount > 0 && (
+            <span className="bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded-full">
+              {unreadCount} Okunmamış
+            </span>
+          )}
         </div>
-      </header>
+        <div className="flex items-center space-x-3">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <FaFilter className="w-4 h-4" />
+            <span>Filtrele</span>
+          </button>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllAsRead}
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <FaCheckCircle className="w-4 h-4" />
+              <span>Tümünü Okundu İşaretle</span>
+            </button>
+          )}
+          <button 
+            onClick={() => setShowNewNotificationModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <FaPlus className="w-4 h-4" />
+            <span>Yeni Bildirim</span>
+          </button>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="p-4 sm:p-6 lg:p-8">
@@ -382,6 +435,114 @@ export default function AdminNotificationsPage() {
           </div>
         </div>
       )}
-    </div>
+
+      {/* New Notification Modal */}
+      {showNewNotificationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-xl font-bold text-gray-800">Yeni Bildirim Oluştur</h3>
+              <button
+                onClick={() => setShowNewNotificationModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Başlık *
+                </label>
+                <input
+                  type="text"
+                  value={newNotification.title}
+                  onChange={(e) => setNewNotification({ ...newNotification, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Bildirim başlığını girin..."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mesaj *
+                </label>
+                <textarea
+                  value={newNotification.message}
+                  onChange={(e) => setNewNotification({ ...newNotification, message: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                  placeholder="Bildirim mesajını girin..."
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tür
+                  </label>
+                  <select
+                    value={newNotification.type}
+                    onChange={(e) => setNewNotification({ ...newNotification, type: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="system_alert">Sistem Uyarısı</option>
+                    <option value="new_ticket">Yeni Ticket</option>
+                    <option value="ticket_message">Ticket Mesajı</option>
+                    <option value="user_activity">Kullanıcı Aktivitesi</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Öncelik
+                  </label>
+                  <select
+                    value={newNotification.priority}
+                    onChange={(e) => setNewNotification({ ...newNotification, priority: e.target.value as any })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="low">Düşük</option>
+                    <option value="medium">Orta</option>
+                    <option value="high">Yüksek</option>
+                    <option value="urgent">Acil</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Kategori
+                </label>
+                <input
+                  type="text"
+                  value={newNotification.category}
+                  onChange={(e) => setNewNotification({ ...newNotification, category: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Bildirim kategorisi (opsiyonel)"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 p-6 border-t">
+              <button
+                onClick={() => setShowNewNotificationModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleCreateNotification}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <FaPlus />
+                Bildirim Oluştur
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </ModernAdminLayout>
   );
 }

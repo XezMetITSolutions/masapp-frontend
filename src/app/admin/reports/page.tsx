@@ -19,18 +19,110 @@ import {
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<any[]>([]);
+  const [showNewReportModal, setShowNewReportModal] = useState(false);
+  const [newReport, setNewReport] = useState({
+    name: '',
+    type: 'revenue',
+    period: 'monthly',
+    description: ''
+  });
 
   // localStorage'dan raporları yükle
   useEffect(() => {
     const savedReports = localStorage.getItem('masapp-reports');
     if (savedReports) {
       setReports(JSON.parse(savedReports));
+    } else {
+      // Demo raporlar oluştur
+      const demoReports = [
+        {
+          id: 'report-1',
+          name: 'Aylık Gelir Raporu',
+          type: 'revenue',
+          period: 'Ocak 2024',
+          status: 'completed',
+          size: '2.3 MB',
+          downloads: 15,
+          generatedAt: '2024-01-15 14:30'
+        },
+        {
+          id: 'report-2',
+          name: 'Restoran Performans Raporu',
+          type: 'performance',
+          period: 'Haftalık',
+          status: 'generating',
+          size: '-',
+          downloads: 0,
+          generatedAt: '2024-01-15 16:45'
+        },
+        {
+          id: 'report-3',
+          name: 'Kullanıcı Aktivite Raporu',
+          type: 'users',
+          period: 'Günlük',
+          status: 'completed',
+          size: '1.8 MB',
+          downloads: 8,
+          generatedAt: '2024-01-14 09:15'
+        }
+      ];
+      setReports(demoReports);
+      localStorage.setItem('masapp-reports', JSON.stringify(demoReports));
     }
   }, []);
 
   // Raporları localStorage'a kaydet
   const saveReportsToStorage = (newReports: any[]) => {
     localStorage.setItem('masapp-reports', JSON.stringify(newReports));
+  };
+
+  // Yeni rapor oluştur
+  const handleCreateReport = () => {
+    if (!newReport.name) {
+      alert('Lütfen rapor adını girin.');
+      return;
+    }
+
+    const report = {
+      id: `report-${Date.now()}`,
+      name: newReport.name,
+      type: newReport.type,
+      period: newReport.period === 'monthly' ? 'Aylık' : 
+              newReport.period === 'weekly' ? 'Haftalık' : 'Günlük',
+      status: 'generating',
+      size: '-',
+      downloads: 0,
+      generatedAt: new Date().toLocaleString('tr-TR'),
+      description: newReport.description
+    };
+
+    const updatedReports = [report, ...reports];
+    setReports(updatedReports);
+    saveReportsToStorage(updatedReports);
+    
+    setNewReport({
+      name: '',
+      type: 'revenue',
+      period: 'monthly',
+      description: ''
+    });
+    setShowNewReportModal(false);
+    
+    alert('Rapor oluşturma işlemi başlatıldı!');
+    
+    // Simüle edilmiş rapor oluşturma süreci
+    setTimeout(() => {
+      const completedReport = {
+        ...report,
+        status: 'completed',
+        size: '1.5 MB'
+      };
+      const finalReports = updatedReports.map(r => 
+        r.id === report.id ? completedReport : r
+      );
+      setReports(finalReports);
+      saveReportsToStorage(finalReports);
+    }, 5000);
   };
 
   const getStatusColor = (status: string) => {
@@ -89,7 +181,10 @@ export default function ReportsPage() {
             <FaFilter className="w-4 h-4" />
             <span>Filtrele</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowNewReportModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <FaChartBar className="w-4 h-4" />
             <span>Yeni Rapor</span>
           </button>
@@ -273,6 +368,101 @@ export default function ReportsPage() {
           </table>
         </div>
       </div>
+
+      {/* New Report Modal */}
+      {showNewReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-xl font-bold text-gray-800">Yeni Rapor Oluştur</h3>
+              <button
+                onClick={() => setShowNewReportModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimesCircle />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rapor Adı *
+                </label>
+                <input
+                  type="text"
+                  value={newReport.name}
+                  onChange={(e) => setNewReport({ ...newReport, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Rapor adını girin..."
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Rapor Türü
+                  </label>
+                  <select
+                    value={newReport.type}
+                    onChange={(e) => setNewReport({ ...newReport, type: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="revenue">Gelir Raporu</option>
+                    <option value="performance">Performans Raporu</option>
+                    <option value="users">Kullanıcı Raporu</option>
+                    <option value="qr">QR Kod Raporu</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dönem
+                  </label>
+                  <select
+                    value={newReport.period}
+                    onChange={(e) => setNewReport({ ...newReport, period: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="daily">Günlük</option>
+                    <option value="weekly">Haftalık</option>
+                    <option value="monthly">Aylık</option>
+                    <option value="yearly">Yıllık</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Açıklama
+                </label>
+                <textarea
+                  value={newReport.description}
+                  onChange={(e) => setNewReport({ ...newReport, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Rapor açıklaması girin..."
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 p-6 border-t">
+              <button
+                onClick={() => setShowNewReportModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleCreateReport}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <FaChartBar />
+                Rapor Oluştur
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ModernAdminLayout>
   );
 }

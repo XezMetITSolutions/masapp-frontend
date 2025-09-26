@@ -20,18 +20,96 @@ import {
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
+  const [showNewPaymentModal, setShowNewPaymentModal] = useState(false);
+  const [newPayment, setNewPayment] = useState({
+    restaurant: '',
+    amount: '',
+    method: 'credit_card',
+    status: 'completed',
+    description: ''
+  });
 
   // localStorage'dan ödemeleri yükle
   useEffect(() => {
     const savedPayments = localStorage.getItem('masapp-payments');
     if (savedPayments) {
       setPayments(JSON.parse(savedPayments));
+    } else {
+      // Demo ödemeler oluştur
+      const demoPayments = [
+        {
+          id: 'payment-1',
+          restaurant: 'Kardesler Restoran',
+          amount: 299.99,
+          method: 'credit_card',
+          status: 'completed',
+          description: 'Aylık abonelik ücreti',
+          date: '2024-01-15 14:30',
+          transactionId: 'TXN-001'
+        },
+        {
+          id: 'payment-2',
+          restaurant: 'Lezzet Durağı',
+          amount: 199.99,
+          method: 'bank_transfer',
+          status: 'pending',
+          description: 'Haftalık abonelik ücreti',
+          date: '2024-01-14 09:15',
+          transactionId: 'TXN-002'
+        },
+        {
+          id: 'payment-3',
+          restaurant: 'Tadım Evi',
+          amount: 149.99,
+          method: 'credit_card',
+          status: 'failed',
+          description: 'Aylık abonelik ücreti',
+          date: '2024-01-13 16:45',
+          transactionId: 'TXN-003'
+        }
+      ];
+      setPayments(demoPayments);
+      localStorage.setItem('masapp-payments', JSON.stringify(demoPayments));
     }
   }, []);
 
   // Ödemeleri localStorage'a kaydet
   const savePaymentsToStorage = (newPayments: any[]) => {
     localStorage.setItem('masapp-payments', JSON.stringify(newPayments));
+  };
+
+  // Yeni ödeme ekle
+  const handleCreatePayment = () => {
+    if (!newPayment.restaurant || !newPayment.amount) {
+      alert('Lütfen restoran ve tutar alanlarını doldurun.');
+      return;
+    }
+
+    const payment = {
+      id: `payment-${Date.now()}`,
+      restaurant: newPayment.restaurant,
+      amount: parseFloat(newPayment.amount),
+      method: newPayment.method,
+      status: newPayment.status,
+      description: newPayment.description,
+      date: new Date().toLocaleString('tr-TR'),
+      transactionId: `TXN-${Date.now().toString().slice(-6)}`
+    };
+
+    const updatedPayments = [payment, ...payments];
+    setPayments(updatedPayments);
+    savePaymentsToStorage(updatedPayments);
+    
+    setNewPayment({
+      restaurant: '',
+      amount: '',
+      method: 'credit_card',
+      status: 'completed',
+      description: ''
+    });
+    setShowNewPaymentModal(false);
+    
+    alert('Ödeme başarıyla oluşturuldu!');
   };
 
   const getStatusColor = (status: string) => {
@@ -100,7 +178,10 @@ export default function PaymentsPage() {
             <FaFilter className="w-4 h-4" />
             <span>Filtrele</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={() => setShowNewPaymentModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <FaPlus className="w-4 h-4" />
             <span>Yeni Ödeme</span>
           </button>
@@ -240,6 +321,114 @@ export default function PaymentsPage() {
           </table>
         </div>
       </div>
+
+      {/* New Payment Modal */}
+      {showNewPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-xl font-bold text-gray-800">Yeni Ödeme Ekle</h3>
+              <button
+                onClick={() => setShowNewPaymentModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimesCircle />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Restoran *
+                  </label>
+                  <input
+                    type="text"
+                    value={newPayment.restaurant}
+                    onChange={(e) => setNewPayment({ ...newPayment, restaurant: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="Restoran adını girin..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tutar (₺) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={newPayment.amount}
+                    onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.00"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Ödeme Yöntemi
+                  </label>
+                  <select
+                    value={newPayment.method}
+                    onChange={(e) => setNewPayment({ ...newPayment, method: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="credit_card">Kredi Kartı</option>
+                    <option value="bank_transfer">Banka Havalesi</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="stripe">Stripe</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Durum
+                  </label>
+                  <select
+                    value={newPayment.status}
+                    onChange={(e) => setNewPayment({ ...newPayment, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="completed">Tamamlandı</option>
+                    <option value="pending">Beklemede</option>
+                    <option value="failed">Başarısız</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Açıklama
+                </label>
+                <textarea
+                  value={newPayment.description}
+                  onChange={(e) => setNewPayment({ ...newPayment, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Ödeme açıklaması girin..."
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 p-6 border-t">
+              <button
+                onClick={() => setShowNewPaymentModal(false)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleCreatePayment}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <FaPlus />
+                Ödeme Ekle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ModernAdminLayout>
   );
 }
