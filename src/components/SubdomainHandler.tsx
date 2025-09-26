@@ -45,8 +45,14 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             // Restoran bilgilerini localStorage'a kaydet
             localStorage.setItem('current-restaurant', JSON.stringify(restaurant));
             
+            // Restoran menüsüne yönlendir (ana sayfa yerine)
+            if (pathname === '/' || pathname === '') {
+              router.push('/demo/menu');
+              return;
+            }
+            
             // Business panel'e yönlendir
-            if (!pathname.startsWith('/business')) {
+            if (!pathname.startsWith('/business') && !pathname.startsWith('/demo')) {
               router.push('/business/dashboard');
               return;
             }

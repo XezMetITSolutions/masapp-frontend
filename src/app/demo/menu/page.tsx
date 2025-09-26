@@ -21,6 +21,17 @@ function MenuPageContent() {
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
   
+  // Restoran bilgileri
+  const [restaurant, setRestaurant] = useState<any>(null);
+  
+  useEffect(() => {
+    // localStorage'dan restoran bilgilerini yükle
+    const storedRestaurant = localStorage.getItem('current-restaurant');
+    if (storedRestaurant) {
+      setRestaurant(JSON.parse(storedRestaurant));
+    }
+  }, []);
+  
   // Translations
   const translations = {
     tr: {
@@ -309,7 +320,7 @@ function MenuPageContent() {
                 <FaArrowLeft size={16} />
               </Link>
               <h1 className="text-dynamic-lg font-bold text-primary">
-                <TranslatedText>Menü</TranslatedText>
+                {restaurant ? `${restaurant.name} - Menü` : <TranslatedText>Menü</TranslatedText>}
               </h1>
               <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
                 <TranslatedText>Masa</TranslatedText> #{tableNumber}
