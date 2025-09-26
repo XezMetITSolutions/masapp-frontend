@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { 
   FaChartLine,
   FaUtensils,
@@ -12,8 +13,13 @@ import {
   FaCog,
   FaCreditCard,
   FaSignOutAlt,
-  FaBars
+  FaBars,
+  FaConciergeBell,
+  FaShoppingCart,
+  FaMoneyBillWave
 } from 'react-icons/fa';
+import { useAuthStore } from '@/store/useAuthStore';
+import { UserRole } from '@/types';
 
 interface BusinessSidebarProps {
   sidebarOpen: boolean;
@@ -23,57 +29,128 @@ interface BusinessSidebarProps {
 
 export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout }: BusinessSidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuthStore();
+  const [userInfo, setUserInfo] = useState<any>(null);
 
-  const menuItems = [
-    {
-      href: '/business/dashboard',
-      icon: FaChartLine,
-      label: 'Kontrol Paneli',
-      active: pathname === '/business/dashboard'
-    },
-    {
-      href: '/admin/payment',
-      icon: FaCreditCard,
-      label: 'Ödeme & Abonelik',
-      active: pathname === '/admin/payment'
-    },
-    {
-      href: '/business/menu',
-      icon: FaUtensils,
-      label: 'Menü Yönetimi',
-      active: pathname === '/business/menu'
-    },
-    {
-      href: '/business/staff',
-      icon: FaUsers,
-      label: 'Personel',
-      active: pathname === '/business/staff'
-    },
-    {
-      href: '/business/qr-codes',
-      icon: FaQrcode,
-      label: 'QR Kodlar',
-      active: pathname === '/business/qr-codes'
-    },
-    {
-      href: '/business/reports',
-      icon: FaChartBar,
-      label: 'Raporlar',
-      active: pathname === '/business/reports'
-    },
-    {
-      href: '/business/support',
-      icon: FaHeadset,
-      label: 'Destek',
-      active: pathname === '/business/support'
-    },
-    {
-      href: '/business/settings',
-      icon: FaCog,
-      label: 'Ayarlar',
-      active: pathname === '/business/settings'
-    }
-  ];
+  // localStorage'dan kullanıcı bilgilerini yükle
+  useEffect(() => {
+    const loadUserInfo = () => {
+      if (user) {
+        setUserInfo(user);
+      } else {
+        // localStorage'dan kullanıcı bilgilerini çek
+        const storedUser = localStorage.getItem('auth-storage');
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            if (parsed.state?.user) {
+              setUserInfo(parsed.state.user);
+            }
+          } catch (error) {
+            console.error('Kullanıcı bilgileri yüklenemedi:', error);
+          }
+        }
+      }
+    };
+
+    loadUserInfo();
+  }, [user]);
+
+  // Kullanıcı rolüne göre menü öğelerini filtrele
+  const getMenuItems = (userRole: UserRole) => {
+    const allMenuItems = [
+      {
+        href: '/business/dashboard',
+        icon: FaChartLine,
+        label: 'Kontrol Paneli',
+        roles: ['restaurant_owner', 'restaurant_admin', 'waiter', 'kitchen', 'cashier'],
+        active: pathname === '/business/dashboard'
+      },
+      {
+        href: '/business/waiter',
+        icon: FaConciergeBell,
+        label: 'Garson Paneli',
+        roles: ['waiter', 'restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/waiter'
+      },
+      {
+        href: '/business/kitchen',
+        icon: FaUtensils,
+        label: 'Mutfak Paneli',
+        roles: ['kitchen', 'restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/kitchen'
+      },
+      {
+        href: '/business/cashier',
+        icon: FaMoneyBillWave,
+        label: 'Kasa Paneli',
+        roles: ['cashier', 'restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/cashier'
+      },
+      {
+        href: '/admin/payment',
+        icon: FaCreditCard,
+        label: 'Ödeme & Abonelik',
+        roles: ['restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/admin/payment'
+      },
+      {
+        href: '/business/menu',
+        icon: FaUtensils,
+        label: 'Menü Yönetimi',
+        roles: ['restaurant_owner', 'restaurant_admin', 'kitchen'],
+        active: pathname === '/business/menu'
+      },
+      {
+        href: '/business/orders',
+        icon: FaShoppingCart,
+        label: 'Siparişler',
+        roles: ['restaurant_owner', 'restaurant_admin', 'waiter', 'kitchen', 'cashier'],
+        active: pathname === '/business/orders'
+      },
+      {
+        href: '/business/staff',
+        icon: FaUsers,
+        label: 'Personel',
+        roles: ['restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/staff'
+      },
+      {
+        href: '/business/qr-codes',
+        icon: FaQrcode,
+        label: 'QR Kodlar',
+        roles: ['restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/qr-codes'
+      },
+      {
+        href: '/business/reports',
+        icon: FaChartBar,
+        label: 'Raporlar',
+        roles: ['restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/reports'
+      },
+      {
+        href: '/business/support',
+        icon: FaHeadset,
+        label: 'Destek',
+        roles: ['restaurant_owner', 'restaurant_admin', 'waiter', 'kitchen', 'cashier'],
+        active: pathname === '/business/support'
+      },
+      {
+        href: '/business/settings',
+        icon: FaCog,
+        label: 'Ayarlar',
+        roles: ['restaurant_owner', 'restaurant_admin'],
+        active: pathname === '/business/settings'
+      }
+    ];
+
+    return allMenuItems.filter(item => 
+      item.roles.includes(userRole)
+    );
+  };
+
+  const menuItems = userInfo ? getMenuItems(userInfo.role) : [];
 
   return (
     <>
@@ -128,11 +205,22 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold">M</span>
+                  <span className="text-sm font-bold">
+                    {userInfo?.name ? userInfo.name.charAt(0).toUpperCase() : 'M'}
+                  </span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">MasApp</p>
-                  <p className="text-xs text-purple-200">toto@Ayantar.com</p>
+                  <p className="text-sm font-medium">{userInfo?.name || 'MasApp'}</p>
+                  <p className="text-xs text-purple-200">{userInfo?.email || 'info@masapp.com'}</p>
+                  {userInfo?.role && (
+                    <p className="text-xs text-purple-300 capitalize">
+                      {userInfo.role === 'restaurant_owner' && 'İşletme Sahibi'}
+                      {userInfo.role === 'restaurant_admin' && 'İşletme Yöneticisi'}
+                      {userInfo.role === 'waiter' && 'Garson'}
+                      {userInfo.role === 'kitchen' && 'Mutfak'}
+                      {userInfo.role === 'cashier' && 'Kasa'}
+                    </p>
+                  )}
                 </div>
               </div>
               <button

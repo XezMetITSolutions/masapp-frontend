@@ -589,9 +589,24 @@ export default function WaiterDashboard() {
     // Client-side rendering kontrolü
     setIsClient(true);
     
-    // Sayfa yüklendiğinde demo garson kullanıcısı oluştur
+    // Sayfa yüklendiğinde kullanıcı bilgilerini kontrol et
     const timer = setTimeout(() => {
       if (!user) {
+        // localStorage'dan kullanıcı bilgilerini çek
+        const storedUser = localStorage.getItem('auth-storage');
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            if (parsed.state?.user) {
+              console.log('📱 localStorage\'dan kullanıcı bilgileri yüklendi:', parsed.state.user);
+              return;
+            }
+          } catch (error) {
+            console.error('Kullanıcı bilgileri yüklenemedi:', error);
+          }
+        }
+        
+        // Eğer hiç kullanıcı yoksa demo garson oluştur
         const demoUser = {
           id: 'demo-waiter-1',
           name: 'Demo Garson',
@@ -605,6 +620,9 @@ export default function WaiterDashboard() {
         // Demo kullanıcıyı login et
         const { login } = useAuthStore.getState();
         login(demoUser, 'demo-token', 'demo-refresh-token');
+        console.log('👤 Demo garson kullanıcısı oluşturuldu');
+      } else {
+        console.log('👤 Mevcut kullanıcı:', user.name, `(${user.role})`);
       }
     }, 100); // Kısa bir gecikme ile
 
@@ -801,9 +819,16 @@ export default function WaiterDashboard() {
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2">
               <FaConciergeBell />
-              {t.title}
+              {user?.name ? `${user.name} - Garson Paneli` : t.title}
             </h1>
-            <p className="text-purple-200 text-sm">{user?.name} {t.subtitle}</p>
+            <p className="text-purple-200 text-sm">
+              {user?.name ? `Hoş geldin ${user.name}` : t.subtitle}
+              {user?.role && (
+                <span className="ml-2 text-purple-300">
+                  ({user.role === 'waiter' && 'Garson'})
+                </span>
+              )}
+            </p>
           </div>
           <div className="flex items-center gap-4">
             {/* Language Selector */}

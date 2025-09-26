@@ -23,13 +23,16 @@ import {
   FaMoneyBillWave,
   FaPlus,
   FaEye,
-  FaEdit
+  FaEdit,
+  FaConciergeBell,
+  FaCheckCircle
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useState } from 'react';
 import BusinessPaymentModal from '@/components/BusinessPaymentModal';
 import { useLanguage } from '@/context/LanguageContext';
+import { createDemoUsers, saveDemoUsersToLocalStorage } from '@/utils/demoUsers';
 
 export default function BusinessDashboard() {
   const router = useRouter();
@@ -108,12 +111,16 @@ export default function BusinessDashboard() {
         return;
       }
 
+      // Kullanıcıya özel veri yükleme
+      console.log(`📊 ${currentUser?.name} (${currentUser?.role}) için dashboard verileri yükleniyor...`);
+
       // Restoran özelinde sipariş verilerini yükle
       const savedOrders = localStorage.getItem(`masapp-restaurant-${restaurantId}-orders`);
       let orders = [];
       if (savedOrders) {
         try {
           orders = JSON.parse(savedOrders);
+          console.log(`📈 ${orders.length} sipariş yüklendi`);
         } catch (e) {
           console.error('Sipariş verileri yüklenemedi:', e);
         }
@@ -125,28 +132,51 @@ export default function BusinessDashboard() {
       if (savedStaff) {
         try {
           staff = JSON.parse(savedStaff);
+          console.log(`👥 ${staff.length} personel yüklendi`);
         } catch (e) {
           console.error('Personel verileri yüklenemedi:', e);
         }
       }
 
-      // Bugünkü siparişleri hesapla
+      // Kullanıcı rolüne göre farklı veri filtreleme
+      let filteredOrders = orders;
+      if (currentUser?.role === 'waiter') {
+        // Garson sadece kendi masalarını görebilir
+        filteredOrders = orders.filter((order: any) => 
+          order.waiterId === currentUser.id || !order.waiterId
+        );
+        console.log(`🍽️ Garson için ${filteredOrders.length} sipariş filtrelendi`);
+      } else if (currentUser?.role === 'kitchen') {
+        // Mutfak sadece hazırlanan siparişleri görebilir
+        filteredOrders = orders.filter((order: any) => 
+          ['preparing', 'ready'].includes(order.status)
+        );
+        console.log(`👨‍🍳 Mutfak için ${filteredOrders.length} sipariş filtrelendi`);
+      } else if (currentUser?.role === 'cashier') {
+        // Kasa sadece ödeme bekleyen siparişleri görebilir
+        filteredOrders = orders.filter((order: any) => 
+          order.paymentStatus === 'pending' || order.status === 'ready'
+        );
+        console.log(`💰 Kasa için ${filteredOrders.length} sipariş filtrelendi`);
+      }
+
+      // Bugünkü siparişleri hesapla (filtrelenmiş verilerle)
       const today = new Date().toISOString().split('T')[0];
-      const todayOrders = orders.filter((order: any) => 
+      const todayOrders = filteredOrders.filter((order: any) => 
         order.createdAt && order.createdAt.startsWith(today)
       );
 
-      // Aktif siparişleri hesapla
-      const activeOrdersList = orders.filter((order: any) => 
+      // Aktif siparişleri hesapla (filtrelenmiş verilerle)
+      const activeOrdersList = filteredOrders.filter((order: any) => 
         ['pending', 'preparing', 'ready'].includes(order.status)
       );
 
-      // Bugünkü ciroyu hesapla
+      // Bugünkü ciroyu hesapla (filtrelenmiş verilerle)
       const todayRevenue = todayOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
 
-      // Aylık ciroyu hesapla
+      // Aylık ciroyu hesapla (filtrelenmiş verilerle)
       const currentMonth = new Date().toISOString().substring(0, 7);
-      const monthlyOrders = orders.filter((order: any) => 
+      const monthlyOrders = filteredOrders.filter((order: any) => 
         order.createdAt && order.createdAt.startsWith(currentMonth)
       );
       const monthlyRevenue = monthlyOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
@@ -330,22 +360,23 @@ export default function BusinessDashboard() {
   };
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo işletme kullanıcısı oluştur
+    // Sayfa yüklendiğinde demo kullanıcıları oluştur
     const timer = setTimeout(() => {
+      // Demo kullanıcıları localStorage'a kaydet
+      saveDemoUsersToLocalStorage();
+      
       if (!user) {
-        const demoUser = {
-          id: 'masapp-demo-1',
-          name: 'MasApp',
-          email: 'info@masapp.com',
-          role: 'restaurant_owner' as const,
-          restaurantId: 'masapp-demo-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
+        // Varsayılan olarak işletme sahibi olarak giriş yap
+        const demoUsers = createDemoUsers();
+        const restaurantOwner = demoUsers.find(u => u.role === 'restaurant_owner');
         
-        // Demo kullanıcıyı login et
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
+        if (restaurantOwner) {
+          const { login } = useAuthStore.getState();
+          login(restaurantOwner, 'demo-token', 'demo-refresh-token');
+          console.log('👤 İşletme sahibi olarak giriş yapıldı:', restaurantOwner.name);
+        }
+      } else {
+        console.log('👤 Mevcut kullanıcı:', user.name, `(${user.role})`);
       }
     }, 100); // Kısa bir gecikme ile
 
@@ -524,11 +555,93 @@ export default function BusinessDashboard() {
                 <FaBars className="text-lg text-gray-600" />
               </button>
             <div>
-                <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">{t.title}</h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">{t.subtitle}{user?.name ? `, ${user.name}` : ''} 👋</p>
+                <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">
+                  {user?.role === 'waiter' && 'Garson Paneli'}
+                  {user?.role === 'kitchen' && 'Mutfak Paneli'}
+                  {user?.role === 'cashier' && 'Kasa Paneli'}
+                  {user?.role === 'restaurant_owner' && 'İşletme Paneli'}
+                  {user?.role === 'restaurant_admin' && 'Yönetim Paneli'}
+                  {!user?.role && t.title}
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">
+                  {user?.name ? `Hoş geldin ${user.name}` : t.subtitle} 👋
+                  {user?.role && (
+                    <span className="ml-2 text-purple-600 font-medium">
+                      {user.role === 'restaurant_owner' && '(İşletme Sahibi)'}
+                      {user.role === 'restaurant_admin' && '(Yönetici)'}
+                      {user.role === 'waiter' && '(Garson)'}
+                      {user.role === 'kitchen' && '(Mutfak)'}
+                      {user.role === 'cashier' && '(Kasa)'}
+                    </span>
+                  )}
+                </p>
             </div>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
+              {/* Kullanıcı Değiştirme */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => {
+                    const demoUsers = createDemoUsers();
+                    const waiter = demoUsers.find(u => u.role === 'waiter');
+                    if (waiter) {
+                      const { login } = useAuthStore.getState();
+                      login(waiter, 'demo-token', 'demo-refresh-token');
+                      console.log('👤 Garson olarak giriş yapıldı:', waiter.name);
+                    }
+                  }}
+                  className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-600 hover:bg-blue-200"
+                  title="Garson olarak giriş yap"
+                >
+                  Garson
+                </button>
+                <button
+                  onClick={() => {
+                    const demoUsers = createDemoUsers();
+                    const kitchen = demoUsers.find(u => u.role === 'kitchen');
+                    if (kitchen) {
+                      const { login } = useAuthStore.getState();
+                      login(kitchen, 'demo-token', 'demo-refresh-token');
+                      console.log('👤 Mutfak olarak giriş yapıldı:', kitchen.name);
+                    }
+                  }}
+                  className="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                  title="Mutfak olarak giriş yap"
+                >
+                  Mutfak
+                </button>
+                <button
+                  onClick={() => {
+                    const demoUsers = createDemoUsers();
+                    const cashier = demoUsers.find(u => u.role === 'cashier');
+                    if (cashier) {
+                      const { login } = useAuthStore.getState();
+                      login(cashier, 'demo-token', 'demo-refresh-token');
+                      console.log('👤 Kasa olarak giriş yapıldı:', cashier.name);
+                    }
+                  }}
+                  className="px-2 py-1 rounded text-xs bg-green-100 text-green-600 hover:bg-green-200"
+                  title="Kasa olarak giriş yap"
+                >
+                  Kasa
+                </button>
+                <button
+                  onClick={() => {
+                    const demoUsers = createDemoUsers();
+                    const owner = demoUsers.find(u => u.role === 'restaurant_owner');
+                    if (owner) {
+                      const { login } = useAuthStore.getState();
+                      login(owner, 'demo-token', 'demo-refresh-token');
+                      console.log('👤 İşletme sahibi olarak giriş yapıldı:', owner.name);
+                    }
+                  }}
+                  className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-600 hover:bg-purple-200"
+                  title="İşletme sahibi olarak giriş yap"
+                >
+                  İşletme
+                </button>
+              </div>
+              
               {/* Language Selector */}
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
@@ -588,59 +701,211 @@ export default function BusinessDashboard() {
               </div>
             </div>
           )}
-          {/* İstatistik Kartları */}
+          {/* İstatistik Kartları - Kullanıcı Rolüne Göre */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-            <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
-              <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
-                  <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
+            {/* Garson için özel kartlar */}
+            {user?.role === 'waiter' && (
+              <>
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                      <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-blue-600 font-medium">Bugün</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.todayOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Sipariş Aldım</p>
                 </div>
-                <span className={`text-xs sm:text-sm font-medium ${
-                  dashboardStats.ordersGrowth >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {dashboardStats.ordersGrowth >= 0 ? '+' : ''}{dashboardStats.ordersGrowth}%
-                </span>
-              </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.todayOrders}</h3>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
-            </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
-              <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
-                  <FaChartLine className="text-lg sm:text-xl text-green-600" />
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                      <FaConciergeBell className="text-lg sm:text-xl text-green-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-green-600 font-medium">Aktif</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.activeOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Servis Bekleyen</p>
                 </div>
-                <span className={`text-xs sm:text-sm font-medium ${
-                  dashboardStats.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {dashboardStats.revenueGrowth >= 0 ? '+' : ''}{dashboardStats.revenueGrowth}%
-                </span>
-              </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.todayRevenue.toLocaleString('tr-TR')}</h3>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
-            </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
-              <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
-                  <FaUtensils className="text-lg sm:text-xl text-purple-600" />
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                      <FaMoneyBillWave className="text-lg sm:text-xl text-purple-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-purple-600 font-medium">Bugün</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.todayRevenue.toLocaleString('tr-TR')}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Ciro</p>
                 </div>
-                <span className="text-xs sm:text-sm text-gray-600">{dashboardStats.activeCategories} kategori</span>
-              </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.totalMenuItems}</h3>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
-            </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
-              <div className="flex items-center justify-between mb-2 sm:mb-4">
-                <div className="p-2 sm:p-3 bg-orange-100 rounded-lg">
-                  <FaUsers className="text-lg sm:text-xl text-orange-600" />
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-orange-100 rounded-lg">
+                      <FaUsers className="text-lg sm:text-xl text-orange-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-orange-600 font-medium">Müşteri</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.activeTables}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Servis Ettim</p>
                 </div>
-                <span className="text-xs sm:text-sm text-orange-600 font-medium">{dashboardStats.activeTables} aktif</span>
-              </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{currentRestaurant?.tableCount || 15}</h3>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Masa</p>
-            </div>
+              </>
+            )}
+
+            {/* Mutfak için özel kartlar */}
+            {user?.role === 'kitchen' && (
+              <>
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-yellow-100 rounded-lg">
+                      <FaUtensils className="text-lg sm:text-xl text-yellow-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-yellow-600 font-medium">Hazırlanıyor</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.activeOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Sipariş Hazırlanıyor</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                      <FaCheckCircle className="text-lg sm:text-xl text-green-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-green-600 font-medium">Hazır</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.ready}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Hazır Siparişler</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                      <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-blue-600 font-medium">Bugün</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.todayOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Sipariş</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                      <FaUtensils className="text-lg sm:text-xl text-purple-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-purple-600 font-medium">Menü</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.totalMenuItems}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Ürün Sayısı</p>
+                </div>
+              </>
+            )}
+
+            {/* Kasa için özel kartlar */}
+            {user?.role === 'cashier' && (
+              <>
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                      <FaMoneyBillWave className="text-lg sm:text-xl text-green-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-green-600 font-medium">Bugün</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.todayRevenue.toLocaleString('tr-TR')}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Günlük Ciro</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                      <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-blue-600 font-medium">Bekleyen</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.activeOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Ödeme Bekleyen</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                      <FaChartLine className="text-lg sm:text-xl text-purple-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-purple-600 font-medium">Aylık</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.monthlyRevenue.toLocaleString('tr-TR')}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Aylık Ciro</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-orange-100 rounded-lg">
+                      <FaUsers className="text-lg sm:text-xl text-orange-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-orange-600 font-medium">Toplam</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.totalOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">İşlem Sayısı</p>
+                </div>
+              </>
+            )}
+
+            {/* İşletme sahibi/yönetici için genel kartlar */}
+            {(!user?.role || user?.role === 'restaurant_owner' || user?.role === 'restaurant_admin') && (
+              <>
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                      <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
+                    </div>
+                    <span className={`text-xs sm:text-sm font-medium ${
+                      dashboardStats.ordersGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {dashboardStats.ordersGrowth >= 0 ? '+' : ''}{dashboardStats.ordersGrowth}%
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.todayOrders}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                      <FaChartLine className="text-lg sm:text-xl text-green-600" />
+                    </div>
+                    <span className={`text-xs sm:text-sm font-medium ${
+                      dashboardStats.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {dashboardStats.revenueGrowth >= 0 ? '+' : ''}{dashboardStats.revenueGrowth}%
+                    </span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.todayRevenue.toLocaleString('tr-TR')}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                      <FaUtensils className="text-lg sm:text-xl text-purple-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-gray-600">{dashboardStats.activeCategories} kategori</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.totalMenuItems}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
+                  <div className="flex items-center justify-between mb-2 sm:mb-4">
+                    <div className="p-2 sm:p-3 bg-orange-100 rounded-lg">
+                      <FaUsers className="text-lg sm:text-xl text-orange-600" />
+                    </div>
+                    <span className="text-xs sm:text-sm text-orange-600 font-medium">{dashboardStats.activeTables} aktif</span>
+                  </div>
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{currentRestaurant?.tableCount || 15}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Masa</p>
+                </div>
+              </>
+            )}
           </div>
 
 
