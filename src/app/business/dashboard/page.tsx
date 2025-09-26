@@ -87,7 +87,12 @@ export default function BusinessDashboard() {
     totalMenuItems: 0,
     activeCategories: 0,
     totalWaiters: 0,
-    activeTables: 0
+    activeTables: 0,
+    totalOrders: 0,
+    averageRating: 0,
+    customerSatisfaction: 0,
+    ordersGrowth: 0,
+    revenueGrowth: 0
   });
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
 
@@ -156,6 +161,38 @@ export default function BusinessDashboard() {
       const activeTableNumbers = new Set(activeOrdersList.map((order: any) => order.tableNumber));
       const activeTables = activeTableNumbers.size;
 
+      // Toplam sipariş sayısını hesapla
+      const totalOrders = orders.length;
+
+      // Ortalama puanı hesapla (siparişlerde rating varsa)
+      const ordersWithRating = orders.filter((order: any) => order.rating && order.rating > 0);
+      const averageRating = ordersWithRating.length > 0 
+        ? ordersWithRating.reduce((sum: number, order: any) => sum + order.rating, 0) / ordersWithRating.length
+        : 4.8; // Varsayılan değer
+
+      // Müşteri memnuniyetini hesapla (4+ puanlı siparişlerin oranı)
+      const satisfiedOrders = ordersWithRating.filter((order: any) => order.rating >= 4).length;
+      const customerSatisfaction = ordersWithRating.length > 0 
+        ? Math.round((satisfiedOrders / ordersWithRating.length) * 100)
+        : 92; // Varsayılan değer
+
+      // Büyüme oranlarını hesapla (dün vs bugün)
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const yesterdayOrders = orders.filter((order: any) => 
+        order.createdAt && order.createdAt.startsWith(yesterdayStr)
+      );
+      const yesterdayRevenue = yesterdayOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+
+      const ordersGrowth = yesterdayOrders.length > 0 
+        ? Math.round(((todayOrders.length - yesterdayOrders.length) / yesterdayOrders.length) * 100)
+        : 0;
+      
+      const revenueGrowth = yesterdayRevenue > 0 
+        ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100)
+        : 0;
+
       setDashboardStats({
         todayOrders: todayOrders.length,
         activeOrders: activeOrdersList.length,
@@ -164,7 +201,12 @@ export default function BusinessDashboard() {
         totalMenuItems,
         activeCategories,
         totalWaiters: activeWaiters,
-        activeTables
+        activeTables,
+        totalOrders,
+        averageRating: Math.round(averageRating * 10) / 10, // 1 ondalık basamak
+        customerSatisfaction,
+        ordersGrowth,
+        revenueGrowth
       });
 
       // Aktif siparişleri formatla
@@ -545,7 +587,11 @@ export default function BusinessDashboard() {
                 <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
                   <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
                 </div>
-                <span className="text-xs sm:text-sm text-green-600 font-medium">+12%</span>
+                <span className={`text-xs sm:text-sm font-medium ${
+                  dashboardStats.ordersGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {dashboardStats.ordersGrowth >= 0 ? '+' : ''}{dashboardStats.ordersGrowth}%
+                </span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{dashboardStats.todayOrders}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
@@ -556,7 +602,11 @@ export default function BusinessDashboard() {
                 <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
                   <FaChartLine className="text-lg sm:text-xl text-green-600" />
                 </div>
-                <span className="text-xs sm:text-sm text-green-600 font-medium">+8%</span>
+                <span className={`text-xs sm:text-sm font-medium ${
+                  dashboardStats.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {dashboardStats.revenueGrowth >= 0 ? '+' : ''}{dashboardStats.revenueGrowth}%
+                </span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{dashboardStats.todayRevenue.toLocaleString('tr-TR')}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
@@ -596,29 +646,37 @@ export default function BusinessDashboard() {
                 </Link>
               </div>
               <div className="space-y-3">
-                {activeOrders.map(order => (
-                  <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <span className="font-bold text-purple-600">{order.table}</span>
+                {activeOrders.length > 0 ? (
+                  activeOrders.map(order => (
+                    <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                          <span className="font-bold text-purple-600">{order.table}</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">Masa {order.table}</p>
+                          <p className="text-sm text-gray-500">{order.items} ürün • ₺{order.total}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-800">Masa {order.table}</p>
-                        <p className="text-sm text-gray-500">{order.items} ürün • ₺{order.total}</p>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          order.status === 'ready' 
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {order.status === 'ready' ? 'Hazır' : 'Hazırlanıyor'}
+                        </span>
+                        <span className="text-xs text-gray-500">{order.time}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.status === 'ready' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {order.status === 'ready' ? 'Hazır' : 'Hazırlanıyor'}
-                      </span>
-                      <span className="text-xs text-gray-500">{order.time}</span>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <FaShoppingCart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg font-medium">Aktif sipariş yok</p>
+                    <p className="text-sm">Yeni siparişler geldiğinde burada görünecek</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
@@ -667,15 +725,15 @@ export default function BusinessDashboard() {
                     <p className="text-purple-200 text-sm">Toplam Ciro</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">{dashboardStats.monthlyRevenue > 0 ? Math.floor(dashboardStats.monthlyRevenue / 100) : 0}</p>
+                    <p className="text-3xl font-bold">{dashboardStats.totalOrders}</p>
                     <p className="text-purple-200 text-sm">Toplam Sipariş</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">4.8</p>
+                    <p className="text-3xl font-bold">{dashboardStats.averageRating}</p>
                     <p className="text-purple-200 text-sm">Ortalama Puan</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">92%</p>
+                    <p className="text-3xl font-bold">{dashboardStats.customerSatisfaction}%</p>
                     <p className="text-purple-200 text-sm">Müşteri Memnuniyeti</p>
                   </div>
                 </div>
