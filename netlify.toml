@@ -33,6 +33,17 @@
   to = "/:splat"
   status = 200
 
+# HTTP'den HTTPS'e yönlendirme
+[[redirects]]
+  from = "http://admin.guzellestir.com/*"
+  to = "https://admin.guzellestir.com/:splat"
+  status = 301
+
+[[redirects]]
+  from = "http://kardesler.guzellestir.com/*"
+  to = "https://kardesler.guzellestir.com/:splat"
+  status = 301
+
 # Tüm subdomain'ler için genel yönlendirme
 [[redirects]]
   from = "https://*.guzellestir.com/*"
