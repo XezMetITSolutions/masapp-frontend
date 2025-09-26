@@ -3,11 +3,29 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
+  const subdomain = getSubdomain(hostname);
   
-  // Netlify'da subdomain kontrolü devre dışı
-  // const subdomain = getSubdomain(hostname);
+  // Admin subdomain kontrolü
+  if (subdomain === 'admin') {
+    if (!pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+    return NextResponse.next();
+  }
   
-  // Admin sayfalarını koru - Demo için direkt erişim
+  // Restoran subdomain kontrolü
+  if (subdomain && subdomain !== 'www') {
+    return handleRestaurantSubdomain(request, subdomain);
+  }
+  
+  // Ana domain - admin panel'e yönlendir
+  if (hostname === 'guzellestir.com' || hostname === 'www.guzellestir.com') {
+    if (!pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+  }
+  
+  // Admin sayfalarını koru
   if (pathname.startsWith('/admin')) {
     return NextResponse.next();
   }
@@ -49,29 +67,24 @@ function getSubdomain(hostname: string): string | null {
 function handleRestaurantSubdomain(request: NextRequest, subdomain: string) {
   const { pathname } = request.nextUrl;
   
-  // Restoran subdomain'i için özel routing
+  // Restoran subdomain'i için business panel'e yönlendir
   if (pathname === '/') {
-    // Ana sayfa - restoran menüsü
-    return NextResponse.rewrite(new URL(`/restaurant/${subdomain}`, request.url));
+    // Ana sayfa - business dashboard
+    return NextResponse.rewrite(new URL('/business/dashboard', request.url));
   }
   
-  if (pathname.startsWith('/admin')) {
-    // Restoran admin paneli
-    return NextResponse.rewrite(new URL(`/restaurant/${subdomain}/admin${pathname.replace('/admin', '')}`, request.url));
+  if (pathname.startsWith('/business')) {
+    // Business panel sayfaları
+    return NextResponse.next();
   }
   
-  if (pathname.startsWith('/menu')) {
-    // Menü sayfası
-    return NextResponse.rewrite(new URL(`/restaurant/${subdomain}/menu${pathname.replace('/menu', '')}`, request.url));
+  if (pathname.startsWith('/kitchen')) {
+    // Mutfak paneli
+    return NextResponse.next();
   }
   
-  if (pathname.startsWith('/order')) {
-    // Sipariş sayfası
-    return NextResponse.rewrite(new URL(`/restaurant/${subdomain}/order${pathname.replace('/order', '')}`, request.url));
-  }
-  
-  // Diğer tüm istekler için restoran sayfasına yönlendir
-  return NextResponse.rewrite(new URL(`/restaurant/${subdomain}${pathname}`, request.url));
+  // Diğer tüm istekler için business dashboard'a yönlendir
+  return NextResponse.rewrite(new URL('/business/dashboard', request.url));
 }
 
 export const config = {
