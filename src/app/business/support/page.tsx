@@ -923,7 +923,7 @@ export default function SupportPage() {
                   </button>
                 )}
               </div>
-            </div>
+        </div>
           </div>
         </div>
       )}

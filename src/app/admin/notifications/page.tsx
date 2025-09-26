@@ -51,7 +51,7 @@ export default function AdminNotificationsPage() {
   useEffect(() => {
     const loadNotifications = () => {
       const savedNotifications = localStorage.getItem('admin-notifications');
-      if (savedNotifications) {
+    if (savedNotifications) {
         try {
           const parsed = JSON.parse(savedNotifications);
           setNotifications(parsed);
@@ -256,7 +256,7 @@ export default function AdminNotificationsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
-          </div>
+            </div>
           
           <div className="flex gap-2">
             <select
@@ -347,8 +347,8 @@ export default function AdminNotificationsPage() {
                             {notification.category}
                           </span>
                         )}
-                      </div>
-                    </div>
+          </div>
+        </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={(e) => {
@@ -380,9 +380,9 @@ export default function AdminNotificationsPage() {
                       >
                         <FaTimes className="text-red-600" />
                       </button>
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </div>
               ))}
             </div>
           )}
@@ -451,7 +451,7 @@ export default function AdminNotificationsPage() {
                 <p className="text-gray-700 bg-gray-50 p-4 rounded-lg">
                   {selectedNotification.message}
                 </p>
-              </div>
+                  </div>
 
               {selectedNotification.ticketId && (
                 <div className="mt-4">
@@ -475,7 +475,7 @@ export default function AdminNotificationsPage() {
                 className="text-gray-500 hover:text-gray-700"
               >
                 <FaTimes />
-              </button>
+                  </button>
             </div>
             
             <div className="p-6 space-y-4">
@@ -569,7 +569,7 @@ export default function AdminNotificationsPage() {
               </button>
             </div>
           </div>
-        </div>
+      </div>
       )}
     </ModernAdminLayout>
   );
