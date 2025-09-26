@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import SetBrandColor from '@/components/SetBrandColor';
+import SubdomainHandler from '@/components/SubdomainHandler';
 import { LanguageProvider } from '@/context/LanguageContext';
 
 const inter = Inter({ 
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans`}>
         <LanguageProvider>
           <SetBrandColor />
-          {children}
+          <SubdomainHandler>
+            {children}
+          </SubdomainHandler>
         </LanguageProvider>
       </body>
     </html>

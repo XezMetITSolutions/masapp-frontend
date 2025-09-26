@@ -20,13 +20,44 @@ import {
 
 export default function SecurityPage() {
   const [securityEvents, setSecurityEvents] = useState<any[]>([]);
+  const [securityStats, setSecurityStats] = useState({
+    activeSessions: 0,
+    securityEvents: 0,
+    twoFactorEnabled: 0,
+    blockedIPs: 0
+  });
 
   // localStorage'dan güvenlik olaylarını yükle
   useEffect(() => {
-    const savedSecurityEvents = localStorage.getItem('masapp-security-events');
-    if (savedSecurityEvents) {
-      setSecurityEvents(JSON.parse(savedSecurityEvents));
-    }
+    const loadSecurityData = () => {
+      // Güvenlik olaylarını yükle
+      const savedSecurityEvents = localStorage.getItem('masapp-security-events');
+      if (savedSecurityEvents) {
+        setSecurityEvents(JSON.parse(savedSecurityEvents));
+      }
+
+      // Kullanıcı verilerinden güvenlik istatistiklerini hesapla
+      const users = JSON.parse(localStorage.getItem('masapp-users') || '[]');
+      const activeUsers = users.filter((user: any) => user.status === 'active');
+      
+      // Aktif oturumlar (şimdilik aktif kullanıcı sayısı)
+      const activeSessions = activeUsers.length;
+      
+      // 2FA aktif kullanıcılar (şimdilik tüm aktif kullanıcılar)
+      const twoFactorEnabled = activeUsers.length;
+      
+      // Engellenen IP'ler (şimdilik 0)
+      const blockedIPs = 0;
+
+      setSecurityStats({
+        activeSessions,
+        securityEvents: savedSecurityEvents ? JSON.parse(savedSecurityEvents).length : 0,
+        twoFactorEnabled,
+        blockedIPs
+      });
+    };
+
+    loadSecurityData();
   }, []);
 
   // Güvenlik olaylarını localStorage'a kaydet
@@ -93,7 +124,7 @@ export default function SecurityPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Aktif Oturumlar</p>
-              <p className="text-3xl font-bold text-gray-900">12</p>
+              <p className="text-3xl font-bold text-gray-900">{securityStats.activeSessions}</p>
             </div>
             <FaUserShield className="w-8 h-8 text-blue-600" />
           </div>
@@ -102,7 +133,7 @@ export default function SecurityPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Güvenlik Olayları</p>
-              <p className="text-3xl font-bold text-orange-600">{securityEvents.length}</p>
+              <p className="text-3xl font-bold text-orange-600">{securityStats.securityEvents}</p>
             </div>
             <FaExclamationTriangle className="w-8 h-8 text-orange-600" />
           </div>
@@ -111,7 +142,7 @@ export default function SecurityPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">2FA Aktif</p>
-              <p className="text-3xl font-bold text-green-600">8</p>
+              <p className="text-3xl font-bold text-green-600">{securityStats.twoFactorEnabled}</p>
             </div>
             <FaFingerprint className="w-8 h-8 text-green-600" />
           </div>
@@ -120,7 +151,7 @@ export default function SecurityPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Engellenen IP</p>
-              <p className="text-3xl font-bold text-red-600">3</p>
+              <p className="text-3xl font-bold text-red-600">{securityStats.blockedIPs}</p>
             </div>
             <FaBan className="w-8 h-8 text-red-600" />
           </div>
@@ -173,21 +204,29 @@ export default function SecurityPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Son Güvenlik Olayları</h3>
           <div className="space-y-3">
-            {securityEvents.slice(0, 4).map((event) => {
-              const EventIcon = getEventIcon(event.type);
-              return (
-                <div key={event.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <EventIcon className={`w-5 h-5 ${getEventColor(event.type)}`} />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{event.description}</p>
-                    <p className="text-xs text-gray-500">{event.timestamp}</p>
+            {securityEvents.length > 0 ? (
+              securityEvents.slice(0, 4).map((event) => {
+                const EventIcon = getEventIcon(event.type);
+                return (
+                  <div key={event.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <EventIcon className={`w-5 h-5 ${getEventColor(event.type)}`} />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">{event.description}</p>
+                      <p className="text-xs text-gray-500">{event.timestamp}</p>
+                    </div>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(event.status)}`}>
+                      {event.status === 'success' ? 'Başarılı' : event.status === 'failed' ? 'Başarısız' : 'Uyarı'}
+                    </span>
                   </div>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(event.status)}`}>
-                    {event.status === 'success' ? 'Başarılı' : event.status === 'failed' ? 'Başarısız' : 'Uyarı'}
-                  </span>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <div className="text-center py-6 text-gray-500">
+                <FaShieldAlt className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+                <p className="text-sm font-medium">Henüz güvenlik olayı yok</p>
+                <p className="text-xs">Güvenlik olayları burada görünecek</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -221,36 +260,48 @@ export default function SecurityPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {securityEvents.map((event) => {
-                const EventIcon = getEventIcon(event.type);
-                return (
-                  <tr key={event.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <EventIcon className={`w-5 h-5 mr-3 ${getEventColor(event.type)}`} />
-                        <span className="text-sm font-medium text-gray-900">{event.description}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {event.user}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {event.ip}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {event.location}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(event.status)}`}>
-                        {event.status === 'success' ? 'Başarılı' : event.status === 'failed' ? 'Başarısız' : 'Uyarı'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {event.timestamp}
-                    </td>
-                  </tr>
-                );
-              })}
+              {securityEvents.length > 0 ? (
+                securityEvents.map((event) => {
+                  const EventIcon = getEventIcon(event.type);
+                  return (
+                    <tr key={event.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <EventIcon className={`w-5 h-5 mr-3 ${getEventColor(event.type)}`} />
+                          <span className="text-sm font-medium text-gray-900">{event.description}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {event.user}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {event.ip}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {event.location}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(event.status)}`}>
+                          {event.status === 'success' ? 'Başarılı' : event.status === 'failed' ? 'Başarısız' : 'Uyarı'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {event.timestamp}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center">
+                      <FaShieldAlt className="w-12 h-12 text-gray-300 mb-4" />
+                      <p className="text-lg font-medium text-gray-500 mb-2">Henüz güvenlik olayı yok</p>
+                      <p className="text-sm text-gray-400">Güvenlik olayları burada görünecek</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

@@ -1,13 +1,27 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { FaQrcode, FaUtensils, FaShoppingCart, FaBell, FaMagic, FaChartLine, FaUsers, FaClock, FaCheckCircle, FaRocket, FaShieldAlt, FaStar, FaPhone, FaWhatsapp } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
 import PriceDisplay from '@/components/PriceDisplay';
+import { getSubdomain, isAdminSubdomain, isRestaurantSubdomain } from '@/utils/subdomain';
 
 export default function Home() {
+  useEffect(() => {
+    const subdomain = getSubdomain();
+    
+    // Eğer subdomain varsa yönlendirme yap
+    if (subdomain) {
+      if (isAdminSubdomain()) {
+        window.location.href = '/admin';
+      } else if (isRestaurantSubdomain()) {
+        window.location.href = '/business/dashboard';
+      }
+    }
+  }, []);
   return (
     <LanguageProvider>
       <main className="min-h-screen bg-white relative">

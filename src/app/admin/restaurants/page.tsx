@@ -36,6 +36,8 @@ export default function RestaurantsPage() {
     address: '',
     subdomain: ''
   });
+  const [subdomainAvailable, setSubdomainAvailable] = useState<boolean | null>(null);
+  const [checkingSubdomain, setCheckingSubdomain] = useState(false);
   const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string} | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -51,6 +53,65 @@ export default function RestaurantsPage() {
       setRestaurants(JSON.parse(savedRestaurants));
     }
   }, []);
+
+  // Subdomain kontrolü
+  const checkSubdomainAvailability = async (subdomain: string) => {
+    if (!subdomain || subdomain.length < 3) {
+      setSubdomainAvailable(null);
+      return;
+    }
+
+    setCheckingSubdomain(true);
+    
+    // Geçerli subdomain formatı kontrolü
+    const validSubdomainRegex = /^[a-z0-9-]+$/;
+    if (!validSubdomainRegex.test(subdomain)) {
+      setSubdomainAvailable(false);
+      setCheckingSubdomain(false);
+      return;
+    }
+
+    // Rezerve edilmiş kelimeler
+    const reservedWords = ['admin', 'www', 'api', 'app', 'mail', 'ftp', 'blog', 'shop', 'store', 'support', 'help', 'docs', 'status', 'cdn', 'assets'];
+    if (reservedWords.includes(subdomain.toLowerCase())) {
+      setSubdomainAvailable(false);
+      setCheckingSubdomain(false);
+      return;
+    }
+
+    // Mevcut restoranlarda subdomain kontrolü
+    const existingRestaurant = restaurants.find(r => r.subdomain === subdomain.toLowerCase());
+    if (existingRestaurant) {
+      setSubdomainAvailable(false);
+      setCheckingSubdomain(false);
+      return;
+    }
+
+    // Simüle edilmiş API çağrısı (gerçek uygulamada DNS kontrolü yapılabilir)
+    setTimeout(() => {
+      setSubdomainAvailable(true);
+      setCheckingSubdomain(false);
+    }, 500);
+  };
+
+  // Form verilerini güncelle
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Subdomain değiştiğinde kontrol et
+    if (name === 'subdomain') {
+      const subdomain = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+      setFormData(prev => ({
+        ...prev,
+        subdomain: subdomain
+      }));
+      checkSubdomainAvailability(subdomain);
+    }
+  };
 
   // Restoranları localStorage'a kaydet
   const saveRestaurantsToStorage = (newRestaurants: any[]) => {
@@ -91,8 +152,16 @@ export default function RestaurantsPage() {
 
   const handleAddRestaurant = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Subdomain kontrolü
+    if (!formData.subdomain || subdomainAvailable !== true) {
+      alert('Lütfen geçerli bir subdomain girin.');
+      return;
+    }
+
     const credentials = generateCredentials();
     const restaurantId = `restaurant-${Date.now()}`;
+    const cleanSubdomain = formData.subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
     
     const newRestaurant = {
       id: restaurantId,
@@ -102,14 +171,15 @@ export default function RestaurantsPage() {
       createdAt: new Date().toISOString().split('T')[0],
       lastOrder: 'Henüz sipariş yok',
       credentials,
-      subdomain: formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      subdomain: cleanSubdomain,
+      domain: `${cleanSubdomain}.guzellestir.com`,
       panelUrls: {
-        dashboard: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/dashboard`,
-        waiter: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/waiter`,
-        kitchen: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/kitchen`,
-        cashier: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/cashier`,
-        menu: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/menu`,
-        qr: `https://${formData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '')}.masapp.com/business/qr-codes`
+        dashboard: `https://${cleanSubdomain}.guzellestir.com/business/dashboard`,
+        waiter: `https://${cleanSubdomain}.guzellestir.com/business/waiter`,
+        kitchen: `https://${cleanSubdomain}.guzellestir.com/kitchen`,
+        cashier: `https://${cleanSubdomain}.guzellestir.com/business/cashier`,
+        menu: `https://${cleanSubdomain}.guzellestir.com/business/menu`,
+        qr: `https://${cleanSubdomain}.guzellestir.com/business/qr-codes`
       }
     };
     
@@ -130,6 +200,8 @@ export default function RestaurantsPage() {
       address: '',
       subdomain: ''
     });
+    setSubdomainAvailable(null);
+    setCheckingSubdomain(false);
     setShowAddForm(false);
   };
 
@@ -484,16 +556,40 @@ export default function RestaurantsPage() {
                       type="text"
                       name="subdomain"
                       value={formData.subdomain}
-                      onChange={handleInputChange}
+                      onChange={handleFormChange}
                       required
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="pizzapalace"
+                      className={`flex-1 px-3 py-2 border rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        subdomainAvailable === false ? 'border-red-300 bg-red-50' : 
+                        subdomainAvailable === true ? 'border-green-300 bg-green-50' : 
+                        'border-gray-300'
+                      }`}
+                      placeholder="kardesler"
                     />
                     <span className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-gray-600">
-                      .masapp.com
+                      .guzellestir.com
                     </span>
                   </div>
-            </div>
+                  {formData.subdomain && (
+                    <div className="mt-2">
+                      {checkingSubdomain ? (
+                        <div className="flex items-center text-blue-600">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                          <span className="text-sm">Kontrol ediliyor...</span>
+                        </div>
+                      ) : subdomainAvailable === true ? (
+                        <div className="flex items-center text-green-600">
+                          <FaCheckCircle className="w-4 h-4 mr-2" />
+                          <span className="text-sm">Subdomain kullanılabilir!</span>
+                        </div>
+                      ) : subdomainAvailable === false ? (
+                        <div className="flex items-center text-red-600">
+                          <FaTimesCircle className="w-4 h-4 mr-2" />
+                          <span className="text-sm">Bu subdomain kullanılamaz</span>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
             
                 <div className="flex space-x-3 pt-4">
                   <button
@@ -778,7 +874,7 @@ export default function RestaurantsPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain</label>
-                    <p className="text-gray-900">{selectedRestaurant.subdomain}.masapp.com</p>
+                    <p className="text-gray-900">{selectedRestaurant.subdomain}.guzellestir.com</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Durum</label>
@@ -971,7 +1067,7 @@ export default function RestaurantsPage() {
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <span className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-gray-600">
-                        .masapp.com
+                        .guzellestir.com
                       </span>
                     </div>
                   </div>
