@@ -33,6 +33,12 @@
   to = "/:splat"
   status = 200
 
+# Tüm subdomain'ler için genel yönlendirme
+[[redirects]]
+  from = "https://*.guzellestir.com/*"
+  to = "/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
