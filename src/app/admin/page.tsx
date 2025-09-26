@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
 import { 
   FaChartLine, 
@@ -19,68 +20,109 @@ import {
 } from 'react-icons/fa';
 
 export default function AdminDashboard() {
-
-  const stats = [
+  const [stats, setStats] = useState([
     {
       title: 'Toplam Restoran',
-      value: '1,247',
-      change: '+12%',
-      changeType: 'positive',
+      value: '0',
+      change: '0%',
+      changeType: 'neutral',
       icon: FaStore,
       color: 'blue'
     },
     {
       title: 'Aktif Kullanıcılar',
-      value: '15,432',
-      change: '+8.2%',
-      changeType: 'positive',
+      value: '0',
+      change: '0%',
+      changeType: 'neutral',
       icon: FaUsers,
       color: 'green'
     },
     {
       title: 'Aylık Gelir',
-      value: '₺2.4M',
-      change: '+15.3%',
-      changeType: 'positive',
+      value: '₺0',
+      change: '0%',
+      changeType: 'neutral',
       icon: FaChartLine,
       color: 'purple'
     },
     {
       title: 'Sistem Uptime',
-      value: '99.9%',
-      change: '+0.1%',
-      changeType: 'positive',
+      value: '100%',
+      change: '0%',
+      changeType: 'neutral',
       icon: FaCheckCircle,
       color: 'emerald'
     }
-  ];
+  ]);
 
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'restaurant',
-      title: 'Yeni Restoran Eklendi',
-      description: 'Pizza Palace başarıyla kaydedildi',
-      time: '2 saat önce',
-      status: 'success'
-    },
-    {
-      id: 2,
-      type: 'user',
-      title: 'Kullanıcı Onayı',
-      description: 'John Doe hesabı onaylandı',
-      time: '4 saat önce',
-      status: 'success'
-    },
-    {
-      id: 3,
-      type: 'payment',
-      title: 'Ödeme Hatası',
-      description: 'Cafe Central ödeme sorunu',
-      time: '6 saat önce',
-      status: 'warning'
-    }
-  ];
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+
+  // localStorage'dan gerçek verileri yükle
+  useEffect(() => {
+    const loadRealData = () => {
+      // Restoran sayısını hesapla
+      const restaurants = JSON.parse(localStorage.getItem('masapp-restaurants') || '[]');
+      
+      // Kullanıcı sayısını hesapla
+      const users = JSON.parse(localStorage.getItem('masapp-users') || '[]');
+      const activeUsers = users.filter((user: any) => user.status === 'active');
+      
+      // Ödeme verilerini hesapla
+      const payments = JSON.parse(localStorage.getItem('masapp-payments') || '[]');
+      const completedPayments = payments.filter((payment: any) => payment.status === 'completed');
+      const monthlyRevenue = completedPayments.reduce((sum: number, payment: any) => sum + (payment.amount || 0), 0);
+      
+      // Bildirimleri yükle
+      const notifications = JSON.parse(localStorage.getItem('admin-notifications') || '[]');
+      const recentNotifs = notifications.slice(0, 3).map((notif: any) => ({
+        id: notif.id,
+        type: notif.type,
+        title: notif.title,
+        description: notif.message,
+        time: new Date(notif.createdAt).toLocaleString('tr-TR'),
+        status: notif.priority === 'urgent' ? 'warning' : 'success'
+      }));
+
+      setStats([
+        {
+          title: 'Toplam Restoran',
+          value: restaurants.length.toString(),
+          change: '0%',
+          changeType: 'neutral',
+          icon: FaStore,
+          color: 'blue'
+        },
+        {
+          title: 'Aktif Kullanıcılar',
+          value: activeUsers.length.toString(),
+          change: '0%',
+          changeType: 'neutral',
+          icon: FaUsers,
+          color: 'green'
+        },
+        {
+          title: 'Aylık Gelir',
+          value: `₺${monthlyRevenue.toLocaleString()}`,
+          change: '0%',
+          changeType: 'neutral',
+          icon: FaChartLine,
+          color: 'purple'
+        },
+        {
+          title: 'Sistem Uptime',
+          value: '100%',
+          change: '0%',
+          changeType: 'neutral',
+          icon: FaCheckCircle,
+          color: 'emerald'
+        }
+      ]);
+
+      setRecentActivities(recentNotifs);
+    };
+
+    loadRealData();
+  }, []);
 
   const quickActions = [
     { title: 'Restoran Ekle', icon: FaStore, color: 'blue' },
@@ -104,6 +146,17 @@ export default function AdminDashboard() {
     return colors[color as keyof typeof colors] || colors.gray;
   };
 
+  const getChangeColor = (changeType: string) => {
+    switch (changeType) {
+      case 'positive':
+        return 'text-green-600';
+      case 'negative':
+        return 'text-red-600';
+      default:
+        return 'text-gray-500';
+    }
+  };
+
   return (
     <ModernAdminLayout title="Dashboard" description="Sistem genel durumu ve yönetim paneli">
       {/* Stats Grid */}
@@ -119,12 +172,12 @@ export default function AdminDashboard() {
                         <div className="flex items-center mt-2">
                           {stat.changeType === 'positive' ? (
                             <FaArrowUp className="w-4 h-4 text-green-500 mr-1" />
-                          ) : (
+                          ) : stat.changeType === 'negative' ? (
                             <FaArrowDown className="w-4 h-4 text-red-500 mr-1" />
+                          ) : (
+                            <span className="w-4 h-4 mr-1"></span>
                           )}
-                          <span className={`text-sm font-medium ${
-                            stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-                          }`}>
+                          <span className={`text-sm font-medium ${getChangeColor(stat.changeType)}`}>
                             {stat.change}
                           </span>
                           <span className="text-sm text-gray-500 ml-1">bu ay</span>
@@ -145,26 +198,34 @@ export default function AdminDashboard() {
                 <h3 className="text-lg font-semibold text-gray-900">Son Aktiviteler</h3>
               </div>
               <div className="p-6">
-                <div className="space-y-4">
-                  {recentActivities.map((activity) => (
-                    <div key={activity.id} className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        activity.status === 'success' ? 'bg-green-100' : 'bg-yellow-100'
-                      }`}>
-                        {activity.status === 'success' ? (
-                          <FaCheckCircle className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <FaExclamationTriangle className="w-5 h-5 text-yellow-600" />
-                        )}
+                {recentActivities.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentActivities.map((activity) => (
+                      <div key={activity.id} className="flex items-center space-x-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          activity.status === 'success' ? 'bg-green-100' : 'bg-yellow-100'
+                        }`}>
+                          {activity.status === 'success' ? (
+                            <FaCheckCircle className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <FaExclamationTriangle className="w-5 h-5 text-yellow-600" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900">{activity.title}</p>
+                          <p className="text-sm text-gray-600">{activity.description}</p>
+                        </div>
+                        <div className="text-sm text-gray-500">{activity.time}</div>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{activity.title}</p>
-                        <p className="text-sm text-gray-600">{activity.description}</p>
-                      </div>
-                      <div className="text-sm text-gray-500">{activity.time}</div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <FaBell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p className="text-lg font-medium">Henüz aktivite yok</p>
+                    <p className="text-sm">Sistem aktiviteleri burada görünecek</p>
+                  </div>
+                )}
               </div>
             </div>
 
