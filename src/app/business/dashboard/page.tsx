@@ -99,20 +99,28 @@ export default function BusinessDashboard() {
   // localStorage'dan gerçek verileri yükle
   useEffect(() => {
     const loadDashboardData = () => {
-      // Siparişlerden istatistikleri hesapla
-      const savedOrders = localStorage.getItem('central-order-store');
+      // Kullanıcının restoran ID'sini al
+      const currentUser = user;
+      const restaurantId = currentUser?.restaurantId;
+      
+      if (!restaurantId) {
+        console.log('Restoran ID bulunamadı, genel veriler yükleniyor');
+        return;
+      }
+
+      // Restoran özelinde sipariş verilerini yükle
+      const savedOrders = localStorage.getItem(`masapp-restaurant-${restaurantId}-orders`);
       let orders = [];
       if (savedOrders) {
         try {
-          const orderData = JSON.parse(savedOrders);
-          orders = orderData.state?.orders || [];
+          orders = JSON.parse(savedOrders);
         } catch (e) {
           console.error('Sipariş verileri yüklenemedi:', e);
         }
       }
 
-      // Personel verilerini yükle
-      const savedStaff = localStorage.getItem('masapp-restaurant-staff');
+      // Restoran özelinde personel verilerini yükle
+      const savedStaff = localStorage.getItem(`masapp-restaurant-${restaurantId}-staff`);
       let staff = [];
       if (savedStaff) {
         try {
@@ -223,7 +231,7 @@ export default function BusinessDashboard() {
     };
 
     loadDashboardData();
-  }, []);
+  }, [user]);
   
   // Restoranlar sayfasından alınan planlar ve fiyatlar
   const plans = {

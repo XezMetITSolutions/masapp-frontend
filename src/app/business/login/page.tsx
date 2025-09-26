@@ -99,7 +99,8 @@ export default function LoginPage() {
           password: restaurant.credentials?.password || 'default123',
           role: 'restaurant_owner',
           name: restaurant.owner,
-          restaurantName: restaurant.name
+          restaurantName: restaurant.name,
+          restaurantId: restaurant.id
         }));
       }
 
@@ -107,7 +108,14 @@ export default function LoginPage() {
       const savedStaff = localStorage.getItem('masapp-restaurant-staff');
       let staffUsers: any[] = [];
       if (savedStaff) {
-        staffUsers = JSON.parse(savedStaff);
+        const staff = JSON.parse(savedStaff);
+        staffUsers = staff.map((member: any) => ({
+          username: member.credentials?.username || member.email,
+          password: member.credentials?.password || 'default123',
+          role: member.role,
+          name: member.name,
+          restaurantId: member.restaurantId || 'demo-restaurant-1'
+        }));
       }
 
       const allUsers = [...demoUsers, ...restaurantUsers, ...staffUsers];
@@ -122,11 +130,11 @@ export default function LoginPage() {
           name: user.name,
           email: `${user.username}@masapp.com`,
           role: user.role as 'waiter' | 'kitchen' | 'cashier' | 'restaurant_owner',
-      restaurantId: 'demo-restaurant-1',
-      status: 'active' as const,
-      createdAt: new Date(),
-      lastLogin: new Date()
-    };
+          restaurantId: user.restaurantId || 'demo-restaurant-1',
+          status: 'active' as const,
+          createdAt: new Date(),
+          lastLogin: new Date()
+        };
 
         await login(userData, 'demo-access-token', 'demo-refresh-token');
 

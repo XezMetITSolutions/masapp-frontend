@@ -326,6 +326,7 @@ export default function StaffPage() {
       rating: 0,
       notes: newStaff.notes,
       avatar: null,
+      restaurantId: user?.restaurantId || 'demo-restaurant-1',
       credentials: {
         username: username,
         password: password
