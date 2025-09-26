@@ -90,6 +90,26 @@ export default function ReportsPage() {
     }, 5000);
   };
 
+  // Rapor sil
+  const handleDeleteReport = (reportId: string) => {
+    if (confirm('Bu raporu silmek istediğinizden emin misiniz?')) {
+      const updatedReports = reports.filter(report => report.id !== reportId);
+      setReports(updatedReports);
+      saveReportsToStorage(updatedReports);
+      alert('Rapor başarıyla silindi!');
+    }
+  };
+
+  // Rapor indir
+  const handleDownloadReport = (reportId: string) => {
+    const report = reports.find(r => r.id === reportId);
+    if (report) {
+      // Simüle edilmiş indirme
+      alert(`${report.name} raporu indiriliyor...`);
+      // Gerçek uygulamada burada dosya indirme işlemi yapılır
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -310,11 +330,26 @@ export default function ReportsPage() {
                       <div className="flex items-center space-x-2">
                         {report.status === 'completed' && (
                           <>
-                            <button className="text-blue-600 hover:text-blue-900 p-1" title="Görüntüle">
+                            <button 
+                              onClick={() => alert(`Rapor: ${report.name}\nTür: ${report.type}\nDönem: ${report.period}\nBoyut: ${report.size}\nİndirme: ${report.downloads} kez`)}
+                              className="text-blue-600 hover:text-blue-900 p-1" 
+                              title="Görüntüle"
+                            >
                               <FaEye className="w-4 h-4" />
                             </button>
-                            <button className="text-green-600 hover:text-green-900 p-1" title="İndir">
+                            <button 
+                              onClick={() => handleDownloadReport(report.id)}
+                              className="text-green-600 hover:text-green-900 p-1" 
+                              title="İndir"
+                            >
                               <FaDownload className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteReport(report.id)}
+                              className="text-red-600 hover:text-red-900 p-1" 
+                              title="Sil"
+                            >
+                              <FaTimesCircle className="w-4 h-4" />
                             </button>
                           </>
                         )}
@@ -323,6 +358,15 @@ export default function ReportsPage() {
                             <FaClock className="w-4 h-4 mr-2 animate-spin" />
                             <span className="text-sm">Oluşturuluyor...</span>
                           </div>
+                        )}
+                        {report.status === 'failed' && (
+                          <button 
+                            onClick={() => handleDeleteReport(report.id)}
+                            className="text-red-600 hover:text-red-900 p-1" 
+                            title="Sil"
+                          >
+                            <FaTimesCircle className="w-4 h-4" />
+                          </button>
                         )}
                       </div>
                     </td>

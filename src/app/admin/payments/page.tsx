@@ -15,7 +15,9 @@ import {
   FaStore,
   FaExclamationTriangle,
   FaArrowUp,
-  FaArrowDown
+  FaArrowDown,
+  FaEdit,
+  FaTrash
 } from 'react-icons/fa';
 
 export default function PaymentsPage() {
@@ -74,6 +76,31 @@ export default function PaymentsPage() {
     setShowNewPaymentModal(false);
     
     alert('Ödeme başarıyla oluşturuldu!');
+  };
+
+  // Ödeme sil
+  const handleDeletePayment = (paymentId: string) => {
+    if (confirm('Bu ödemeyi silmek istediğinizden emin misiniz?')) {
+      const updatedPayments = payments.filter(payment => payment.id !== paymentId);
+      setPayments(updatedPayments);
+      savePaymentsToStorage(updatedPayments);
+      alert('Ödeme başarıyla silindi!');
+    }
+  };
+
+  // Ödeme düzenle
+  const handleEditPayment = (paymentId: string) => {
+    const paymentToEdit = payments.find(payment => payment.id === paymentId);
+    if (paymentToEdit) {
+      setNewPayment({
+        restaurant: paymentToEdit.restaurant,
+        amount: paymentToEdit.amount.toString(),
+        method: paymentToEdit.method,
+        status: paymentToEdit.status,
+        description: paymentToEdit.description || ''
+      });
+      setShowNewPaymentModal(true);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -268,11 +295,33 @@ export default function PaymentsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1">
+                        <button 
+                          onClick={() => alert(`Ödeme Detayları:\nRestoran: ${payment.restaurant}\nTutar: ₺${payment.amount}\nYöntem: ${payment.method}\nDurum: ${getStatusText(payment.status)}\nTarih: ${payment.date}\nTransaction ID: ${payment.transactionId}`)}
+                          className="text-blue-600 hover:text-blue-900 p-1"
+                          title="Görüntüle"
+                        >
                           <FaEye className="w-4 h-4" />
                         </button>
+                        <button 
+                          onClick={() => handleEditPayment(payment.id)}
+                          className="text-green-600 hover:text-green-900 p-1"
+                          title="Düzenle"
+                        >
+                          <FaEdit className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeletePayment(payment.id)}
+                          className="text-red-600 hover:text-red-900 p-1"
+                          title="Sil"
+                        >
+                          <FaTrash className="w-4 h-4" />
+                        </button>
                         {payment.status === 'failed' && (
-                          <button className="text-green-600 hover:text-green-900 p-1">
+                          <button 
+                            onClick={() => alert('Ödeme yeniden işleme alınıyor...')}
+                            className="text-yellow-600 hover:text-yellow-900 p-1"
+                            title="Yeniden Dene"
+                          >
                             <FaCheckCircle className="w-4 h-4" />
                           </button>
                         )}

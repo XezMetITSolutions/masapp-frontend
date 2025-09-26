@@ -14,7 +14,8 @@ import {
   FaTimes,
   FaFilter,
   FaSearch,
-  FaPlus
+  FaPlus,
+  FaEdit
 } from 'react-icons/fa';
 
 interface AdminNotification {
@@ -42,8 +43,8 @@ export default function AdminNotificationsPage() {
   const [newNotification, setNewNotification] = useState({
     title: '',
     message: '',
-    type: 'system_alert' as const,
-    priority: 'medium' as const,
+    type: 'system_alert' as 'new_ticket' | 'ticket_message' | 'system_alert' | 'user_activity',
+    priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
     category: ''
   });
 
@@ -114,10 +115,27 @@ export default function AdminNotificationsPage() {
   };
 
   const deleteNotification = (notificationId: string) => {
-    const updatedNotifications = notifications.filter(notif => notif.id !== notificationId);
-    setNotifications(updatedNotifications);
-    setFilteredNotifications(updatedNotifications);
-    localStorage.setItem('admin-notifications', JSON.stringify(updatedNotifications));
+    if (confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) {
+      const updatedNotifications = notifications.filter(notif => notif.id !== notificationId);
+      setNotifications(updatedNotifications);
+      setFilteredNotifications(updatedNotifications);
+      localStorage.setItem('admin-notifications', JSON.stringify(updatedNotifications));
+      alert('Bildirim başarıyla silindi!');
+    }
+  };
+
+  const editNotification = (notificationId: string) => {
+    const notificationToEdit = notifications.find(notif => notif.id === notificationId);
+    if (notificationToEdit) {
+      setNewNotification({
+        title: notificationToEdit.title,
+        message: notificationToEdit.message,
+        type: notificationToEdit.type,
+        priority: notificationToEdit.priority || 'medium',
+        category: notificationToEdit.category || ''
+      });
+      setShowNewNotificationModal(true);
+    }
   };
 
   const handleCreateNotification = () => {
@@ -341,6 +359,16 @@ export default function AdminNotificationsPage() {
                         title="Okundu işaretle"
                       >
                         <FaCheckCircle className="text-green-600" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          editNotification(notification.id);
+                        }}
+                        className="p-1 hover:bg-gray-200 rounded"
+                        title="Düzenle"
+                      >
+                        <FaEdit className="text-blue-600" />
                       </button>
                       <button
                         onClick={(e) => {

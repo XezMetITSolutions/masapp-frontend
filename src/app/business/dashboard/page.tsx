@@ -107,7 +107,7 @@ export default function BusinessDashboard() {
       const restaurantId = currentUser?.restaurantId;
       
       if (!restaurantId) {
-        console.log('Restoran ID bulunamadı, genel veriler yükleniyor');
+        console.log('Restoran ID bulunamadı');
         return;
       }
 

@@ -79,6 +79,34 @@ export default function UsersPage() {
     alert('Kullanıcı başarıyla oluşturuldu!');
   };
 
+  // Kullanıcı sil
+  const handleDeleteUser = (userId: string) => {
+    if (confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')) {
+      const updatedUsers = users.filter(user => user.id !== userId);
+      setUsers(updatedUsers);
+      saveUsersToStorage(updatedUsers);
+      alert('Kullanıcı başarıyla silindi!');
+    }
+  };
+
+  // Kullanıcı düzenle
+  const handleEditUser = (userId: string) => {
+    const userToEdit = users.find(user => user.id === userId);
+    if (userToEdit) {
+      setNewUser({
+        name: userToEdit.name,
+        email: userToEdit.email,
+        phone: userToEdit.phone || '',
+        role: userToEdit.role,
+        status: userToEdit.status,
+        location: userToEdit.location || '',
+        restaurant: userToEdit.restaurant || ''
+      });
+      setShowNewUserModal(true);
+      // Düzenleme modunda olduğunu belirtmek için state ekleyebiliriz
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -307,13 +335,25 @@ export default function UsersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1">
+                        <button 
+                          onClick={() => alert(`Kullanıcı: ${user.name}\nEmail: ${user.email}\nRol: ${getRoleText(user.role)}\nDurum: ${getStatusText(user.status)}`)}
+                          className="text-blue-600 hover:text-blue-900 p-1"
+                          title="Görüntüle"
+                        >
                           <FaEye className="w-4 h-4" />
                         </button>
-                        <button className="text-green-600 hover:text-green-900 p-1">
+                        <button 
+                          onClick={() => handleEditUser(user.id)}
+                          className="text-green-600 hover:text-green-900 p-1"
+                          title="Düzenle"
+                        >
                           <FaEdit className="w-4 h-4" />
                         </button>
-                        <button className="text-red-600 hover:text-red-900 p-1">
+                        <button 
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="text-red-600 hover:text-red-900 p-1"
+                          title="Sil"
+                        >
                           <FaTrash className="w-4 h-4" />
                         </button>
                       </div>
