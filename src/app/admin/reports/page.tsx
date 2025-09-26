@@ -14,7 +14,8 @@ import {
   FaUsers,
   FaQrcode,
   FaMoneyBillWave,
-  FaClock
+  FaClock,
+  FaTimesCircle
 } from 'react-icons/fa';
 
 export default function ReportsPage() {
@@ -32,42 +33,6 @@ export default function ReportsPage() {
     const savedReports = localStorage.getItem('masapp-reports');
     if (savedReports) {
       setReports(JSON.parse(savedReports));
-    } else {
-      // Demo raporlar oluştur
-      const demoReports = [
-        {
-          id: 'report-1',
-          name: 'Aylık Gelir Raporu',
-          type: 'revenue',
-          period: 'Ocak 2024',
-          status: 'completed',
-          size: '2.3 MB',
-          downloads: 15,
-          generatedAt: '2024-01-15 14:30'
-        },
-        {
-          id: 'report-2',
-          name: 'Restoran Performans Raporu',
-          type: 'performance',
-          period: 'Haftalık',
-          status: 'generating',
-          size: '-',
-          downloads: 0,
-          generatedAt: '2024-01-15 16:45'
-        },
-        {
-          id: 'report-3',
-          name: 'Kullanıcı Aktivite Raporu',
-          type: 'users',
-          period: 'Günlük',
-          status: 'completed',
-          size: '1.8 MB',
-          downloads: 8,
-          generatedAt: '2024-01-14 09:15'
-        }
-      ];
-      setReports(demoReports);
-      localStorage.setItem('masapp-reports', JSON.stringify(demoReports));
     }
   }, []);
 

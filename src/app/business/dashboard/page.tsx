@@ -32,7 +32,6 @@ import useRestaurantStore from '@/store/useRestaurantStore';
 import { useState } from 'react';
 import BusinessPaymentModal from '@/components/BusinessPaymentModal';
 import { useLanguage } from '@/context/LanguageContext';
-import { createDemoUsers, saveDemoUsersToLocalStorage } from '@/utils/demoUsers';
 
 export default function BusinessDashboard() {
   const router = useRouter();
@@ -85,6 +84,7 @@ export default function BusinessDashboard() {
   const [dashboardStats, setDashboardStats] = useState({
     todayOrders: 0,
     activeOrders: 0,
+    ready: 0,
     todayRevenue: 0,
     monthlyRevenue: 0,
     totalMenuItems: 0,
@@ -234,6 +234,7 @@ export default function BusinessDashboard() {
       setDashboardStats({
         todayOrders: todayOrders.length,
         activeOrders: activeOrdersList.length,
+        ready: 0, // Hazır siparişler - şimdilik 0
         todayRevenue,
         monthlyRevenue,
         totalMenuItems,
@@ -360,27 +361,9 @@ export default function BusinessDashboard() {
   };
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo kullanıcıları oluştur
-    const timer = setTimeout(() => {
-      // Demo kullanıcıları localStorage'a kaydet
-      saveDemoUsersToLocalStorage();
-      
-      if (!user) {
-        // Varsayılan olarak işletme sahibi olarak giriş yap
-        const demoUsers = createDemoUsers();
-        const restaurantOwner = demoUsers.find(u => u.role === 'restaurant_owner');
-        
-        if (restaurantOwner) {
-          const { login } = useAuthStore.getState();
-          login(restaurantOwner, 'demo-token', 'demo-refresh-token');
-          console.log('👤 İşletme sahibi olarak giriş yapıldı:', restaurantOwner.name);
-        }
-      } else {
-        console.log('👤 Mevcut kullanıcı:', user.name, `(${user.role})`);
-      }
-    }, 100); // Kısa bir gecikme ile
-
-    return () => clearTimeout(timer);
+    if (user) {
+      console.log('👤 Mevcut kullanıcı:', user.name, `(${user.role})`);
+    }
   }, [user]);
 
   const handleLogout = () => {
@@ -578,70 +561,6 @@ export default function BusinessDashboard() {
             </div>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
-              {/* Kullanıcı Değiştirme */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => {
-                    const demoUsers = createDemoUsers();
-                    const waiter = demoUsers.find(u => u.role === 'waiter');
-                    if (waiter) {
-                      const { login } = useAuthStore.getState();
-                      login(waiter, 'demo-token', 'demo-refresh-token');
-                      console.log('👤 Garson olarak giriş yapıldı:', waiter.name);
-                    }
-                  }}
-                  className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-600 hover:bg-blue-200"
-                  title="Garson olarak giriş yap"
-                >
-                  Garson
-                </button>
-                <button
-                  onClick={() => {
-                    const demoUsers = createDemoUsers();
-                    const kitchen = demoUsers.find(u => u.role === 'kitchen');
-                    if (kitchen) {
-                      const { login } = useAuthStore.getState();
-                      login(kitchen, 'demo-token', 'demo-refresh-token');
-                      console.log('👤 Mutfak olarak giriş yapıldı:', kitchen.name);
-                    }
-                  }}
-                  className="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-                  title="Mutfak olarak giriş yap"
-                >
-                  Mutfak
-                </button>
-                <button
-                  onClick={() => {
-                    const demoUsers = createDemoUsers();
-                    const cashier = demoUsers.find(u => u.role === 'cashier');
-                    if (cashier) {
-                      const { login } = useAuthStore.getState();
-                      login(cashier, 'demo-token', 'demo-refresh-token');
-                      console.log('👤 Kasa olarak giriş yapıldı:', cashier.name);
-                    }
-                  }}
-                  className="px-2 py-1 rounded text-xs bg-green-100 text-green-600 hover:bg-green-200"
-                  title="Kasa olarak giriş yap"
-                >
-                  Kasa
-                </button>
-                <button
-                  onClick={() => {
-                    const demoUsers = createDemoUsers();
-                    const owner = demoUsers.find(u => u.role === 'restaurant_owner');
-                    if (owner) {
-                      const { login } = useAuthStore.getState();
-                      login(owner, 'demo-token', 'demo-refresh-token');
-                      console.log('👤 İşletme sahibi olarak giriş yapıldı:', owner.name);
-                    }
-                  }}
-                  className="px-2 py-1 rounded text-xs bg-purple-100 text-purple-600 hover:bg-purple-200"
-                  title="İşletme sahibi olarak giriş yap"
-                >
-                  İşletme
-                </button>
-              </div>
-              
               {/* Language Selector */}
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button

@@ -34,42 +34,6 @@ export default function PaymentsPage() {
     const savedPayments = localStorage.getItem('masapp-payments');
     if (savedPayments) {
       setPayments(JSON.parse(savedPayments));
-    } else {
-      // Demo ödemeler oluştur
-      const demoPayments = [
-        {
-          id: 'payment-1',
-          restaurant: 'Kardesler Restoran',
-          amount: 299.99,
-          method: 'credit_card',
-          status: 'completed',
-          description: 'Aylık abonelik ücreti',
-          date: '2024-01-15 14:30',
-          transactionId: 'TXN-001'
-        },
-        {
-          id: 'payment-2',
-          restaurant: 'Lezzet Durağı',
-          amount: 199.99,
-          method: 'bank_transfer',
-          status: 'pending',
-          description: 'Haftalık abonelik ücreti',
-          date: '2024-01-14 09:15',
-          transactionId: 'TXN-002'
-        },
-        {
-          id: 'payment-3',
-          restaurant: 'Tadım Evi',
-          amount: 149.99,
-          method: 'credit_card',
-          status: 'failed',
-          description: 'Aylık abonelik ücreti',
-          date: '2024-01-13 16:45',
-          transactionId: 'TXN-003'
-        }
-      ];
-      setPayments(demoPayments);
-      localStorage.setItem('masapp-payments', JSON.stringify(demoPayments));
     }
   }, []);
 

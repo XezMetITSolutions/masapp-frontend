@@ -606,21 +606,6 @@ export default function WaiterDashboard() {
           }
         }
         
-        // Eğer hiç kullanıcı yoksa demo garson oluştur
-        const demoUser = {
-          id: 'demo-waiter-1',
-          name: 'Demo Garson',
-          email: 'demo@waiter.com',
-          role: 'waiter' as const,
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        // Demo kullanıcıyı login et
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-        console.log('👤 Demo garson kullanıcısı oluşturuldu');
       } else {
         console.log('👤 Mevcut kullanıcı:', user.name, `(${user.role})`);
       }

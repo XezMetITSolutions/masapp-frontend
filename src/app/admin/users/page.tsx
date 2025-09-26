@@ -40,45 +40,6 @@ export default function UsersPage() {
     const savedUsers = localStorage.getItem('masapp-users');
     if (savedUsers) {
       setUsers(JSON.parse(savedUsers));
-    } else {
-      // Demo kullanıcılar oluştur
-      const demoUsers = [
-        {
-          id: 'user-1',
-          name: 'Ahmet Yılmaz',
-          email: 'ahmet@example.com',
-          phone: '+90 555 123 4567',
-          role: 'restaurant_owner',
-          status: 'active',
-          location: 'İstanbul, Türkiye',
-          restaurant: 'Kardesler Restoran',
-          lastLogin: '2024-01-15 14:30'
-        },
-        {
-          id: 'user-2',
-          name: 'Fatma Demir',
-          email: 'fatma@example.com',
-          phone: '+90 555 234 5678',
-          role: 'customer',
-          status: 'active',
-          location: 'Ankara, Türkiye',
-          restaurant: '',
-          lastLogin: '2024-01-14 09:15'
-        },
-        {
-          id: 'user-3',
-          name: 'Mehmet Kaya',
-          email: 'mehmet@example.com',
-          phone: '+90 555 345 6789',
-          role: 'admin',
-          status: 'active',
-          location: 'İzmir, Türkiye',
-          restaurant: '',
-          lastLogin: '2024-01-15 16:45'
-        }
-      ];
-      setUsers(demoUsers);
-      localStorage.setItem('masapp-users', JSON.stringify(demoUsers));
     }
   }, []);
 
