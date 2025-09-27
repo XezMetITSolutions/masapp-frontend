@@ -25,8 +25,10 @@ import {
   FaExternalLinkAlt
 } from 'react-icons/fa';
 import DomainSetupGuide from '@/components/DomainSetupGuide';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export default function RestaurantsPage() {
+  const { isAuthenticated, isLoading } = useAdminAuth();
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -50,11 +52,63 @@ export default function RestaurantsPage() {
 
   // localStorage'dan restoranları yükle
   useEffect(() => {
+    if (!isAuthenticated) return;
+    
     const savedRestaurants = localStorage.getItem('masapp-restaurants');
     if (savedRestaurants) {
-      setRestaurants(JSON.parse(savedRestaurants));
+      const parsedRestaurants = JSON.parse(savedRestaurants);
+      setRestaurants(parsedRestaurants);
+    } else {
+      // Demo restoran verisi ekle
+      const demoRestaurants = [
+        {
+          id: 'restaurant-demo-1',
+          name: 'Çağkebapçısı',
+          owner: 'Ahmet Yılmaz',
+          email: 'ahmet@cagkebapcisi.com',
+          phone: '+90 212 555 0123',
+          address: 'Kadıköy, İstanbul',
+          subdomain: 'cagkebapcisi',
+          domain: 'cagkebapcisi.guzellestir.com',
+          status: 'active',
+          qrCount: 5,
+          createdAt: '2024-01-15',
+          lastOrder: '2 saat önce',
+          credentials: {
+            username: 'cagkebap',
+            password: 'demo123'
+          },
+          panelUrls: {
+            dashboard: 'https://cagkebapcisi.guzellestir.com/business/dashboard',
+            waiter: 'https://cagkebapcisi.guzellestir.com/business/waiter',
+            kitchen: 'https://cagkebapcisi.guzellestir.com/kitchen',
+            cashier: 'https://cagkebapcisi.guzellestir.com/business/cashier',
+            menu: 'https://cagkebapcisi.guzellestir.com/demo/menu',
+            qr: 'https://cagkebapcisi.guzellestir.com/business/qr-codes'
+          }
+        }
+      ];
+      setRestaurants(demoRestaurants);
+      localStorage.setItem('masapp-restaurants', JSON.stringify(demoRestaurants));
     }
-  }, []);
+  }, [isAuthenticated]);
+
+  // Loading durumu
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Authentication yoksa hiçbir şey gösterme
+  if (!isAuthenticated) {
+    return null;
+  }
 
   // Subdomain kontrolü
   const checkSubdomainAvailability = async (subdomain: string) => {
