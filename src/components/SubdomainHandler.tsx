@@ -11,6 +11,7 @@ interface SubdomainHandlerProps {
 export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRestaurant, setCurrentRestaurant] = useState<any>(null);
+  const [redirecting, setRedirecting] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -47,7 +48,13 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             // Restoran aktif mi kontrol et
             if (restaurant.status !== 'active') {
               // Restoran aktif değilse ana sayfaya yönlendir
-              window.location.href = 'https://guzellestir.com';
+              console.log('🚫 Restoran aktif değil, ana sayfaya yönlendiriliyor...');
+              
+              setRedirecting(true);
+              setTimeout(() => {
+                window.location.replace('https://guzellestir.com');
+              }, 2000);
+              
               return;
             }
             
@@ -69,14 +76,26 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             }
           } else {
             // Restoran bulunamadıysa ana sayfaya yönlendir
-            console.log('Restoran bulunamadı, ana sayfaya yönlendiriliyor...');
-            window.location.href = 'https://guzellestir.com';
+            console.log('🚫 Restoran bulunamadı, ana sayfaya yönlendiriliyor...');
+            
+            // Daha agresif yönlendirme - setTimeout ile
+            setRedirecting(true);
+            setTimeout(() => {
+              window.location.replace('https://guzellestir.com');
+            }, 2000);
+            
             return;
           }
         } catch (error) {
           console.error('Restoran bilgisi alınamadı:', error);
           // Hata durumunda da ana sayfaya yönlendir
-          window.location.href = 'https://guzellestir.com';
+          console.log('🚫 Hata durumu, ana sayfaya yönlendiriliyor...');
+          
+          setRedirecting(true);
+          setTimeout(() => {
+            window.location.replace('https://guzellestir.com');
+          }, 2000);
+          
           return;
         }
       }
@@ -92,7 +111,25 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
+          <p className="text-gray-600">Subdomain kontrol ediliyor...</p>
+          <p className="text-sm text-gray-500 mt-2">Lütfen bekleyin</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (redirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-pulse rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Restoran bulunamadı</p>
+          <p className="text-sm text-gray-500 mt-2">Ana sayfaya yönlendiriliyor...</p>
+          <div className="mt-4">
+            <div className="w-48 bg-gray-200 rounded-full h-2 mx-auto">
+              <div className="bg-red-600 h-2 rounded-full animate-pulse" style={{width: '100%'}}></div>
+            </div>
+          </div>
         </div>
       </div>
     );
