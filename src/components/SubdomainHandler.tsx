@@ -55,6 +55,7 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
                 window.location.replace('https://guzellestir.com');
               }, 2000);
               
+              setIsLoading(false);
               return;
             }
             
@@ -84,6 +85,7 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
               window.location.replace('https://guzellestir.com');
             }, 2000);
             
+            setIsLoading(false);
             return;
           }
         } catch (error) {
@@ -96,6 +98,7 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             window.location.replace('https://guzellestir.com');
           }, 2000);
           
+          setIsLoading(false);
           return;
         }
       }

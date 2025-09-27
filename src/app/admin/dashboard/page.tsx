@@ -64,7 +64,29 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadRealData = () => {
       // Restoran sayısını hesapla
-      const restaurants = JSON.parse(localStorage.getItem('masapp-restaurants') || '[]');
+      let restaurants = JSON.parse(localStorage.getItem('masapp-restaurants') || '[]');
+      
+      // Eğer restoran yoksa demo veri ekle
+      if (restaurants.length === 0) {
+        restaurants = [
+          {
+            id: 'restaurant-demo-1',
+            name: 'Çağkebapçısı',
+            owner: 'Ahmet Yılmaz',
+            email: 'ahmet@cagkebapcisi.com',
+            phone: '+90 212 555 0123',
+            address: 'Kadıköy, İstanbul',
+            subdomain: 'cagkebapcisi',
+            domain: 'cagkebapcisi.guzellestir.com',
+            status: 'active',
+            qrCount: 5,
+            createdAt: '2024-01-15',
+            lastOrder: '2 saat önce'
+          }
+        ];
+        localStorage.setItem('masapp-restaurants', JSON.stringify(restaurants));
+        console.log('📋 Admin dashboard için demo restoran eklendi');
+      }
       
       // Kullanıcı sayısını hesapla
       const users = JSON.parse(localStorage.getItem('masapp-users') || '[]');

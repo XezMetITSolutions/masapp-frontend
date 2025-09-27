@@ -59,9 +59,8 @@ export default function RestaurantsPage() {
       const parsedRestaurants = JSON.parse(savedRestaurants);
       setRestaurants(parsedRestaurants);
     } else {
-      // Demo restoran verisi ekle (sadece ilk kez)
-      const hasDemoData = localStorage.getItem('masapp-demo-added');
-      if (!hasDemoData) {
+      // Demo restoran verisi ekle (her zaman)
+      console.log('📋 Demo restoran verisi ekleniyor...');
         const demoRestaurants = [
           {
             id: 'restaurant-demo-1',
@@ -93,9 +92,7 @@ export default function RestaurantsPage() {
         setRestaurants(demoRestaurants);
         localStorage.setItem('masapp-restaurants', JSON.stringify(demoRestaurants));
         localStorage.setItem('masapp-demo-added', 'true');
-      } else {
-        setRestaurants([]);
-      }
+        console.log('✅ Demo restoran verisi eklendi:', demoRestaurants);
     }
   }, [isAuthenticated]);
 
