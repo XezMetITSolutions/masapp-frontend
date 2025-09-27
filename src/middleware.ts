@@ -24,8 +24,12 @@ export function middleware(request: NextRequest) {
     
     // Admin subdomain
     if (subdomain === 'admin') {
+      if (url.pathname === '/') {
+        url.pathname = '/admin/dashboard';
+        return NextResponse.redirect(url);
+      }
       if (!url.pathname.startsWith('/admin')) {
-        url.pathname = '/admin';
+        url.pathname = `/admin${url.pathname}`;
         return NextResponse.redirect(url);
       }
     }

@@ -13,11 +13,9 @@ export default function Home() {
   useEffect(() => {
     const subdomain = getSubdomain();
     
-    // Sadece subdomain varsa yönlendirme yap (ana domain için yönlendirme yok)
-    if (subdomain && subdomain !== 'www') {
-      if (isAdminSubdomain()) {
-        window.location.href = '/admin';
-      } else if (isRestaurantSubdomain()) {
+    // Sadece restoran subdomain'i için yönlendirme yap
+    if (subdomain && subdomain !== 'www' && subdomain !== 'admin') {
+      if (isRestaurantSubdomain()) {
         window.location.href = '/business/dashboard';
       }
     }

@@ -2,6 +2,7 @@
   publish = "out"
   command = "npm run build"
 
+# Ana domain yönlendirmeleri
 [[redirects]]
   from = "https://guzellestir.com/*"
   to = "/:splat"
@@ -12,24 +13,20 @@
   to = "/:splat"
   status = 200
 
+# Admin subdomain - admin paneli için
 [[redirects]]
-  from = "https://admin.guzellestir.com/*"
-  to = "/:splat"
+  from = "https://admin.guzellestir.com/"
+  to = "/admin/dashboard"
   status = 200
 
+[[redirects]]
+  from = "https://admin.guzellestir.com/*"
+  to = "/admin/:splat"
+  status = 200
+
+# Restoran subdomain'leri (wildcard)
 [[redirects]]
   from = "https://*.guzellestir.com/*"
-  to = "/:splat"
-  status = 200
-
-# Geçici subdomain yönlendirmeleri
-[[redirects]]
-  from = "https://admin.guzellestir.com/*"
-  to = "/:splat"
-  status = 200
-
-[[redirects]]
-  from = "https://kardesler.guzellestir.com/*"
   to = "/:splat"
   status = 200
 
@@ -40,16 +37,11 @@
   status = 301
 
 [[redirects]]
-  from = "http://kardesler.guzellestir.com/*"
-  to = "https://kardesler.guzellestir.com/:splat"
+  from = "http://*.guzellestir.com/*"
+  to = "https://:splat"
   status = 301
 
-# Tüm subdomain'ler için genel yönlendirme
-[[redirects]]
-  from = "https://*.guzellestir.com/*"
-  to = "/:splat"
-  status = 200
-
+# Fallback - tüm istekleri ana sayfaya yönlendir
 [[redirects]]
   from = "/*"
   to = "/index.html"

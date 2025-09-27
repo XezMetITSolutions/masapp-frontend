@@ -25,15 +25,19 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
         return;
       }
       
-      // Admin subdomain (admin.guzellestir.com)
-      if (isAdminSubdomain()) {
-        if (!pathname.startsWith('/admin')) {
-          router.push('/admin');
-          return;
-        }
-        setIsLoading(false);
-        return;
-      }
+              // Admin subdomain (admin.guzellestir.com)
+              if (isAdminSubdomain()) {
+                if (pathname === '/' || pathname === '') {
+                  router.push('/admin/dashboard');
+                  return;
+                }
+                if (!pathname.startsWith('/admin')) {
+                  router.push(`/admin${pathname}`);
+                  return;
+                }
+                setIsLoading(false);
+                return;
+              }
       
       // Restoran subdomain'i
       if (isRestaurantSubdomain()) {
@@ -45,9 +49,9 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             // Restoran bilgilerini localStorage'a kaydet
             localStorage.setItem('current-restaurant', JSON.stringify(restaurant));
             
-            // Restoran ana sayfasına yönlendir
+            // Restoran menüsüne yönlendir (ana sayfa yerine)
             if (pathname === '/' || pathname === '') {
-              router.push('/restaurant');
+              router.push('/demo/menu');
               return;
             }
             
