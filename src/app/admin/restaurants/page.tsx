@@ -488,10 +488,18 @@ export default function RestaurantsPage() {
   };
 
   const handleDeleteRestaurant = (restaurant: any) => {
-    if (confirm(`${restaurant.name} restoranını silmek istediğinizden emin misiniz?`)) {
+    if (confirm(`${restaurant.name} restoranını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz ve restoranın subdomain'i (${restaurant.subdomain}.guzellestir.com) artık erişilemez olacaktır.`)) {
       const updatedRestaurants = restaurants.filter(r => r.id !== restaurant.id);
       setRestaurants(updatedRestaurants);
       saveRestaurantsToStorage(updatedRestaurants);
+      
+      // Restoran silindikten sonra subdomain erişimini engelle
+      console.log(`🚫 Restoran silindi: ${restaurant.name} (${restaurant.subdomain}.guzellestir.com)`);
+      
+      // Subdomain bilgisini de localStorage'dan kaldır
+      const subdomains = JSON.parse(localStorage.getItem('masapp-subdomains') || '[]');
+      const updatedSubdomains = subdomains.filter((s: any) => s.subdomain !== restaurant.subdomain);
+      localStorage.setItem('masapp-subdomains', JSON.stringify(updatedSubdomains));
     }
   };
 

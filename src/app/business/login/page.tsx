@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguage } from '@/context/LanguageContext';
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaSignInAlt } from 'react-icons/fa';
+import { getSubdomain, isRestaurantSubdomain } from '@/utils/subdomain';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +18,24 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Restoran kontrolü
+  useEffect(() => {
+    if (isRestaurantSubdomain()) {
+      const subdomain = getSubdomain();
+      if (subdomain) {
+        // Restoran var mı kontrol et
+        const restaurants = JSON.parse(localStorage.getItem('masapp-restaurants') || '[]');
+        const restaurant = restaurants.find((r: any) => r.subdomain === subdomain);
+        
+        if (!restaurant || restaurant.status !== 'active') {
+          // Restoran yoksa veya aktif değilse ana sayfaya yönlendir
+          window.location.href = 'https://guzellestir.com';
+          return;
+        }
+      }
+    }
+  }, []);
 
   const getLanguageCode = () => {
     switch (currentLanguage) {

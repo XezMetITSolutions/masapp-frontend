@@ -51,6 +51,27 @@ export default function BusinessDashboard() {
       return;
     }
 
+    // Restoran kontrolü
+    const currentRestaurant = localStorage.getItem('current-restaurant');
+    if (!currentRestaurant) {
+      // Restoran bilgisi yoksa ana sayfaya yönlendir
+      window.location.href = 'https://guzellestir.com';
+      return;
+    }
+
+    try {
+      const restaurant = JSON.parse(currentRestaurant);
+      if (restaurant.status !== 'active') {
+        // Restoran aktif değilse ana sayfaya yönlendir
+        window.location.href = 'https://guzellestir.com';
+        return;
+      }
+    } catch (error) {
+      console.error('Restoran bilgisi okunamadı:', error);
+      window.location.href = 'https://guzellestir.com';
+      return;
+    }
+
     // Dashboard istatistiklerini yükle
     const loadDashboardData = () => {
       try {

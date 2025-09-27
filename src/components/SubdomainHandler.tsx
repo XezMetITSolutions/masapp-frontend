@@ -44,25 +44,40 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
         try {
           const restaurant = await getCurrentRestaurant();
           if (restaurant) {
+            // Restoran aktif mi kontrol et
+            if (restaurant.status !== 'active') {
+              // Restoran aktif değilse ana sayfaya yönlendir
+              window.location.href = 'https://guzellestir.com';
+              return;
+            }
+            
             setCurrentRestaurant(restaurant);
             
             // Restoran bilgilerini localStorage'a kaydet
             localStorage.setItem('current-restaurant', JSON.stringify(restaurant));
             
-                    // Restoran menüsüne yönlendir (ana sayfa yerine)
-                    if (pathname === '/' || pathname === '') {
-                      router.push('/menu');
-                      return;
-                    }
+            // Restoran menüsüne yönlendir (ana sayfa yerine)
+            if (pathname === '/' || pathname === '') {
+              router.push('/menu');
+              return;
+            }
             
             // Business panel'e yönlendir
             if (!pathname.startsWith('/business') && !pathname.startsWith('/menu')) {
               router.push('/business/dashboard');
               return;
             }
+          } else {
+            // Restoran bulunamadıysa ana sayfaya yönlendir
+            console.log('Restoran bulunamadı, ana sayfaya yönlendiriliyor...');
+            window.location.href = 'https://guzellestir.com';
+            return;
           }
         } catch (error) {
           console.error('Restoran bilgisi alınamadı:', error);
+          // Hata durumunda da ana sayfaya yönlendir
+          window.location.href = 'https://guzellestir.com';
+          return;
         }
       }
       
