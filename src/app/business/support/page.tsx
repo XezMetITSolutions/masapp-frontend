@@ -525,7 +525,6 @@ export default function SupportPage() {
       <BusinessSidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
-        onLogout={() => logout()}
       />
 
       {/* Main Content */}

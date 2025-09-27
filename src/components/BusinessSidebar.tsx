@@ -2,78 +2,169 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
 import { 
-  FaChartLine,
+  FaHome,
   FaUtensils,
   FaUsers,
   FaQrcode,
+  FaShoppingCart,
   FaChartBar,
   FaHeadset,
   FaCog,
-  FaCreditCard,
   FaSignOutAlt,
-  FaBars
+  FaBars,
+  FaTimes,
+  FaStore,
+  FaClipboardList,
+  FaConciergeBell,
+  FaMoneyBillWave
 } from 'react-icons/fa';
 
 interface BusinessSidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
-  onLogout: () => void;
 }
 
-export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout }: BusinessSidebarProps) {
+export default function BusinessSidebar({ sidebarOpen, setSidebarOpen }: BusinessSidebarProps) {
   const pathname = usePathname();
+  const { user, logout } = useAuthStore();
 
-  const menuItems = [
-    {
-      href: '/business/dashboard',
-      icon: FaChartLine,
-      label: 'Kontrol Paneli',
-      active: pathname === '/business/dashboard'
-    },
-    {
-      href: '/admin/payment',
-      icon: FaCreditCard,
-      label: 'Ödeme & Abonelik',
-      active: pathname === '/admin/payment'
-    },
-    {
-      href: '/business/menu',
-      icon: FaUtensils,
-      label: 'Menü Yönetimi',
-      active: pathname === '/business/menu'
-    },
-    {
-      href: '/business/staff',
-      icon: FaUsers,
-      label: 'Personel',
-      active: pathname === '/business/staff'
-    },
-    {
-      href: '/business/qr-codes',
-      icon: FaQrcode,
-      label: 'QR Kodlar',
-      active: pathname === '/business/qr-codes'
-    },
-    {
-      href: '/business/reports',
-      icon: FaChartBar,
-      label: 'Raporlar',
-      active: pathname === '/business/reports'
-    },
-    {
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'restaurant_owner': return 'Restoran Sahibi';
+      case 'restaurant_admin': return 'Restoran Yöneticisi';
+      case 'waiter': return 'Garson';
+      case 'kitchen': return 'Mutfak';
+      case 'cashier': return 'Kasa';
+      default: return 'Kullanıcı';
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'restaurant_owner': return 'from-purple-600 to-purple-800';
+      case 'restaurant_admin': return 'from-blue-600 to-blue-800';
+      case 'waiter': return 'from-green-600 to-green-800';
+      case 'kitchen': return 'from-orange-600 to-orange-800';
+      case 'cashier': return 'from-yellow-600 to-yellow-800';
+      default: return 'from-gray-600 to-gray-800';
+    }
+  };
+
+  // Role-based menu items
+  const getMenuItems = () => {
+    const baseItems = [
+      {
+        href: '/business/dashboard',
+        icon: FaHome,
+        label: 'Dashboard',
+        active: pathname === '/business/dashboard'
+      }
+    ];
+
+    // Restaurant owner and admin can see all items
+    if (user?.role === 'restaurant_owner' || user?.role === 'restaurant_admin') {
+      baseItems.push(
+        {
+          href: '/business/menu',
+          icon: FaUtensils,
+          label: 'Menü Yönetimi',
+          active: pathname === '/business/menu'
+        },
+        {
+          href: '/business/staff',
+          icon: FaUsers,
+          label: 'Personel',
+          active: pathname === '/business/staff'
+        },
+        {
+          href: '/business/qr-codes',
+          icon: FaQrcode,
+          label: 'QR Kodlar',
+          active: pathname === '/business/qr-codes'
+        },
+        {
+          href: '/business/orders',
+          icon: FaShoppingCart,
+          label: 'Siparişler',
+          active: pathname === '/business/orders'
+        },
+        {
+          href: '/business/reports',
+          icon: FaChartBar,
+          label: 'Raporlar',
+          active: pathname === '/business/reports'
+        },
+        {
+          href: '/business/settings',
+          icon: FaCog,
+          label: 'Ayarlar',
+          active: pathname === '/business/settings'
+        }
+      );
+    }
+
+    // Waiter specific items
+    if (user?.role === 'waiter') {
+      baseItems.push(
+        {
+          href: '/business/waiter',
+          icon: FaConciergeBell,
+          label: 'Garson Paneli',
+          active: pathname === '/business/waiter'
+        },
+        {
+          href: '/business/orders',
+          icon: FaShoppingCart,
+          label: 'Siparişler',
+          active: pathname === '/business/orders'
+        }
+      );
+    }
+
+    // Kitchen specific items
+    if (user?.role === 'kitchen') {
+      baseItems.push(
+        {
+          href: '/kitchen',
+          icon: FaUtensils,
+          label: 'Mutfak Paneli',
+          active: pathname === '/kitchen'
+        }
+      );
+    }
+
+    // Cashier specific items
+    if (user?.role === 'cashier') {
+      baseItems.push(
+        {
+          href: '/business/cashier',
+          icon: FaMoneyBillWave,
+          label: 'Kasa Paneli',
+          active: pathname === '/business/cashier'
+        },
+        {
+          href: '/business/orders',
+          icon: FaShoppingCart,
+          label: 'Siparişler',
+          active: pathname === '/business/orders'
+        }
+      );
+    }
+
+    // Support for all roles
+    baseItems.push({
       href: '/business/support',
       icon: FaHeadset,
       label: 'Destek',
       active: pathname === '/business/support'
-    },
-    {
-      href: '/business/settings',
-      icon: FaCog,
-      label: 'Ayarlar',
-      active: pathname === '/business/settings'
-    }
-  ];
+    });
+
+    return baseItems;
+  };
+
+  const menuItems = getMenuItems();
 
   return (
     <>
@@ -86,63 +177,77 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-purple-900 to-purple-800 text-white transform transition-transform duration-300 ease-in-out z-50 ${
+      <div className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-b ${getRoleColor(user?.role || 'default')} text-white transform transition-transform duration-300 ease-in-out z-50 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0`}>
         <div className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Restoran Yönetim Sistemi</p>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <FaStore className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">MasApp</h1>
+                <p className="text-white/80 text-xs">Restoran Yönetim</p>
+              </div>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 hover:bg-purple-700 rounded-lg transition-colors"
+              className="lg:hidden p-2 rounded-md text-white/80 hover:text-white hover:bg-white/10"
             >
-              <FaBars className="text-lg" />
+              <FaTimes className="h-5 w-5" />
             </button>
           </div>
 
-          <nav className="mt-4 sm:mt-6">
+          {/* User Info */}
+          {user && (
+            <div className="mb-8 p-4 bg-white/10 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">
+                    {user.name?.charAt(0) || 'U'}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-medium">{user.name || 'Kullanıcı'}</p>
+                  <p className="text-white/80 text-sm">{getRoleDisplayName(user.role)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation */}
+          <nav className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 transition-colors rounded-r-lg mx-2 sm:mx-0 ${
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
                     item.active
-                      ? 'bg-purple-700 bg-opacity-50 border-l-4 border-white'
-                      : 'hover:bg-purple-700 hover:bg-opacity-50'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
                   }`}
+                  onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon className="mr-2 sm:mr-3 text-sm sm:text-base" />
-                  <span className="text-sm sm:text-base font-medium">{item.label}</span>
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Bottom Section */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 border-t border-purple-700">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold">M</span>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">MasApp</p>
-                  <p className="text-xs text-purple-200">toto@Ayantar.com</p>
-                </div>
-              </div>
-              <button
-                onClick={onLogout}
-                className="p-2 hover:bg-purple-700 rounded-lg transition-colors"
-                title="Çıkış Yap"
-              >
-                <FaSignOutAlt className="text-lg" />
-              </button>
-            </div>
+          {/* Logout Button */}
+          <div className="mt-8 pt-4 border-t border-white/20">
+            <button
+              onClick={logout}
+              className="flex items-center space-x-3 px-4 py-3 w-full text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
+            >
+              <FaSignOutAlt className="h-5 w-5" />
+              <span className="font-medium">Çıkış Yap</span>
+            </button>
           </div>
         </div>
       </div>
