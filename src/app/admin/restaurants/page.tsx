@@ -85,7 +85,7 @@ export default function RestaurantsPage() {
               waiter: 'https://cagkebapcisi.guzellestir.com/business/waiter',
               kitchen: 'https://cagkebapcisi.guzellestir.com/kitchen',
               cashier: 'https://cagkebapcisi.guzellestir.com/business/cashier',
-              menu: 'https://cagkebapcisi.guzellestir.com/demo/menu',
+              menu: 'https://cagkebapcisi.guzellestir.com/menu',
               qr: 'https://cagkebapcisi.guzellestir.com/business/qr-codes'
             }
           }
@@ -263,7 +263,7 @@ export default function RestaurantsPage() {
         waiter: `https://${cleanSubdomain}.guzellestir.com/business/waiter`,
         kitchen: `https://${cleanSubdomain}.guzellestir.com/kitchen`,
         cashier: `https://${cleanSubdomain}.guzellestir.com/business/cashier`,
-        menu: `https://${cleanSubdomain}.guzellestir.com/demo/menu`,
+        menu: `https://${cleanSubdomain}.guzellestir.com/menu`,
         qr: `https://${cleanSubdomain}.guzellestir.com/business/qr-codes`
       }
     };
@@ -785,7 +785,7 @@ export default function RestaurantsPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Menü:</span>
                     <a 
-                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/demo/menu`}
+                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/menu`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 text-sm flex items-center"

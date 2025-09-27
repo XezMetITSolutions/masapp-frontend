@@ -74,11 +74,11 @@ export const generateNetlifySetupGuide = (subdomain: string) => {
         url: `https://${domainInfo.domain}/business/dashboard`,
         description: "Restoran yönetim paneli"
       },
-      {
-        name: "Menü",
-        url: `https://${domainInfo.domain}/demo/menu`,
-        description: "Müşteri menü sayfası"
-      },
+    {
+      name: "Menü",
+      url: `https://${domainInfo.domain}/menu`,
+      description: "Müşteri menü sayfası"
+    },
       {
         name: "Garson Paneli",
         url: `https://${domainInfo.domain}/business/waiter`,

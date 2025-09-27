@@ -49,14 +49,14 @@ export default function SubdomainHandler({ children }: SubdomainHandlerProps) {
             // Restoran bilgilerini localStorage'a kaydet
             localStorage.setItem('current-restaurant', JSON.stringify(restaurant));
             
-            // Restoran menüsüne yönlendir (ana sayfa yerine)
-            if (pathname === '/' || pathname === '') {
-              router.push('/demo/menu');
-              return;
-            }
+                    // Restoran menüsüne yönlendir (ana sayfa yerine)
+                    if (pathname === '/' || pathname === '') {
+                      router.push('/menu');
+                      return;
+                    }
             
             // Business panel'e yönlendir
-            if (!pathname.startsWith('/business') && !pathname.startsWith('/demo')) {
+            if (!pathname.startsWith('/business') && !pathname.startsWith('/menu')) {
               router.push('/business/dashboard');
               return;
             }

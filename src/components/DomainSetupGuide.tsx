@@ -61,7 +61,7 @@ export default function DomainSetupGuide({ subdomain, restaurantName, onClose }:
     },
     {
       name: "Menü",
-      url: `https://${subdomain}.guzellestir.com/demo/menu`,
+      url: `https://${subdomain}.guzellestir.com/menu`,
       description: "Müşteri menü sayfası"
     },
     {
