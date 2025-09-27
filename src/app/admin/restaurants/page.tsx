@@ -38,7 +38,7 @@ export default function RestaurantsPage() {
   });
   const [subdomainAvailable, setSubdomainAvailable] = useState<boolean | null>(null);
   const [checkingSubdomain, setCheckingSubdomain] = useState(false);
-  const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string} | null>(null);
+  const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string, subdomain: string} | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -217,7 +217,10 @@ export default function RestaurantsPage() {
     // Subdomain kurulumunu başlat (arka planda)
     setupSubdomainAsync(cleanSubdomain, restaurantId);
     
-    setGeneratedCredentials(credentials);
+    setGeneratedCredentials({
+      ...credentials,
+      subdomain: cleanSubdomain
+    });
     setFormData({
       name: '',
       owner: '',
@@ -704,23 +707,56 @@ export default function RestaurantsPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Dashboard:</span>
                     <a 
-                      href={`https://${formData.subdomain}.guzellestir.com/business/dashboard`}
+                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/business/dashboard`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                     >
-                      {formData.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                      {generatedCredentials.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
                     </a>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Menü:</span>
                     <a 
-                      href={`https://${formData.subdomain}.guzellestir.com/demo/menu`}
+                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/demo/menu`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                     >
-                      {formData.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                      {generatedCredentials.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                    </a>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Garson Paneli:</span>
+                    <a 
+                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/business/waiter`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    >
+                      {generatedCredentials.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                    </a>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Mutfak Paneli:</span>
+                    <a 
+                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/kitchen`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    >
+                      {generatedCredentials.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                    </a>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Kasa Paneli:</span>
+                    <a 
+                      href={`https://${generatedCredentials.subdomain}.guzellestir.com/business/cashier`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    >
+                      {generatedCredentials.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
                     </a>
                   </div>
                 </div>
