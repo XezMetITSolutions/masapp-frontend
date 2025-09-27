@@ -24,6 +24,7 @@ import {
   FaCopy,
   FaExternalLinkAlt
 } from 'react-icons/fa';
+import DomainSetupGuide from '@/components/DomainSetupGuide';
 
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -38,10 +39,11 @@ export default function RestaurantsPage() {
   });
   const [subdomainAvailable, setSubdomainAvailable] = useState<boolean | null>(null);
   const [checkingSubdomain, setCheckingSubdomain] = useState(false);
-  const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string, subdomain: string} | null>(null);
+  const [generatedCredentials, setGeneratedCredentials] = useState<{username: string, password: string, subdomain: string, restaurantName: string} | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDomainGuide, setShowDomainGuide] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -219,7 +221,8 @@ export default function RestaurantsPage() {
     
     setGeneratedCredentials({
       ...credentials,
-      subdomain: cleanSubdomain
+      subdomain: cleanSubdomain,
+      restaurantName: formData.name
     });
     setFormData({
       name: '',
@@ -778,6 +781,15 @@ export default function RestaurantsPage() {
                   Kopyala
                 </button>
                 <button
+                  onClick={() => {
+                    setShowDomainGuide(true);
+                    setGeneratedCredentials(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  🌐 Domain Kurulum Rehberi
+                </button>
+                <button
                   onClick={() => setGeneratedCredentials(null)}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
@@ -1290,6 +1302,15 @@ export default function RestaurantsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Domain Setup Guide Modal */}
+      {showDomainGuide && generatedCredentials && (
+        <DomainSetupGuide
+          subdomain={generatedCredentials.subdomain}
+          restaurantName={generatedCredentials.restaurantName}
+          onClose={() => setShowDomainGuide(false)}
+        />
       )}
     </ModernAdminLayout>
   );
