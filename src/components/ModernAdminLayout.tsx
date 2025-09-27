@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { 
   FaBars, 
   FaTimes, 
@@ -30,6 +31,7 @@ interface ModernAdminLayoutProps {
 export default function ModernAdminLayout({ children, title, description }: ModernAdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAdminAuth();
 
   const menuItems = [
     { name: 'Dashboard', href: '/admin', icon: FaHome },
@@ -106,11 +108,14 @@ export default function ModernAdminLayout({ children, title, description }: Mode
                 <span className="text-white font-bold text-sm">A</span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Admin</p>
-                <p className="text-xs text-gray-500">Süper Yönetici</p>
+                <p className="text-sm font-medium text-gray-900">{user?.name || 'Admin'}</p>
+                <p className="text-xs text-gray-500">{user?.role === 'super_admin' ? 'Süper Yönetici' : 'Yönetici'}</p>
               </div>
             </div>
-            <button className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <button 
+              onClick={logout}
+              className="w-full flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <FaSignOutAlt className="w-4 h-4" />
               <span className="text-sm">Çıkış Yap</span>
             </button>

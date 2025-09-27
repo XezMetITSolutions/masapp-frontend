@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ModernAdminLayout from '@/components/ModernAdminLayout';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { 
   FaChartLine, 
   FaUsers, 
@@ -20,6 +21,8 @@ import {
 } from 'react-icons/fa';
 
 export default function AdminDashboard() {
+  const { isAuthenticated, isLoading, user } = useAdminAuth();
+
   const [stats, setStats] = useState([
     {
       title: 'Toplam Restoran',
@@ -156,6 +159,23 @@ export default function AdminDashboard() {
         return 'text-gray-500';
     }
   };
+
+  // Loading durumu
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Kontrol ediliyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Authentication yoksa hiçbir şey gösterme
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <ModernAdminLayout title="Dashboard" description="Sistem genel durumu ve yönetim paneli">
