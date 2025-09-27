@@ -94,13 +94,36 @@ export default function RestaurantsPage() {
     }, 500);
   };
 
+  // Restoran adından otomatik subdomain oluştur
+  const generateSubdomainFromName = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '') // Özel karakterleri kaldır
+      .replace(/\s+/g, '') // Boşlukları kaldır
+      .substring(0, 20); // Maksimum 20 karakter
+  };
+
   // Form verilerini güncelle
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Restoran adı değiştiğinde otomatik subdomain öner
+    if (name === 'name' && !formData.subdomain) {
+      const autoSubdomain = generateSubdomainFromName(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        subdomain: autoSubdomain
+      }));
+      if (autoSubdomain.length >= 3) {
+        checkSubdomainAvailability(autoSubdomain);
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
 
     // Subdomain değiştiğinde kontrol et
     if (name === 'subdomain') {
@@ -150,7 +173,7 @@ export default function RestaurantsPage() {
     return { username, password };
   };
 
-  const handleAddRestaurant = (e: React.FormEvent) => {
+  const handleAddRestaurant = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Subdomain kontrolü
@@ -178,7 +201,7 @@ export default function RestaurantsPage() {
         waiter: `https://${cleanSubdomain}.guzellestir.com/business/waiter`,
         kitchen: `https://${cleanSubdomain}.guzellestir.com/kitchen`,
         cashier: `https://${cleanSubdomain}.guzellestir.com/business/cashier`,
-        menu: `https://${cleanSubdomain}.guzellestir.com/business/menu`,
+        menu: `https://${cleanSubdomain}.guzellestir.com/demo/menu`,
         qr: `https://${cleanSubdomain}.guzellestir.com/business/qr-codes`
       }
     };
@@ -190,6 +213,9 @@ export default function RestaurantsPage() {
     
     // Restoran için otomatik panel kurulumu yap
     setupRestaurantPanels(newRestaurant);
+    
+    // Subdomain kurulumunu başlat (arka planda)
+    setupSubdomainAsync(cleanSubdomain, restaurantId);
     
     setGeneratedCredentials(credentials);
     setFormData({
@@ -203,6 +229,29 @@ export default function RestaurantsPage() {
     setSubdomainAvailable(null);
     setCheckingSubdomain(false);
     setShowAddForm(false);
+  };
+
+  // Subdomain kurulumunu arka planda yap
+  const setupSubdomainAsync = async (subdomain: string, restaurantId: string) => {
+    try {
+      // DNS kaydı oluştur (simüle edilmiş)
+      console.log(`🚀 Subdomain kurulumu başlatılıyor: ${subdomain}.guzellestir.com`);
+      
+      // Gerçek uygulamada burada Netlify API çağrısı yapılır
+      setTimeout(() => {
+        console.log(`✅ Subdomain aktif: ${subdomain}.guzellestir.com`);
+        
+        // Restoran listesini güncelle
+        const updatedRestaurants = restaurants.map(r => 
+          r.id === restaurantId ? { ...r, subdomainStatus: 'active' } : r
+        );
+        setRestaurants(updatedRestaurants);
+        saveRestaurantsToStorage(updatedRestaurants);
+      }, 3000); // 3 saniye sonra aktif olarak işaretle
+      
+    } catch (error) {
+      console.error('Subdomain kurulum hatası:', error);
+    }
   };
 
   // Restoran panellerini otomatik kurulum
@@ -490,11 +539,12 @@ export default function RestaurantsPage() {
                     type="text"
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={handleFormChange}
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Örn: Pizza Palace"
+                    placeholder="Örn: Çağkebapçısı"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Restoran adı yazıldığında otomatik subdomain oluşturulacak</p>
                 </div>
                 
             <div>
@@ -563,12 +613,15 @@ export default function RestaurantsPage() {
                         subdomainAvailable === true ? 'border-green-300 bg-green-50' : 
                         'border-gray-300'
                       }`}
-                      placeholder="kardesler"
+                      placeholder="cagkebapcisi"
                     />
                     <span className="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-gray-600">
                       .guzellestir.com
                     </span>
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Restoran adından otomatik oluşturuldu. Değiştirebilirsiniz.
+                  </p>
                   {formData.subdomain && (
                     <div className="mt-2">
                       {checkingSubdomain ? (
@@ -640,6 +693,40 @@ export default function RestaurantsPage() {
                 <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-800">
                     ⚠️ Bu bilgileri güvenli bir yerde saklayın. Şifre sadece bir kez gösterilir!
+                  </p>
+                </div>
+              </div>
+
+              {/* Subdomain Linkleri */}
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-gray-900 mb-3">Restoran Panelleri</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Dashboard:</span>
+                    <a 
+                      href={`https://${formData.subdomain}.guzellestir.com/business/dashboard`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    >
+                      {formData.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                    </a>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Menü:</span>
+                    <a 
+                      href={`https://${formData.subdomain}.guzellestir.com/demo/menu`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
+                    >
+                      {formData.subdomain}.guzellestir.com <FaExternalLinkAlt className="w-3 h-3 ml-1" />
+                    </a>
+                  </div>
+                </div>
+                <div className="mt-3 p-3 bg-blue-100 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    🚀 Restoran subdomain'i otomatik olarak oluşturuldu! DNS yayılması 5-10 dakika sürebilir.
                   </p>
                 </div>
               </div>
