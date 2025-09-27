@@ -59,37 +59,43 @@ export default function RestaurantsPage() {
       const parsedRestaurants = JSON.parse(savedRestaurants);
       setRestaurants(parsedRestaurants);
     } else {
-      // Demo restoran verisi ekle
-      const demoRestaurants = [
-        {
-          id: 'restaurant-demo-1',
-          name: 'Çağkebapçısı',
-          owner: 'Ahmet Yılmaz',
-          email: 'ahmet@cagkebapcisi.com',
-          phone: '+90 212 555 0123',
-          address: 'Kadıköy, İstanbul',
-          subdomain: 'cagkebapcisi',
-          domain: 'cagkebapcisi.guzellestir.com',
-          status: 'active',
-          qrCount: 5,
-          createdAt: '2024-01-15',
-          lastOrder: '2 saat önce',
-          credentials: {
-            username: 'cagkebap',
-            password: 'demo123'
-          },
-          panelUrls: {
-            dashboard: 'https://cagkebapcisi.guzellestir.com/business/dashboard',
-            waiter: 'https://cagkebapcisi.guzellestir.com/business/waiter',
-            kitchen: 'https://cagkebapcisi.guzellestir.com/kitchen',
-            cashier: 'https://cagkebapcisi.guzellestir.com/business/cashier',
-            menu: 'https://cagkebapcisi.guzellestir.com/demo/menu',
-            qr: 'https://cagkebapcisi.guzellestir.com/business/qr-codes'
+      // Demo restoran verisi ekle (sadece ilk kez)
+      const hasDemoData = localStorage.getItem('masapp-demo-added');
+      if (!hasDemoData) {
+        const demoRestaurants = [
+          {
+            id: 'restaurant-demo-1',
+            name: 'Çağkebapçısı',
+            owner: 'Ahmet Yılmaz',
+            email: 'ahmet@cagkebapcisi.com',
+            phone: '+90 212 555 0123',
+            address: 'Kadıköy, İstanbul',
+            subdomain: 'cagkebapcisi',
+            domain: 'cagkebapcisi.guzellestir.com',
+            status: 'active',
+            qrCount: 5,
+            createdAt: '2024-01-15',
+            lastOrder: '2 saat önce',
+            credentials: {
+              username: 'cagkebap',
+              password: 'demo123'
+            },
+            panelUrls: {
+              dashboard: 'https://cagkebapcisi.guzellestir.com/business/dashboard',
+              waiter: 'https://cagkebapcisi.guzellestir.com/business/waiter',
+              kitchen: 'https://cagkebapcisi.guzellestir.com/kitchen',
+              cashier: 'https://cagkebapcisi.guzellestir.com/business/cashier',
+              menu: 'https://cagkebapcisi.guzellestir.com/demo/menu',
+              qr: 'https://cagkebapcisi.guzellestir.com/business/qr-codes'
+            }
           }
-        }
-      ];
-      setRestaurants(demoRestaurants);
-      localStorage.setItem('masapp-restaurants', JSON.stringify(demoRestaurants));
+        ];
+        setRestaurants(demoRestaurants);
+        localStorage.setItem('masapp-restaurants', JSON.stringify(demoRestaurants));
+        localStorage.setItem('masapp-demo-added', 'true');
+      } else {
+        setRestaurants([]);
+      }
     }
   }, [isAuthenticated]);
 
@@ -264,8 +270,11 @@ export default function RestaurantsPage() {
     
     // Restoranı kaydet
     const updatedRestaurants = [...restaurants, newRestaurant];
+    console.log('🔄 Yeni restoran ekleniyor:', newRestaurant);
+    console.log('📋 Güncel restoran listesi:', updatedRestaurants);
     setRestaurants(updatedRestaurants);
     saveRestaurantsToStorage(updatedRestaurants);
+    console.log('💾 localStorage\'a kaydedildi');
     
     // Restoran için otomatik panel kurulumu yap
     setupRestaurantPanels(newRestaurant);
@@ -301,8 +310,9 @@ export default function RestaurantsPage() {
       setTimeout(() => {
         console.log(`✅ Subdomain aktif: ${subdomain}.guzellestir.com`);
         
-        // Restoran listesini güncelle
-        const updatedRestaurants = restaurants.map(r => 
+        // Restoran listesini güncelle - localStorage'dan güncel veriyi al
+        const currentRestaurants = JSON.parse(localStorage.getItem('masapp-restaurants') || '[]');
+        const updatedRestaurants = currentRestaurants.map((r: any) => 
           r.id === restaurantId ? { ...r, subdomainStatus: 'active' } : r
         );
         setRestaurants(updatedRestaurants);
