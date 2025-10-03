@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export', // Static export devre dışı
+  output: 'export',
   trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,
