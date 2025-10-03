@@ -4,8 +4,23 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  API_BASE_URL = "https://api.guzellestir.com"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Subdomain routing için edge function
+[[edge_functions]]
+  function = "subdomain-router"
+  path = "/*"
+
+# Admin routing için edge function  
+[[edge_functions]]
+  function = "admin-router"
+  path = "/admin/*"
+
+# Wildcard domain desteği
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
