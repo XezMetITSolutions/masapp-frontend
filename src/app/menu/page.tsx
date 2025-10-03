@@ -470,7 +470,7 @@ function MenuPageContent() {
               <FaUtensils className="mb-0.5" size={16} />
               <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
             </Link>
-            <Link href="/demo/cart" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <div className="relative">
                 <FaShoppingCart className="mb-0.5" size={16} />
                 {isClient && cartCount > 0 && (
@@ -481,7 +481,7 @@ function MenuPageContent() {
               </div>
               <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
             </Link>
-            <Link href="/demo/waiter" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/business/waiter" className="flex flex-col items-center" style={{ color: primary }}>
               <FaBell className="mb-0.5" size={16} />
               <span className="text-[10px]"><TranslatedText>Garson Çağır</TranslatedText></span>
             </Link>

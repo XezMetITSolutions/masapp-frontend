@@ -169,13 +169,13 @@ export default function Home() {
       {/* Demo Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Canlı Demo İnceleyin</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Menümüzü İnceleyin</h2>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            MasApp'in nasıl çalıştığını görmek için demo menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!
+            MasApp'in nasıl çalıştığını görmek için menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!
           </p>
-          <Link href="/demo/menu" className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
+          <Link href="/menu" className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
             <FaUtensils className="inline mr-2" />
-            Demo Menüyü İncele
+            Menüyü İncele
             </Link>
         </div>
       </section>
