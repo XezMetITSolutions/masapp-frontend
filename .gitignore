@@ -26,6 +26,11 @@ yarn-error.log*
 # Local env files
 .env*.local
 .env
+.env.admin
+
+# Admin security files
+ADMIN_SECURITY_CHECKLIST.md
+netlify-admin.toml
 
 # Vercel
 .vercel

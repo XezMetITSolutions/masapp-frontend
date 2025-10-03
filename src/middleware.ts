@@ -1,15 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { adminSecurityMiddleware, rateLimitMiddleware } from './middleware/admin-security';
 
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
   
-  // Netlify'da subdomain kontrolü devre dışı
-  // const subdomain = getSubdomain(hostname);
+  // Subdomain kontrolü
+  const subdomain = getSubdomain(hostname);
   
-  // Admin sayfalarını koru - Demo için direkt erişim
-  if (pathname.startsWith('/admin')) {
-    return NextResponse.next();
+  // Admin subdomain kontrolü
+  if (subdomain === 'admin') {
+    // Admin subdomain'inden gelen tüm istekler
+    if (pathname === '/') {
+      // Ana sayfa -> admin login'e yönlendir
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+    
+    if (pathname.startsWith('/admin')) {
+      // Rate limiting kontrolü
+      const rateLimitResponse = rateLimitMiddleware(request);
+      if (rateLimitResponse.status !== 200) {
+        return rateLimitResponse;
+      }
+      
+      // Admin güvenlik kontrolleri
+      return adminSecurityMiddleware(request);
+    }
+    
+    // Admin subdomain'inde olmayan sayfalar -> admin login'e yönlendir
+    return NextResponse.redirect(new URL('/admin/login', request.url));
+  }
+  
+  // Ana domain'den admin sayfalarına erişimi engelle
+  if (pathname.startsWith('/admin') && !subdomain) {
+    return NextResponse.redirect(new URL('https://admin.guzellestir.com/admin/login'));
   }
   
   // Business sayfalarını koru
