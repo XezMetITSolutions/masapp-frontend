@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: 'export', // Commented out for API routes support
+  output: 'export', // Re-enabled for Netlify static hosting
   trailingSlash: true,
   typescript: {
     ignoreBuildErrors: true,
