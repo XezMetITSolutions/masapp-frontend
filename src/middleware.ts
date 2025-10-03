@@ -4,18 +4,8 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
   
-  // Admin subdomain kontrolü
-  const subdomain = getSubdomain(hostname);
-  
-  // Admin subdomain'i kontrolü - guzellestir.com için
-  if (hostname === 'admin.guzellestir.com' || subdomain === 'admin') {
-    return handleAdminSubdomain(request);
-  }
-  
-  // Admin subdomain'inde normal sayfaları engelle
-  if (hostname === 'admin.guzellestir.com') {
-    return handleAdminSubdomain(request);
-  }
+  // Netlify'da subdomain kontrolü devre dışı
+  // const subdomain = getSubdomain(hostname);
   
   // Admin sayfalarını koru - Demo için direkt erişim
   if (pathname.startsWith('/admin')) {
@@ -54,25 +44,6 @@ function getSubdomain(hostname: string): string | null {
   }
   
   return null;
-}
-
-function handleAdminSubdomain(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Admin subdomain'i için özel routing
-  if (pathname === '/') {
-    // Ana sayfa - admin dashboard'a yönlendir
-    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-  }
-  
-  if (pathname.startsWith('/admin')) {
-    // Admin sayfaları - direkt erişim
-    return NextResponse.next();
-  }
-  
-  // Admin olmayan sayfalar için admin dashboard'a yönlendir
-  // Bu sayede /menu, /business, /demo gibi sayfalar admin subdomain'inde açılmaz
-  return NextResponse.redirect(new URL('/admin/dashboard', request.url));
 }
 
 function handleRestaurantSubdomain(request: NextRequest, subdomain: string) {
