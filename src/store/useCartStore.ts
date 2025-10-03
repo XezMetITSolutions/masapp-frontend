@@ -1,0 +1,192 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+// Simple ID generator
+const generateId = () => Math.random().toString(36).substring(2, 15);
+
+export interface CartItem {
+  id: string;
+  itemId: string;
+  name: {
+    en: string;
+    tr: string;
+  };
+  price: number;
+  quantity: number;
+  image?: string;
+  notes?: string; // müşteri özel istek notu
+}
+
+interface CartState {
+  items: CartItem[];
+  preparingItems: CartItem[]; // Hazırlanan ürünler
+  couponCode: string | null;
+  tipPercentage: number;
+  tableNumber: number;
+  orderStatus: 'idle' | 'preparing' | 'ready' | 'completed';
+  paid: boolean;
+  
+  // Actions
+  addItem: (item: Omit<CartItem, 'id'>) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  updateNotes: (id: string, notes: string) => void;
+  clearCart: () => void;
+  setCouponCode: (code: string | null) => void;
+  setTipPercentage: (percentage: number) => void;
+  setTableNumber: (tableNumber: number) => void;
+  setOrderStatus: (status: 'idle' | 'preparing' | 'ready' | 'completed') => void;
+  markPaidAndClear: () => void;
+  resetTable: () => void;
+  moveToPreparing: () => void; // Aktif ürünleri hazırlanan bölümüne taşı
+  
+  // Computed values
+  getTotalItems: () => number;
+  getActiveItems: () => number; // Sadece aktif (hazırlanmayan) ürünlerin sayısı
+  getSubtotal: () => number;
+  getDiscount: () => number;
+  getTipAmount: () => number;
+  getTotal: () => number;
+}
+
+const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      preparingItems: [], // Hazırlanan ürünler
+      couponCode: null,
+      tipPercentage: 10, // Default tip percentage
+      tableNumber: 5, // Default table number
+      orderStatus: 'idle', // Default order status
+      paid: false,
+      
+      addItem: (item) => {
+        const state = get();
+        const items = [...state.items];
+        const existingItemIndex = items.findIndex(i => i.itemId === item.itemId);
+        
+        // Yeni ürün eklenirken sipariş durumunu idle'a çevir (hazırlanan ürünleri etkilemez)
+        if (existingItemIndex >= 0) {
+          // Item already exists, update quantity
+          items[existingItemIndex].quantity += item.quantity;
+        } else {
+          // Add new item
+          items.push({ ...item, id: generateId() });
+        }
+        
+        set({ 
+          items,
+          orderStatus: 'idle' 
+        });
+      },
+      
+      removeItem: (id) => {
+        set({ items: get().items.filter(item => item.id !== id) });
+      },
+      
+      updateQuantity: (id, quantity) => {
+        const state = get();
+        const updatedItems = state.items.map(item => 
+          item.id === id ? { ...item, quantity } : item
+        );
+        set({ 
+          items: updatedItems, 
+          orderStatus: 'idle' 
+        });
+      },
+
+      updateNotes: (id, notes) => {
+        const state = get();
+        const updatedItems = state.items.map(item => 
+          item.id === id ? { ...item, notes } : item
+        );
+        set({ items: updatedItems });
+      },
+      
+      clearCart: () => {
+        set({ items: [], preparingItems: [], couponCode: null, tipPercentage: 10, orderStatus: 'idle', paid: false });
+      },
+      
+      setCouponCode: (code) => {
+        set({ couponCode: code });
+      },
+      
+      setTipPercentage: (percentage) => {
+        set({ tipPercentage: percentage });
+      },
+      
+      setTableNumber: (tableNumber) => {
+        set({ tableNumber });
+      },
+      
+      setOrderStatus: (status) => {
+        set({ orderStatus: status });
+      },
+
+      // Ödeme alındıktan sonra sepeti sıfırla ve paid=true kaydet
+      markPaidAndClear: () => {
+        set({ items: [], preparingItems: [], couponCode: null, tipPercentage: 10, orderStatus: 'completed', paid: true });
+      },
+
+      // Masa tamamlandığında tabloyu default hale getir (örn. 0) ve sepeti temizle
+      resetTable: () => {
+        set({ items: [], preparingItems: [], couponCode: null, tipPercentage: 10, orderStatus: 'idle', paid: false, tableNumber: 0 });
+      },
+      
+      moveToPreparing: () => {
+        const state = get();
+        set({ 
+          preparingItems: [...state.preparingItems, ...state.items],
+          items: [],
+          orderStatus: 'preparing'
+        });
+      },
+      
+      getTotalItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+      
+      getActiveItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+      
+      getSubtotal: () => {
+        return get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      },
+      
+      getDiscount: () => {
+        const subtotal = get().getSubtotal();
+        const couponCode = get().couponCode;
+        
+        // Simple discount logic - can be expanded
+        if (couponCode === 'WELCOME10') {
+          return subtotal * 0.1; // 10% discount
+        } else if (couponCode === 'MASAPP20') {
+          return subtotal * 0.2; // 20% discount
+        }
+        
+        return 0;
+      },
+      
+      getTipAmount: () => {
+        const subtotal = get().getSubtotal();
+        const discount = get().getDiscount();
+        const tipPercentage = get().tipPercentage;
+        
+        return (subtotal - discount) * (tipPercentage / 100);
+      },
+      
+      getTotal: () => {
+        const subtotal = get().getSubtotal();
+        const discount = get().getDiscount();
+        const tipAmount = get().getTipAmount();
+        
+        return subtotal - discount + tipAmount;
+      },
+    }),
+    {
+      name: 'masapp-cart-storage',
+    }
+  )
+);
+
+export default useCartStore;
