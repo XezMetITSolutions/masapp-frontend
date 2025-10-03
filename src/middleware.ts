@@ -4,8 +4,13 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
   
-  // Netlify'da subdomain kontrolü devre dışı
-  // const subdomain = getSubdomain(hostname);
+  // Admin subdomain kontrolü
+  const subdomain = getSubdomain(hostname);
+  
+  // Admin subdomain'i kontrolü
+  if (subdomain === 'admin') {
+    return handleAdminSubdomain(request);
+  }
   
   // Admin sayfalarını koru - Demo için direkt erişim
   if (pathname.startsWith('/admin')) {
@@ -44,6 +49,24 @@ function getSubdomain(hostname: string): string | null {
   }
   
   return null;
+}
+
+function handleAdminSubdomain(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Admin subdomain'i için özel routing
+  if (pathname === '/') {
+    // Ana sayfa - admin dashboard
+    return NextResponse.rewrite(new URL('/admin/dashboard', request.url));
+  }
+  
+  if (pathname.startsWith('/admin')) {
+    // Admin sayfaları - direkt erişim
+    return NextResponse.next();
+  }
+  
+  // Diğer tüm istekler için admin dashboard'a yönlendir
+  return NextResponse.rewrite(new URL('/admin/dashboard', request.url));
 }
 
 function handleRestaurantSubdomain(request: NextRequest, subdomain: string) {
