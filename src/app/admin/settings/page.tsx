@@ -26,7 +26,8 @@ import {
   FaTimes,
   FaExclamationTriangle,
   FaInfoCircle,
-  FaCheckCircle
+  FaCheckCircle,
+  FaPlus
 } from 'react-icons/fa';
 
 export default function SystemSettings() {
