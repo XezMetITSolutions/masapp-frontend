@@ -134,7 +134,7 @@ export default function AdminLogin() {
             Güvenli Admin Paneli
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Admin Girişi</h1>
-          <p className="text-gray-300">admin.guzellestir.com</p>
+          <p className="text-gray-300">MasApp Admin Panel</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
