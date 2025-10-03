@@ -7,8 +7,13 @@ export function middleware(request: NextRequest) {
   // Admin subdomain kontrolü
   const subdomain = getSubdomain(hostname);
   
-  // Admin subdomain'i kontrolü
-  if (subdomain === 'admin') {
+  // Admin subdomain'i kontrolü - guzellestir.com için
+  if (hostname === 'admin.guzellestir.com' || subdomain === 'admin') {
+    return handleAdminSubdomain(request);
+  }
+  
+  // Admin subdomain'inde normal sayfaları engelle
+  if (hostname === 'admin.guzellestir.com') {
     return handleAdminSubdomain(request);
   }
   
@@ -56,8 +61,8 @@ function handleAdminSubdomain(request: NextRequest) {
   
   // Admin subdomain'i için özel routing
   if (pathname === '/') {
-    // Ana sayfa - admin dashboard
-    return NextResponse.rewrite(new URL('/admin/dashboard', request.url));
+    // Ana sayfa - admin dashboard'a yönlendir
+    return NextResponse.redirect(new URL('/admin/dashboard', request.url));
   }
   
   if (pathname.startsWith('/admin')) {
@@ -65,8 +70,9 @@ function handleAdminSubdomain(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // Diğer tüm istekler için admin dashboard'a yönlendir
-  return NextResponse.rewrite(new URL('/admin/dashboard', request.url));
+  // Admin olmayan sayfalar için admin dashboard'a yönlendir
+  // Bu sayede /menu, /business, /demo gibi sayfalar admin subdomain'inde açılmaz
+  return NextResponse.redirect(new URL('/admin/dashboard', request.url));
 }
 
 function handleRestaurantSubdomain(request: NextRequest, subdomain: string) {
