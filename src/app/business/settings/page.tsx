@@ -451,7 +451,7 @@ export default function SettingsPage() {
                 Duyurular
               </button>
               <button 
-                onClick={() => window.open('/demo/menu', '_blank')}
+                onClick={() => window.open('/menu', '_blank')}
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
               >
                 <FaEye />
@@ -511,7 +511,7 @@ export default function SettingsPage() {
                         </p>
                         <div className="flex flex-wrap gap-2">
                           <button
-                            onClick={() => window.open('/demo/menu', '_blank')}
+                            onClick={() => window.open('/menu', '_blank')}
                             className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium hover:bg-purple-200 transition-colors"
                           >
                             <FaQrcode className="inline mr-1" /> QR Kod Menü

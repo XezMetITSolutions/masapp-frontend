@@ -118,7 +118,7 @@ export default function WaiterPage() {
         <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
           <div className="container mx-auto px-3 py-3 flex justify-between items-center">
             <div className="flex items-center">
-              <Link href="/demo/menu" className="mr-2">
+              <Link href="/menu" className="mr-2">
                 <FaArrowLeft size={16} />
               </Link>
               <h1 className="text-dynamic-lg font-bold" style={{ color: primary }}>{t.callWaiter}</h1>
@@ -150,7 +150,7 @@ export default function WaiterPage() {
             </div>
             <h2 className="text-dynamic-xl font-bold mb-3">{t.requestSent}</h2>
             <p className="text-gray-600 mb-4 text-sm">{t.waiterComing}</p>
-            <Link href="/demo/menu" className="btn text-white text-sm py-2" style={{ backgroundColor: primary }}>
+            <Link href="/menu" className="btn text-white text-sm py-2" style={{ backgroundColor: primary }}>
               {t.back}
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default function WaiterPage() {
         {/* Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
           <div className="container mx-auto flex justify-around">
-            <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <FaUtensils className="mb-0.5" size={16} />
               <span className="text-[10px]">{t.menu}</span>
             </Link>
@@ -184,7 +184,7 @@ export default function WaiterPage() {
       <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-3 py-3 flex justify-between items-center">
           <div className="flex items-center">
-            <Link href="/demo/menu" className="mr-2">
+            <Link href="/menu" className="mr-2">
               <FaArrowLeft size={16} />
             </Link>
             <h1 className="text-lg font-bold" style={{ color: primary }}>{t.callWaiter}</h1>
@@ -288,7 +288,7 @@ export default function WaiterPage() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
         <div className="container mx-auto flex justify-around">
-          <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
+          <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
             <FaUtensils className="mb-0.5" size={16} />
             <span className="text-[10px]">{t.menu}</span>
           </Link>

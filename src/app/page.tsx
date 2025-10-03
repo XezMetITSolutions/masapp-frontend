@@ -26,9 +26,9 @@ export default function Home() {
             <span className="text-white font-bold"><TranslatedText>satışlarınızı %300 artırın!</TranslatedText></span> <TranslatedText>Rakiplerinizi geride bırakın.</TranslatedText>
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6 max-w-2xl mx-auto">
-            <a href="tel:+905393222797" className="bg-white text-orange-600 px-8 py-4 rounded-2xl text-lg font-black flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
-              <FaPhone className="text-xl" /> <TranslatedText>Hemen Bizi Arayın</TranslatedText>
-            </a>
+            <Link href="/menu" className="bg-white text-orange-600 px-8 py-4 rounded-2xl text-lg font-black flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
+              <FaUtensils className="text-xl" /> <TranslatedText>Menüyü Görüntüle</TranslatedText>
+            </Link>
             <Link href="#pricing" className="bg-orange-700 hover:bg-orange-800 text-white px-8 py-4 rounded-2xl text-lg font-black transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
               <FaRocket className="inline mr-3 text-xl" /> <TranslatedText>14 Gün Ücretsiz Deneyin</TranslatedText>
             </Link>

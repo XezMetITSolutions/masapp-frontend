@@ -309,7 +309,7 @@ export default function CartPage() {
         <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center">
-              <Link href="/demo/menu" className="mr-2">
+              <Link href="/menu" className="mr-2">
                 <FaArrowLeft />
               </Link>
               <h1 className="text-dynamic-xl font-bold" style={{ color: primary }}>{t.cart}</h1>
@@ -338,7 +338,7 @@ export default function CartPage() {
           <div className="text-center px-4">
             <FaShoppingCart className="mx-auto text-gray-300 text-5xl mb-3" />
             <h2 className="text-dynamic-xl font-bold mb-3">{t.emptyCart}</h2>
-            <Link href="/demo/menu" className="btn bg-secondary hover:bg-secondary/90 text-white text-sm py-2">
+            <Link href="/menu" className="btn bg-secondary hover:bg-secondary/90 text-white text-sm py-2">
               {t.browseMenu}
             </Link>
           </div>
@@ -347,7 +347,7 @@ export default function CartPage() {
         {/* Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
           <div className="container mx-auto flex justify-around">
-            <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <FaUtensils className="mb-0.5" size={16} />
               <span className="text-[10px]">{t.menu}</span>
             </Link>
@@ -372,7 +372,7 @@ export default function CartPage() {
         <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center">
-              <Link href="/demo/menu" className="mr-2">
+              <Link href="/menu" className="mr-2">
                 <FaArrowLeft />
               </Link>
               <h1 className="text-dynamic-xl font-bold" style={{ color: primary }}>{t.cart}</h1>
@@ -404,7 +404,7 @@ export default function CartPage() {
             </div>
             <h2 className="text-dynamic-xl font-bold mb-3">{t.orderPlaced}</h2>
             <p className="text-gray-600 mb-4 text-sm">Order #{orderId.slice(0, 8)}</p>
-            <Link href="/demo/menu" className="btn bg-secondary hover:bg-secondary/90 text-white text-sm py-2">
+            <Link href="/menu" className="btn bg-secondary hover:bg-secondary/90 text-white text-sm py-2">
               {t.addMore}
             </Link>
           </div>
@@ -413,7 +413,7 @@ export default function CartPage() {
         {/* Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
           <div className="container mx-auto flex justify-around">
-            <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <FaUtensils className="mb-0.5" size={16} />
               <span className="text-[10px]">{t.menu}</span>
             </Link>
@@ -438,7 +438,7 @@ export default function CartPage() {
       <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-3 py-3 flex justify-between items-center">
           <div className="flex items-center">
-            <Link href="/demo/menu" className="mr-2">
+            <Link href="/menu" className="mr-2">
               <FaArrowLeft size={16} />
             </Link>
             <h1 className="text-dynamic-lg font-bold" style={{ color: primary }}>{t.cart}</h1>
@@ -794,7 +794,7 @@ export default function CartPage() {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
         <div className="container mx-auto flex justify-around">
-          <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
+          <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
             <FaUtensils className="mb-0.5" size={16} />
             <span className="text-[10px]">{t.menu}</span>
           </Link>
