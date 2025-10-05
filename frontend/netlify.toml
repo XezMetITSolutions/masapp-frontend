@@ -18,7 +18,12 @@
   to = "/index.html"
   status = 200
 
-# Subdomain routing için edge function
-[[edge_functions]]
-  function = "subdomain-router"
-  path = "/*"
+# Subdomain routing
+[[redirects]]
+  from = "https://:subdomain.guzellestir.com/*"
+  to = "/menu"
+  status = 200
+  force = true
+  conditions = {
+    subdomain = ["kardesler", "lezzet-duragi", "cafe-corner", "bistro-34", "demo", "example", "test", "pizzapalace", "burgerking", "sushimaster", "coffeecorner", "steakhouse"]
+  }
