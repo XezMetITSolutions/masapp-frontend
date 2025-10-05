@@ -7,6 +7,7 @@ import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils
 import { useCartStore } from '@/store';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import useNotificationStore from '@/store/useNotificationStore';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
@@ -29,10 +30,11 @@ export function MenuPageContent() {
   const [tokenValid, setTokenValid] = useState<boolean>(true);
   const [tokenError, setTokenError] = useState<string>('');
   
-  // Cart and waiter modal states
-  const [showCartModal, setShowCartModal] = useState(false);
-  const [showWaiterModal, setShowWaiterModal] = useState(false);
-  const [waiterCallSent, setWaiterCallSent] = useState(false);
+  // Notification store
+  const createWaiterCallNotification = useNotificationStore(state => state.createWaiterCallNotification);
+  
+  // Toast message state
+  const [toastMessage, setToastMessage] = useState<string>('Ürün sepete eklendi!');
   
   // URL parametrelerinden restaurant slug'ını ve masa numarasını al
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
@@ -247,6 +249,7 @@ export function MenuPageContent() {
         quantity: 1,
         image: item.image
       });
+      setToastMessage('Ürün sepete eklendi!');
       setToastVisible(true);
       // Auto hide toast after 3 seconds
       setTimeout(() => setToastVisible(false), 3000);
@@ -265,22 +268,13 @@ export function MenuPageContent() {
     setSelectedItem(null);
   };
   
-  // Garson çağır
+  // Garson çağır - notification oluştur
   const handleCallWaiter = () => {
-    setShowWaiterModal(true);
-    // 3 saniye sonra modal'ı kapat
-    setTimeout(() => {
-      setShowWaiterModal(false);
-      setWaiterCallSent(true);
-      // Başarı mesajını 3 saniye göster
-      setTimeout(() => setWaiterCallSent(false), 3000);
-    }, 2000);
-  };
-  
-  // Sepeti aç
-  const handleOpenCart = () => {
-    if (cartItems.length > 0) {
-      setShowCartModal(true);
+    if (tableNumber) {
+      createWaiterCallNotification(tableNumber);
+      setToastMessage(`Garson çağrıldı! Masa ${tableNumber}`);
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
     }
   };
 
@@ -366,106 +360,12 @@ export function MenuPageContent() {
           `}</style>
         </div>
       )}
-      <Toast message="Ürün sepete eklendi!" visible={toastVisible} onClose={() => setToastVisible(false)} />
+      <Toast 
+        message={toastMessage} 
+        visible={toastVisible} 
+        onClose={() => setToastVisible(false)} 
+      />
       <AnnouncementPopup />
-      
-      {/* Garson Çağır Modal */}
-      {showWaiterModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center animate-scaleIn">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaBell className="text-purple-600 text-3xl animate-bounce" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              <TranslatedText>Garson Çağrılıyor</TranslatedText>
-            </h3>
-            <p className="text-gray-600 text-sm">
-              <TranslatedText>Garsonunuz en kısa sürede yanınızda olacak</TranslatedText>
-            </p>
-          </div>
-        </div>
-      )}
-      
-      {/* Garson Başarı Mesajı */}
-      {waiterCallSent && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 animate-slideDown">
-          <FaBell />
-          <span><TranslatedText>Garson çağrıldı! Masa</TranslatedText> {tableNumber}</span>
-        </div>
-      )}
-      
-      {/* Sepet Modal */}
-      {showCartModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-          <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[80vh] overflow-y-auto animate-slideUp">
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-800">
-                <TranslatedText>Sepetim</TranslatedText>
-              </h3>
-              <button 
-                onClick={() => setShowCartModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            {/* Cart Items */}
-            <div className="p-6 space-y-4">
-              {cartItems.length === 0 ? (
-                <div className="text-center py-8">
-                  <FaShoppingCart className="mx-auto text-gray-300 text-5xl mb-4" />
-                  <p className="text-gray-500"><TranslatedText>Sepetiniz boş</TranslatedText></p>
-                </div>
-              ) : (
-                <>
-                  {cartItems.map((item, index) => (
-                    <div key={index} className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg">
-                      {item.image && (
-                        <img src={item.image} alt={typeof item.name === 'string' ? item.name : item.name.tr} className="w-16 h-16 object-cover rounded-lg" />
-                      )}
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800">
-                          {typeof item.name === 'string' ? item.name : (currentLanguage === 'en' ? item.name.en : item.name.tr)}
-                        </h4>
-                        <p className="text-sm text-gray-600"><TranslatedText>Adet</TranslatedText>: {item.quantity}</p>
-                      </div>
-                      <p className="font-bold text-gray-800">{item.price * item.quantity}₺</p>
-                    </div>
-                  ))}
-                  
-                  {/* Total */}
-                  <div className="border-t pt-4 mt-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-gray-600"><TranslatedText>Ara Toplam</TranslatedText></span>
-                      <span className="font-semibold">
-                        {cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}₺
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-lg font-bold">
-                      <span><TranslatedText>Toplam</TranslatedText></span>
-                      <span style={{ color: primary }}>
-                        {cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}₺
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Order Button */}
-                  <button 
-                    className="w-full py-4 rounded-lg font-semibold text-white text-lg shadow-lg"
-                    style={{ backgroundColor: primary }}
-                  >
-                    <TranslatedText>Sipariş Ver</TranslatedText>
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
       <main className="min-h-screen pb-20">
         {/* Header */}
         <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
@@ -744,11 +644,7 @@ export function MenuPageContent() {
               <FaUtensils className="mb-0.5" size={16} />
               <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
             </button>
-            <button 
-              onClick={handleOpenCart}
-              className="flex flex-col items-center relative" 
-              style={{ color: cartCount > 0 ? primary : '#9CA3AF' }}
-            >
+            <div className="flex flex-col items-center relative" style={{ color: cartCount > 0 ? primary : '#9CA3AF' }}>
               <div className="relative">
                 <FaShoppingCart className="mb-0.5" size={16} />
                 {isClient && cartCount > 0 && (
@@ -758,7 +654,7 @@ export function MenuPageContent() {
                 )}
               </div>
               <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
-            </button>
+            </div>
             <button 
               onClick={handleCallWaiter}
               className="flex flex-col items-center" 
