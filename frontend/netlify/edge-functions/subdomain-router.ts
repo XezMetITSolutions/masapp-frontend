@@ -21,26 +21,24 @@ export default async (request: Request, context: Context) => {
       return context.next();
     }
     
-    // Subdomain'i API üzerinden doğrula
-    // Bu URL'yi kendi backend API endpoint'iniz ile değiştirin.
-    const apiEndpoint = new URL(`/api/check-subdomain?subdomain=${encodeURIComponent(subdomain)}`, request.url);
-    apiEndpoint.hostname = "guzellestir.com"; // Ana domain'e istek at
-
-    let isValid = false;
-    try {
-      const apiResponse = await fetch(apiEndpoint.toString());
-      if (apiResponse.ok) {
-        const data = await apiResponse.json();
-        isValid = data.isValid;
-      }
-    } catch (error) {
-      console.error('Subdomain validation API error:', error);
-      // Hata durumunda güvenli bir varsayılan işlem yap - ana sayfaya yönlendir
-      return Response.redirect("https://guzellestir.com", 302);
-    }
+    // Subdomain validasyonu - veritabanından kontrol edilmeli
+    // Şimdilik statik liste kullanıyoruz, backend API ile entegre edilebilir
+    const validSubdomains = [
+      'lezzet-duragi',
+      'cafe-corner',
+      'bistro-34',
+      'demo',
+      'example',
+      'test',
+      'pizzapalace',
+      'burgerking',
+      'sushimaster',
+      'coffeecorner',
+      'steakhouse',
+    ];
 
     // Geçerli subdomain kontrolü
-    if (!isValid) {
+    if (!validSubdomains.includes(subdomain.toLowerCase())) {
       // Geçersiz subdomain için 404 sayfası
       return new Response(
         `<!DOCTYPE html>
