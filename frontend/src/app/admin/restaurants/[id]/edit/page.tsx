@@ -175,7 +175,7 @@ export default function EditRestaurantPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">E-posta *</nlabel>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">E-posta *</label>
                       <input
                         type="email"
                         required
@@ -249,7 +249,7 @@ export default function EditRestaurantPage() {
                     </div>
 
                     <div>
-                      <label className="block text sm font-medium text-gray-700 mb-1">İkincil Renk</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">İkincil Renk</label>
                       <div className="flex items-center space-x-2">
                         <input
                           type="color"
