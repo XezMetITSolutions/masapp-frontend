@@ -155,8 +155,10 @@ export default function RestaurantsManagement() {
       // Farklı aksiyonlar için gerçek işlevler
       switch(action) {
         case 'view':
-          // Restoran detay sayfasına yönlendir
-          router.push(`/admin/restaurants/${restaurant.id}`);
+          // Restoranı seç ve menü sayfasına yönlendir
+          const { setCurrentRestaurant } = useRestaurantStore.getState();
+          setCurrentRestaurant(restaurant);
+          router.push('/business/menu');
           break;
         case 'edit':
           setSelectedRestaurant(restaurant);
