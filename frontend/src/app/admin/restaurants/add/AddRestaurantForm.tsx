@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { kardeslerMenuCategories, kardeslerMenuItems } from '@/data/kardeslerDemoData';
+import { meteMenuCategories, meteMenuItems } from '@/data/meteDemoData';
 import { Restaurant } from '@/types';
 import { updateSubdomainsFile } from '@/lib/subdomains';
 
@@ -93,8 +94,10 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
 
     addRestaurant(newRestaurant);
     
+    const restaurantNameLower = formData.name.toLowerCase();
+    
     // Eğer "Kardeşler" restoranı ise demo menü verilerini ekle
-    if (formData.name.toLowerCase() === 'kardeşler' || formData.name.toLowerCase() === 'kardesler') {
+    if (restaurantNameLower === 'kardeşler' || restaurantNameLower === 'kardesler') {
       console.log('Kardeşler restoranı oluşturuluyor, demo verileri ekleniyor...');
       
       // Kategorileri ekle
@@ -119,6 +122,33 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
       });
       
       alert('Kardeşler restoranı demo menü ile birlikte oluşturuldu!');
+    }
+    // Eğer "Mete" restoranı ise demo menü verilerini ekle
+    else if (restaurantNameLower === 'mete') {
+      console.log('Mete restoranı oluşturuluyor, demo verileri ekleniyor...');
+      
+      // Kategorileri ekle
+      meteMenuCategories.forEach(category => {
+        addCategory({
+          ...category,
+          restaurantId: newRestaurant.id
+        });
+      });
+      
+      // Ürünleri ekle
+      meteMenuItems.forEach((item, index) => {
+        addMenuItem({
+          ...item,
+          restaurantId: newRestaurant.id,
+          order: index + 1,
+          allergens: { 
+            tr: Array.isArray((item as any).allergens) ? (item as any).allergens : [], 
+            en: Array.isArray((item as any).allergens) ? (item as any).allergens : [] 
+          }
+        } as any);
+      });
+      
+      alert('Mete restoranı demo menü ile birlikte oluşturuldu!');
     } else {
       alert('Restoran başarıyla eklendi!');
     }
