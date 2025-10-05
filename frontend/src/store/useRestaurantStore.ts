@@ -51,75 +51,10 @@ interface RestaurantState {
   clearCompletedCalls: () => void;
 }
 
-const getInitialState = () => ({
-  currentRestaurant: null,
-  restaurants: [
-    {
-      id: 'rest_1',
-      name: 'Lezzet Durağı',
-      username: 'lezzet',
-      password: '123456',
-      primaryColor: '#D32F2F',
-      secondaryColor: '#FFC107',
-      address: 'Merkez Mah. Lezzet Sk. No:1, Kadıköy, İstanbul',
-      phone: '0216 123 45 67',
-      email: 'info@lezzetduragi.com',
-      ownerId: 'owner_1',
-      tableCount: 20,
-      qrCodes: [],
-      settings: { language: ['tr'], currency: 'TRY', taxRate: 18, serviceChargeRate: 0, allowTips: true, allowOnlinePayment: true, autoAcceptOrders: false, workingHours: [] },
-      subscription: { plan: 'premium' as const, startDate: new Date(), endDate: new Date(), status: 'active' as const },
-      createdAt: new Date(),
-      status: 'active' as const
-    },
-    {
-      id: 'rest_2',
-      name: 'Cafe Corner',
-      username: 'cafe',
-      password: '123456',
-      primaryColor: '#388E3C',
-      secondaryColor: '#8BC34A',
-      address: 'Kızılay Meydanı, Çankaya, Ankara',
-      phone: '0312 987 65 43',
-      email: 'contact@cafecorner.com',
-      ownerId: 'owner_2',
-      tableCount: 15,
-      qrCodes: [],
-      settings: { language: ['tr', 'en'], currency: 'TRY', taxRate: 18, serviceChargeRate: 5, allowTips: true, allowOnlinePayment: true, autoAcceptOrders: true, workingHours: [] },
-      subscription: { plan: 'premium' as const, startDate: new Date(), endDate: new Date(), status: 'active' as const },
-      createdAt: new Date(),
-      status: 'active' as const
-    },
-    {
-      id: 'rest_3',
-      name: 'Kardeşler Pide',
-      username: 'kardesler',
-      password: '123456',
-      primaryColor: '#1976D2',
-      secondaryColor: '#64B5F6',
-      address: 'Alsancak, Konak, İzmir',
-      phone: '0232 456 78 90',
-      email: 'siparis@kardeslerpide.com',
-      ownerId: 'owner_3',
-      tableCount: 25,
-      qrCodes: [],
-      settings: { language: ['tr'], currency: 'TRY', taxRate: 18, serviceChargeRate: 0, allowTips: false, allowOnlinePayment: false, autoAcceptOrders: false, workingHours: [] },
-      subscription: { plan: 'basic' as const, startDate: new Date(), endDate: new Date(), status: 'active' as const },
-      createdAt: new Date(),
-      status: 'active' as const
-    }
-  ],
-  categories: [],
-  menuItems: [],
-  orders: [],
-  activeOrders: [],
-  serviceCalls: [],
-});
-
 const useRestaurantStore = create<RestaurantState>()(
   persist(
-    (set) => ({
-      ...getInitialState(),
+    (set) => ({ 
+      restaurants: [],
       currentRestaurant: null,
       categories: [],
       menuItems: [],
@@ -247,11 +182,6 @@ const useRestaurantStore = create<RestaurantState>()(
     }),
     {
       name: 'restaurant-storage',
-      onRehydrateStorage: () => (state) => {
-        if (state && state.restaurants.length === 0) {
-          state.restaurants = getInitialState().restaurants;
-        }
-      },
     }
   )
 );
