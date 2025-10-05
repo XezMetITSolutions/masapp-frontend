@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { Restaurant } from '@/types';
+import { updateSubdomainsFile } from '@/lib/subdomains';
 
 interface AddRestaurantFormProps {
   onClose: () => void;
@@ -110,6 +111,13 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
     };
 
     addRestaurant(newRestaurant);
+    
+    // Subdomain'i JSON dosyasına ekleme konusunda bilgi ver
+    updateSubdomainsFile([slug]); // Bu sadece konsola uyarı yazdırır
+    
+    // Kullanıcıya bilgi ver
+    alert(`Restoran başarıyla eklendi!\n\nÖNEMLİ: Subdomain'in (${slug}) çalışması için lütfen şu adımları takip edin:\n\n1. src/data/subdomains.json dosyasını açın\n2. "${slug}" değerini listeye ekleyin\n3. Değişiklikleri kaydedin ve git push yapın\n\nBu işlem yapılmadan ${slug}.guzellestir.com adresi çalışmayacaktır.`);
+    
     onClose();
     router.refresh();
   };

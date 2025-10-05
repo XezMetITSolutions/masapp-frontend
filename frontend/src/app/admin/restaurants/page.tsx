@@ -171,6 +171,10 @@ export default function RestaurantsManagement() {
         case 'delete':
           // Restoranı kalıcı olarak kaldır (Zustand store + persist)
           deleteRestaurant(restaurant.id);
+          
+          // Kullanıcıya subdomain'i JSON dosyasından kaldırması gerektiği konusunda bilgi ver
+          alert(`Restoran silindi!\n\nÖNEMLİ: Subdomain'in (${restaurant.slug}) tamamen kaldırılması için lütfen şu adımları takip edin:\n\n1. src/data/subdomains.json dosyasını açın\n2. "${restaurant.slug}" değerini listeden kaldırın\n3. Değişiklikleri kaydedin ve git push yapın\n\nBu işlem yapılmadan ${restaurant.slug}.guzellestir.com adresi hala çalışır durumda kalacaktır.`);
+          
           // Görünümü güncelle
           router.refresh();
           break;
