@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter } from 'react-icons/fa';
+import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter, FaQrcode } from 'react-icons/fa';
 import { useCartStore } from '@/store';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -15,6 +15,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
 import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 import SetBrandColor from '@/components/SetBrandColor';
+import { createSessionToken, validateToken, getSessionToken, markTokenAsUsed, getRemainingTime } from '@/utils/sessionToken';
 
 export function MenuPageContent() {
   // Store states
@@ -23,6 +24,11 @@ export function MenuPageContent() {
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
   
+  // Session token state
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [tokenValid, setTokenValid] = useState<boolean>(true);
+  const [tokenError, setTokenError] = useState<string>('');
+  
   // URL parametrelerinden restaurant slug'ını ve masa numarasını al
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
   const setTableNumber = useCartStore(state => state.setTableNumber);
@@ -30,18 +36,62 @@ export function MenuPageContent() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      setRestaurantSlug(params.get('restaurant'));
+      const restaurant = params.get('restaurant');
+      const tableParam = params.get('table') || params.get('masa');
+      const urlToken = params.get('token');
+      
+      setRestaurantSlug(restaurant);
       
       // Masa numarasını URL'den al ve store'a kaydet
-      const tableParam = params.get('table') || params.get('masa');
       if (tableParam) {
         const tableNum = parseInt(tableParam, 10);
         if (!isNaN(tableNum)) {
           setTableNumber(tableNum);
+          
+          // Token kontrolü ve oluşturma
+          if (urlToken) {
+            // URL'de token varsa validate et
+            const validation = validateToken(urlToken);
+            if (validation.valid) {
+              setSessionToken(urlToken);
+              setTokenValid(true);
+            } else {
+              // Token geçersiz - yeni token oluştur
+              handleTokenError(validation.reason || 'invalid');
+            }
+          } else {
+            // URL'de token yoksa yeni oluştur (ilk QR tarama)
+            if (restaurant) {
+              const newToken = createSessionToken(restaurant, tableNum);
+              setSessionToken(newToken.token);
+              setTokenValid(true);
+              
+              // URL'i token ile güncelle
+              const newUrl = `${window.location.pathname}?restaurant=${restaurant}&table=${tableNum}&token=${newToken.token}`;
+              window.history.replaceState({}, '', newUrl);
+            }
+          }
         }
       }
     }
   }, [setTableNumber]);
+  
+  // Token hatası yönetimi
+  const handleTokenError = (reason: string) => {
+    setTokenValid(false);
+    switch (reason) {
+      case 'token_used':
+        setTokenError('Bu oturum kullanılmış. Lütfen QR kodu tekrar tarayın.');
+        break;
+      case 'token_expired':
+        setTokenError('Oturum süresi dolmuş. Lütfen QR kodu tekrar tarayın.');
+        break;
+      case 'no_token':
+      case 'invalid_token':
+      default:
+        setTokenError('Geçersiz oturum. Lütfen QR kodu tarayın.');
+    }
+  };
   
   // Restaurant store
   const { authenticatedRestaurant } = useAuthStore();
@@ -180,6 +230,11 @@ export function MenuPageContent() {
 
   const addToCart = (item: any) => {
     try {
+      // İlk ürün sepete eklendiğinde token'ı kullanıldı olarak işaretle
+      if (cartItems.length === 0) {
+        markTokenAsUsed();
+      }
+      
       addItem({
         itemId: item.id,
         name: item.name,
@@ -204,6 +259,53 @@ export function MenuPageContent() {
     setIsModalOpen(false);
     setSelectedItem(null);
   };
+
+  // Token geçersizse QR taratma ekranı göster
+  if (!tokenValid) {
+    return (
+      <>
+        <SetBrandColor />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
+            <div className="mb-6">
+              <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <FaQrcode className="text-red-600 text-4xl" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Oturum Geçersiz</h2>
+              <p className="text-gray-600">{tokenError}</p>
+            </div>
+            
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <div className="flex items-start">
+                <FaBell className="text-yellow-600 mt-0.5 mr-3" />
+                <div className="text-left">
+                  <h3 className="font-semibold text-yellow-800 mb-1">Güvenlik Önlemi</h3>
+                  <p className="text-sm text-yellow-700">
+                    Her sipariş için QR kodunu tekrar taramanız gerekmektedir. Bu, yetkisiz siparişleri önler.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-center text-gray-600 text-sm">
+                <FaQrcode className="mr-2" />
+                <span>Masanızdaki QR kodu tarayın</span>
+              </div>
+              
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <FaQrcode />
+                Sayfayı Yenile
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
