@@ -5,26 +5,64 @@ import { useRouter } from 'next/navigation';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useAuthStore } from '@/store/useAuthStore';
 
+// Demo staff verileri - gerçek uygulamada bunlar veritabanından gelecek
+const demoStaff = [
+  { id: '1', restaurantId: 'rest_1', name: 'Demo Garson', username: 'garson', password: '123456', email: 'garson@test.com', phone: '0532', role: 'waiter' as const, status: 'active' as const, createdAt: new Date() },
+  { id: '2', restaurantId: 'rest_1', name: 'Demo Aşçı', username: 'asci', password: '123456', email: 'chef@test.com', phone: '0532', role: 'chef' as const, status: 'active' as const, createdAt: new Date() },
+  { id: '3', restaurantId: 'rest_1', name: 'Demo Kasiyer', username: 'kasiyer', password: '123456', email: 'cashier@test.com', phone: '0532', role: 'cashier' as const, status: 'active' as const, createdAt: new Date() },
+  { id: '4', restaurantId: 'rest_1', name: 'Demo Yönetici', username: 'yonetici', password: '123456', email: 'manager@test.com', phone: '0532', role: 'manager' as const, status: 'active' as const, createdAt: new Date() },
+];
+
 export default function LoginPage() {
   const router = useRouter();
   const { restaurants } = useRestaurantStore();
-  const { login } = useAuthStore();
+  const { loginRestaurant, loginStaff } = useAuthStore();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Önce restoran olarak giriş kontrolü
     const restaurant = restaurants.find(
       (r) => r.username === username && r.password === password
     );
 
     if (restaurant) {
-      login(restaurant);
+      loginRestaurant(restaurant);
       router.push('/business/dashboard');
-    } else {
-      setError('Geçersiz kullanıcı adı veya şifre');
+      return;
     }
+
+    // Restoran değilse, personel olarak giriş kontrolü
+    const staff = demoStaff.find(
+      (s) => s.username === username && s.password === password
+    );
+
+    if (staff) {
+      loginStaff(staff);
+      // Role göre yönlendirme
+      switch (staff.role) {
+        case 'waiter':
+          router.push('/business/waiter');
+          break;
+        case 'chef':
+          router.push('/business/kitchen');
+          break;
+        case 'cashier':
+          router.push('/business/cashier');
+          break;
+        case 'manager':
+          router.push('/business/dashboard');
+          break;
+        default:
+          router.push('/business/dashboard');
+      }
+      return;
+    }
+
+    setError('Geçersiz kullanıcı adı veya şifre');
   };
 
   return (

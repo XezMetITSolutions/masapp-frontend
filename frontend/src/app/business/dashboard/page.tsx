@@ -32,7 +32,11 @@ import BusinessPaymentModal from '@/components/BusinessPaymentModal';
 
 export default function BusinessDashboard() {
   const router = useRouter();
-  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  
+  // Giriş yapan kişinin adını al
+  const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
+  const displayEmail = authenticatedRestaurant?.email || authenticatedStaff?.email || '';
   
   // Premium plan state'leri
   const [currentPlan, setCurrentPlan] = useState('premium'); // basic, premium, enterprise
@@ -257,7 +261,7 @@ export default function BusinessDashboard() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">{authenticatedRestaurant?.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">{displayName}</h1>
               <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
@@ -304,8 +308,8 @@ export default function BusinessDashboard() {
           <div className="border-t border-purple-700 pt-3 sm:pt-4">
             <div className="flex items-center justify-between">
               <div className="hidden sm:block">
-                <p className="text-sm font-medium">{authenticatedRestaurant?.name}</p>
-                <p className="text-xs text-purple-300">{authenticatedRestaurant?.email}</p>
+                <p className="text-sm font-medium">{displayName}</p>
+                <p className="text-xs text-purple-300">{displayEmail}</p>
               </div>
               <button
                 onClick={handleLogout}
@@ -333,7 +337,7 @@ export default function BusinessDashboard() {
               </button>
             <div>
                 <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">Kontrol Paneli</h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Hoş geldiniz{authenticatedRestaurant?.name ? `, ${authenticatedRestaurant.name}` : ''} 👋</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Hoş geldiniz, {displayName} 👋</p>
             </div>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">

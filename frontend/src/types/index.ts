@@ -1,5 +1,6 @@
 // Kullanıcı Tipleri
-export type UserRole = 'super_admin' | 'restaurant_owner' | 'restaurant_admin' | 'waiter' | 'kitchen' | 'cashier';
+export type UserRole = 'super_admin' | 'restaurant_owner' | 'restaurant_admin' | 'manager' | 'waiter' | 'chef' | 'kitchen' | 'cashier';
+export type StaffRole = 'manager' | 'waiter' | 'chef' | 'cashier';
 export type UserStatus = 'active' | 'inactive' | 'suspended';
 
 export interface User {
@@ -11,6 +12,20 @@ export interface User {
   restaurantId?: string;
   createdAt: Date;
   lastLogin?: Date;
+}
+
+// Personel Tipleri
+export interface Staff {
+  id: string;
+  restaurantId: string;
+  name: string;
+  username: string;
+  password: string;
+  email: string;
+  phone: string;
+  role: StaffRole;
+  status: 'active' | 'inactive';
+  createdAt: Date;
 }
 
 // Restoran Tipleri

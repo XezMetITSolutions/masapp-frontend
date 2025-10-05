@@ -1,25 +1,42 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Restaurant } from '@/types';
+import { Restaurant, Staff } from '@/types';
 
 interface AuthState {
   authenticatedRestaurant: Restaurant | null;
-  login: (restaurant: Restaurant) => void;
+  authenticatedStaff: Staff | null;
+  loginRestaurant: (restaurant: Restaurant) => void;
+  loginStaff: (staff: Staff) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
+  getRole: () => string | null;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       authenticatedRestaurant: null,
-      login: (restaurant) => set({ authenticatedRestaurant: restaurant }),
-      logout: () => set({ authenticatedRestaurant: null }),
-      isAuthenticated: () => get().authenticatedRestaurant !== null,
+      authenticatedStaff: null,
+      loginRestaurant: (restaurant) => set({ authenticatedRestaurant: restaurant, authenticatedStaff: null }),
+      loginStaff: (staff) => set({ authenticatedStaff: staff, authenticatedRestaurant: null }),
+      logout: () => set({ authenticatedRestaurant: null, authenticatedStaff: null }),
+      isAuthenticated: () => {
+        const state = get();
+        return state.authenticatedRestaurant !== null || state.authenticatedStaff !== null;
+      },
+      getRole: () => {
+        const state = get();
+        if (state.authenticatedStaff) return state.authenticatedStaff.role;
+        if (state.authenticatedRestaurant) return 'restaurant_owner';
+        return null;
+      },
     }),
     {
       name: 'restaurant-auth-storage',
-      partialize: (state) => ({ authenticatedRestaurant: state.authenticatedRestaurant }),
+      partialize: (state) => ({ 
+        authenticatedRestaurant: state.authenticatedRestaurant,
+        authenticatedStaff: state.authenticatedStaff 
+      }),
     }
   )
 );
