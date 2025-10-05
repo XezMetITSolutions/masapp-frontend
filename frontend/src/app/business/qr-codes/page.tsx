@@ -44,7 +44,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function QRCodesPage() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [qrCodes, setQrCodes] = useState<any[]>([]);
   const [filteredQrCodes, setFilteredQrCodes] = useState<any[]>([]);
@@ -70,26 +70,10 @@ export default function QRCodesPage() {
   });
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo işletme kullanıcısı oluştur
-    const timer = setTimeout(() => {
-      if (!user) {
-        const demoUser = {
-          id: 'demo-restaurant-1',
-          name: 'Demo İşletme',
-          email: 'demo@restaurant.com',
-          role: 'restaurant_owner' as const,
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [user]);
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   // Demo QR kod verileri
   useEffect(() => {
@@ -224,7 +208,7 @@ export default function QRCodesPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/business/login');
+    router.push('/login');
   };
 
   const getTypeColor = (type: string) => {
@@ -628,8 +612,8 @@ export default function QRCodesPage() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Restoran Yönetim Sistemi</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{authenticatedRestaurant?.name}</h1>
+              <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -674,7 +658,7 @@ export default function QRCodesPage() {
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <button onClick={handleLogout} 
             className="flex items-center justify-between w-full p-2 hover:bg-purple-700 rounded-lg">
-            <span className="text-sm">{user?.name}</span>
+            <span className="text-sm">{authenticatedRestaurant?.name}</span>
             <FaSignOutAlt />
           </button>
         </div>

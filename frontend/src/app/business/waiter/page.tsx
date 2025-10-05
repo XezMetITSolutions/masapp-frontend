@@ -33,7 +33,7 @@ import BillModal from '@/components/BillModal';
 
 export default function WaiterDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
   const { language } = useLanguageStore();
   const { 
     createBillRequest, 
@@ -494,31 +494,14 @@ export default function WaiterDashboard() {
     // Client-side rendering kontrolü
     setIsClient(true);
     
-    // Sayfa yüklendiğinde demo garson kullanıcısı oluştur
-    const timer = setTimeout(() => {
-      if (!user) {
-        const demoUser = {
-          id: 'demo-waiter-1',
-          name: 'Demo Garson',
-          email: 'demo@waiter.com',
-          role: 'waiter' as const,
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        // Demo kullanıcıyı login et
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-      }
-    }, 100); // Kısa bir gecikme ile
-
-    return () => clearTimeout(timer);
-  }, [user]);
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router, setIsClient]);
 
   const handleLogout = () => {
     logout();
-    router.push('/business/login');
+    router.push('/login');
   };
 
   const filteredOrders = orders.filter(order => {
@@ -708,7 +691,7 @@ export default function WaiterDashboard() {
               <FaConciergeBell />
               MasApp Garson
             </h1>
-            <p className="text-purple-200 text-sm">{user?.name} • Lezzet Durağı</p>
+            <p className="text-purple-200 text-sm">{authenticatedRestaurant?.name}</p>
           </div>
           <div className="flex items-center gap-4">
             <button

@@ -48,7 +48,7 @@ import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 
 export default function StaffPage() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
   const { 
     settings, 
     updateStaffCredentials, 
@@ -83,26 +83,10 @@ export default function StaffPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo işletme kullanıcısı oluştur
-    const timer = setTimeout(() => {
-      if (!user) {
-        const demoUser = {
-          id: 'demo-restaurant-1',
-          name: 'Demo İşletme',
-          email: 'demo@restaurant.com',
-          role: 'restaurant_owner' as const,
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [user]);
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   // Demo personel verileri
   useEffect(() => {
@@ -221,7 +205,7 @@ export default function StaffPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/business/login');
+    router.push('/login');
   };
 
   const getRoleColor = (role: string) => {

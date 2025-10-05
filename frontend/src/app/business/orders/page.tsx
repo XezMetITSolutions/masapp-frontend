@@ -34,7 +34,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,26 +46,10 @@ export default function OrdersPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo işletme kullanıcısı oluştur
-    const timer = setTimeout(() => {
-      if (!user) {
-        const demoUser = {
-          id: 'demo-restaurant-1',
-          name: 'Demo İşletme',
-          email: 'demo@restaurant.com',
-          role: 'restaurant_owner' as const,
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [user]);
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   // Demo sipariş verileri
   useEffect(() => {
@@ -205,7 +189,7 @@ export default function OrdersPage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/business/login');
+    router.push('/login');
   };
 
   const getStatusColor = (status: string) => {
@@ -326,7 +310,7 @@ export default function OrdersPage() {
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
           <button onClick={handleLogout} 
             className="flex items-center justify-between w-full p-2 hover:bg-purple-700 rounded-lg">
-            <span className="text-xs sm:text-sm hidden sm:block">{user?.name}</span>
+            <span className="text-xs sm:text-sm hidden sm:block">{authenticatedRestaurant?.name}</span>
             <span className="text-xs sm:hidden">Çıkış</span>
             <FaSignOutAlt className="text-sm sm:text-base" />
           </button>

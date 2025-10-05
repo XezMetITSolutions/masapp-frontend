@@ -48,7 +48,7 @@ import { useBusinessSettingsStore } from '@/store/useBusinessSettingsStore';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
     settings,
@@ -106,30 +106,14 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo işletme kullanıcısı oluştur
-    const timer = setTimeout(() => {
-      if (!user) {
-        const demoUser = {
-          id: 'demo-restaurant-1',
-          name: 'Demo İşletme',
-          email: 'demo@restaurant.com',
-          role: 'restaurant_owner' as const,
-          restaurantId: 'demo-restaurant-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [user]);
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   const handleLogout = () => {
     logout();
-    router.push('/business/login');
+    router.push('/login');
   };
 
   const togglePasswordVisibility = (key: string) => {
