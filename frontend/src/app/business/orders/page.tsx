@@ -34,7 +34,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -252,8 +252,8 @@ export default function OrdersPage() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp İşletme</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Sipariş Yönetimi</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{authenticatedRestaurant?.name || authenticatedStaff?.name}</h1>
+              <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}

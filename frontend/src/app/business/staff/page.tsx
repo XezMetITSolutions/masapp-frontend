@@ -347,8 +347,8 @@ export default function StaffPage() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp İşletme</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Personel Yönetimi</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{authenticatedRestaurant?.name || authenticatedStaff?.name}</h1>
+              <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}

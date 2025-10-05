@@ -33,7 +33,7 @@ import BillModal from '@/components/BillModal';
 
 export default function WaiterDashboard() {
   const router = useRouter();
-  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const { language } = useLanguageStore();
   const { 
     createBillRequest, 
@@ -689,9 +689,9 @@ export default function WaiterDashboard() {
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2">
               <FaConciergeBell />
-              MasApp Garson
+              {authenticatedRestaurant?.name || authenticatedStaff?.name}
             </h1>
-            <p className="text-purple-200 text-sm">{authenticatedRestaurant?.name}</p>
+            <p className="text-purple-200 text-sm">Garson Paneli</p>
           </div>
           <div className="flex items-center gap-4">
             <button

@@ -344,8 +344,8 @@ export default function SettingsPage() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Restoran Yönetim Sistemi</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{authenticatedRestaurant?.name || authenticatedStaff?.name}</h1>
+              <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
