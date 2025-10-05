@@ -143,12 +143,16 @@ export default function MenuManagement() {
       nameEn: item.name.en || '',
       descriptionTr: item.description.tr || '',
       descriptionEn: item.description.en || '',
-      price: item.price?.toString() || '',
-      category: item.category || '',
+      price: item.price.toString(),
+      category: item.categoryId || '',
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
       isAvailable: item.isAvailable !== false
     });
+    // Resmi de yükle
+    if (item.image) {
+      setCapturedImage(item.image);
+    }
     setShowItemForm(true);
   };
 
@@ -253,10 +257,15 @@ export default function MenuManagement() {
   };
 
   const handleCameraCapture = (imageBlob: Blob) => {
-    const imageUrl = URL.createObjectURL(imageBlob);
-    setCapturedImage(imageUrl);
+    // Blob'u base64'e çevir
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setCapturedImage(base64String);
+      console.log('📸 Fotoğraf başarıyla çekildi ve base64 encode edildi!');
+    };
+    reader.readAsDataURL(imageBlob);
     setShowCamera(false);
-    console.log('📸 Fotoğraf başarıyla çekildi!');
   };
 
   const handleImageUpload = () => {
@@ -268,10 +277,15 @@ export default function MenuManagement() {
   };
 
   const handleImageSelect = (imageBlob: Blob) => {
-    const imageUrl = URL.createObjectURL(imageBlob);
-    setCapturedImage(imageUrl);
+    // Blob'u base64'e çevir
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setCapturedImage(base64String);
+      console.log('📁 Görsel başarıyla yüklendi ve base64 encode edildi!');
+    };
+    reader.readAsDataURL(imageBlob);
     setShowImageUploader(false);
-    console.log('📁 Görsel başarıyla yüklendi!');
   };
 
   // Filtrelenmiş ürünler
