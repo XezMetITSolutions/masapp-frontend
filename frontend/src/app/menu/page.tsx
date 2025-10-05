@@ -98,15 +98,15 @@ export function MenuPageContent() {
 
   // Helper functions - defined inside component to avoid dependency issues
   const getPopularItems = () => {
-    return items.filter(item => item.popular);
+    return items.filter(item => item.isPopular);
   };
 
   const getItemsByCategory = (categoryId: string) => {
-    return items.filter(item => item.category === categoryId);
+    return items.filter(item => item.categoryId === categoryId && item.isAvailable);
   };
 
   const getItemsBySubcategory = (subcategoryId: string) => {
-    return items.filter(item => item.subcategory === subcategoryId);
+    return items.filter(item => (item as any).subcategory === subcategoryId);
   };
 
   const getSubcategoriesByParent = (parentId: string) => {
@@ -372,7 +372,7 @@ export function MenuPageContent() {
                     height={80}
                     className="object-cover w-full h-full rounded-lg"
                   />
-                  {item.popular && (
+                  {item.isPopular && (
                     <div className="absolute top-0 left-0 text-white text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--brand-strong)' }}>
                       <FaStar className="inline-block mr-1" size={8} />
                       <TranslatedText>Popüler</TranslatedText>
@@ -389,11 +389,11 @@ export function MenuPageContent() {
                   </p>
 
                   {/* Allergens */}
-                  {item.allergens && item.allergens.length > 0 && (
+                  {item.allergens && (item.allergens as any).tr && (item.allergens as any).tr.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-2">
-                      {item.allergens.slice(0, 3).map((allergen, i) => (
+                      {(item.allergens as any).tr.slice(0, 3).map((allergen: string, i: number) => (
                         <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
-                          {allergen[language as keyof typeof allergen] || allergen.tr || allergen.en}
+                          {allergen}
                         </span>
                       ))}
                     </div>
