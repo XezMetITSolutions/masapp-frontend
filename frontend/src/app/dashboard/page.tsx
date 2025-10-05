@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import DashboardContent from './DashboardContent';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,9 +39,7 @@ export default function DashboardPage() {
           Çıkış Yap
         </button>
       </div>
-      <p>Hoş geldiniz, {authenticatedRestaurant.username}!</p>
-      <p>Burası, restoranınızın menüsünü, siparişlerini ve ayarlarını yönetebileceğiniz size özel paneldir.</p>
-      {/* Buraya restoran yönetimi ile ilgili component'ler gelecek */}
+      <DashboardContent restaurant={authenticatedRestaurant} />
     </div>
   );
 }
