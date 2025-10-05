@@ -667,8 +667,26 @@ export default function MenuManagement() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map(category => (
+          {categories.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+              <div className="text-gray-400 mb-4">
+                <FaFolderOpen className="mx-auto text-5xl" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Henüz kategori yok</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Menü ürünlerinizi düzenlemek için kategoriler oluşturun
+              </p>
+              <button 
+                onClick={handleAddCategory}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 inline-flex items-center gap-2"
+              >
+                <FaPlus />
+                İlk Kategoriyi Ekle
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categories.map(category => (
               <div key={category.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="font-semibold text-lg">{category.name.tr}</h3>
@@ -683,7 +701,7 @@ export default function MenuManagement() {
                 
                 <div>
                   <p className="text-sm text-gray-500 mb-4">
-                    {getItemsByCategory(category.id).length} ürün
+                    {items.filter(i => i.categoryId === category.id).length} ürün
                   </p>
                   
                   {/* Alt Kategoriler */}
@@ -721,7 +739,8 @@ export default function MenuManagement() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -974,10 +993,19 @@ export default function MenuManagement() {
                           required
                         >
                           <option value="">Kategori Seçin</option>
-                          {categories.map(cat => (
-                            <option key={cat.id} value={cat.id}>{cat.name.tr}</option>
-                          ))}
+                          {categories.length > 0 ? (
+                            categories.map(cat => (
+                              <option key={cat.id} value={cat.id}>{cat.name.tr}</option>
+                            ))
+                          ) : (
+                            <option disabled>Önce kategori ekleyin</option>
+                          )}
                         </select>
+                        {categories.length === 0 && (
+                          <p className="text-xs text-red-600 mt-1">
+                            ⚠️ Kategori bulunamadı. Lütfen önce "Kategoriler" sekmesinden kategori ekleyin.
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
