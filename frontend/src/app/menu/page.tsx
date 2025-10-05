@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter } from 'react-icons/fa';
-import { useMenuStore, useCartStore } from '@/store';
+import { useCartStore } from '@/store';
+import useRestaurantStore from '@/store/useRestaurantStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
@@ -21,11 +23,33 @@ export function MenuPageContent() {
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
   
-  // Menu store
-  const items = useMenuStore(state => state.items);
-  const categories = useMenuStore(state => state.categories);
-  const subcategories = useMenuStore(state => state.subcategories);
-  const fetchMenu = useMenuStore(state => state.fetchMenu);
+  // URL parametrelerinden restaurant slug'ını al
+  const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setRestaurantSlug(params.get('restaurant'));
+    }
+  }, []);
+  
+  // Restaurant store
+  const { authenticatedRestaurant } = useAuthStore();
+  const restaurants = useRestaurantStore(state => state.restaurants);
+  
+  // URL'de restaurant parametresi varsa onu kullan, yoksa authenticated restaurant
+  const activeRestaurant = restaurantSlug 
+    ? restaurants.find(r => r.username === restaurantSlug || r.id === restaurantSlug)
+    : authenticatedRestaurant;
+  
+  // Menü verilerini restoran bazlı al
+  const allCategories = useRestaurantStore(state => state.categories);
+  const allMenuItems = useRestaurantStore(state => state.menuItems);
+  
+  // Sadece bu restoranın kategorilerini ve ürünlerini filtrele
+  const categories = allCategories.filter(c => c.restaurantId === activeRestaurant?.id);
+  const items = allMenuItems.filter(i => i.restaurantId === activeRestaurant?.id);
+  const subcategories: any[] = []; // Şimdilik subcategory yok
   
   // Local states
   const [activeCategory, setActiveCategory] = useState('popular');
@@ -41,9 +65,8 @@ export function MenuPageContent() {
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
   
-  // Fetch menu on mount
+  // Mount on client
   useEffect(() => {
-    fetchMenu();
     setIsClient(true);
     try {
       const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('menuVisitedOnce');
@@ -181,7 +204,7 @@ export function MenuPageContent() {
                 </div>
               )}
             </div>
-            <div className="text-dynamic-xl font-bold text-gray-900">{settings.basicInfo.name || 'İşletme'}</div>
+            <div className="text-dynamic-xl font-bold text-gray-900">{activeRestaurant?.name || settings.basicInfo.name || 'İşletme'}</div>
             {settings.branding.showSloganOnLoading !== false && settings.basicInfo.slogan && (
               <div className="text-dynamic-sm text-gray-600 mt-1">{settings.basicInfo.slogan}</div>
             )}

@@ -156,8 +156,8 @@ export default function RestaurantsManagement() {
       switch(action) {
         case 'view':
           // Müşteri menüsüne yönlendir (restoran username ile)
-          const slug = restaurant.username || restaurant.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-          window.open(`/r/${slug}/menu`, '_blank');
+          const slug = restaurant.username || restaurant.id;
+          window.open(`/menu?restaurant=${slug}`, '_blank');
           break;
         case 'edit':
           setSelectedRestaurant(restaurant);
