@@ -70,11 +70,8 @@ export default async (request: Request, context: Context) => {
     
     // Subdomain için restoran menü sayfasına yönlendir
     // URL'deki path'i koruyarak restoran sayfasına yönlendir
-    const restaurantUrl = new URL(url.pathname, request.url);
-    restaurantUrl.hostname = "guzellestir.com";
-    restaurantUrl.pathname = `/restaurant/${subdomain}${url.pathname}`;
-    
-    return Response.redirect(restaurantUrl.toString(), 302);
+    const newPath = `/restaurant/${subdomain}${url.pathname}`;
+    return context.rewrite(newPath);
   }
   
   // Diğer durumlar için normal işlem
