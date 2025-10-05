@@ -113,6 +113,54 @@ export default function SettingsPage() {
     }
   }, [isAuthenticated, router]);
 
+  // Restaurant bilgilerini settings'e senkronize et
+  useEffect(() => {
+    if (authenticatedRestaurant) {
+      // Admin panelinden gelen restaurant bilgilerini settings'e aktar
+      // Sadece boş olan alanları doldur, kullanıcı değiştirdiyse üzerine yazma
+      const updates: any = {};
+      
+      if (!settings.basicInfo.name && authenticatedRestaurant.name) {
+        updates.name = authenticatedRestaurant.name;
+      }
+      if (!settings.basicInfo.subdomain && authenticatedRestaurant.username) {
+        updates.subdomain = authenticatedRestaurant.username;
+      }
+      if (!settings.basicInfo.address && authenticatedRestaurant.address) {
+        updates.address = authenticatedRestaurant.address;
+      }
+      if (!settings.basicInfo.phone && authenticatedRestaurant.phone) {
+        updates.phone = authenticatedRestaurant.phone;
+      }
+      if (!settings.basicInfo.email && authenticatedRestaurant.email) {
+        updates.email = authenticatedRestaurant.email;
+      }
+      
+      if (Object.keys(updates).length > 0) {
+        updateBasicInfo(updates);
+      }
+      
+      // Logo varsa ve settings'de logo yoksa branding'e ekle
+      if (authenticatedRestaurant.logo && !settings.branding.logo) {
+        updateBranding({
+          logo: authenticatedRestaurant.logo
+        });
+      }
+      
+      // Renkler varsa ve settings'de yoksa branding'e ekle
+      if (authenticatedRestaurant.primaryColor && !settings.branding.primaryColor) {
+        updateBranding({
+          primaryColor: authenticatedRestaurant.primaryColor
+        });
+      }
+      if (authenticatedRestaurant.secondaryColor && !settings.branding.secondaryColor) {
+        updateBranding({
+          secondaryColor: authenticatedRestaurant.secondaryColor
+        });
+      }
+    }
+  }, [authenticatedRestaurant?.id]); // Sadece restaurant değiştiğinde çalışsın
+
   const handleLogout = () => {
     logout();
     router.push('/login');
