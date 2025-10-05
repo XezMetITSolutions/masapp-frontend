@@ -27,7 +27,7 @@ import {
 
 export default function RestaurantsManagement() {
   const router = useRouter();
-  const { restaurants } = useRestaurantStore();
+  const { restaurants, deleteRestaurant } = useRestaurantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -163,13 +163,10 @@ export default function RestaurantsManagement() {
           router.push(`/admin/restaurants/${restaurant.id}/edit`);
           break;
         case 'delete':
-          // Restoranı listeden kaldır
-          const index = restaurants.findIndex(r => r.id === restaurant.id);
-          if (index > -1) {
-            restaurants.splice(index, 1);
-            // Sayfayı yenile
-            router.refresh();
-          }
+          // Restoranı kalıcı olarak kaldır (Zustand store + persist)
+          deleteRestaurant(restaurant.id);
+          // Görünümü güncelle
+          router.refresh();
           break;
         default:
           console.log(`${action} işlemi tamamlandı`);
