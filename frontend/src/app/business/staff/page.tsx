@@ -78,7 +78,6 @@ export default function StaffPage() {
     phone: '',
     role: 'waiter',
     department: 'service',
-    startDate: '',
     notes: ''
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -287,7 +286,7 @@ export default function StaffPage() {
       phone: newStaff.phone.trim(),
       role: newStaff.role,
       department: newStaff.department,
-      startDate: newStaff.startDate || now.toISOString().slice(0, 10),
+      startDate: now.toISOString().slice(0, 10),
       status: 'active',
       lastLogin: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
       totalOrders: 0,
@@ -304,7 +303,6 @@ export default function StaffPage() {
       phone: '',
       role: 'waiter',
       department: 'service',
-      startDate: '',
       notes: ''
     });
   };
@@ -977,10 +975,6 @@ export default function StaffPage() {
                         <span className="truncate">{member.phone}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <FaCalendarAlt className="text-gray-400" />
-                        <span className="truncate">İşe Başlama: {member.startDate}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
                         <FaClock className="text-gray-400" />
                         <span className="truncate">Son Giriş: {member.lastLogin}</span>
                       </div>
@@ -1156,18 +1150,6 @@ export default function StaffPage() {
                       <option value="management">Yönetim</option>
                     </select>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                    İşe Başlama
-                  </label>
-                  <input
-                    type="date"
-                    value={newStaff.startDate}
-                    onChange={(e) => setNewStaff({...newStaff, startDate: e.target.value})}
-                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
-                  />
                 </div>
 
                 <div>
