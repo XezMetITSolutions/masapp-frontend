@@ -6,6 +6,9 @@ import ResponsiveTable from '@/components/ResponsiveTable';
 import AdminLayout from '@/components/admin/AdminLayout';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { Restaurant } from '@/types';
+import Modal from '@/components/Modal';
+import AddRestaurantForm from './add/AddRestaurantForm';
+import EditRestaurantForm from './EditRestaurantForm';
 import { 
   FaBuilding, 
   FaSearch, 
@@ -32,6 +35,9 @@ export default function RestaurantsManagement() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
 
   const getStatusClass = (status: string) => {
     switch(status) {
@@ -159,8 +165,8 @@ export default function RestaurantsManagement() {
           router.push(`/admin/restaurants/${restaurant.id}`);
           break;
         case 'edit':
-          // Restoran düzenleme sayfasına yönlendir (static export uyumlu)
-          router.push(`/admin/restaurants/edit?id=${restaurant.id}`);
+          setSelectedRestaurant(restaurant);
+          setEditModalOpen(true);
           break;
         case 'delete':
           // Restoranı kalıcı olarak kaldır (Zustand store + persist)
@@ -179,8 +185,7 @@ export default function RestaurantsManagement() {
   };
 
   const handleAddRestaurant = () => {
-    // Yeni restoran ekleme sayfasına yönlendir
-    router.push('/admin/restaurants/add');
+    setAddModalOpen(true);
   };
 
   const handleBulkApprove = () => {
@@ -365,6 +370,19 @@ export default function RestaurantsManagement() {
           isLoading={isLoading}
         />
       </div>
+      
+      <Modal isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)} title="Yeni Restoran Ekle">
+        <AddRestaurantForm onClose={() => setAddModalOpen(false)} />
+      </Modal>
+
+      {selectedRestaurant && (
+        <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} title={`Düzenle: ${selectedRestaurant.name}`}>
+          <EditRestaurantForm 
+            restaurantId={selectedRestaurant.id} 
+            onClose={() => setEditModalOpen(false)} 
+          />
+        </Modal>
+      )}
     </AdminLayout>
   );
 }
