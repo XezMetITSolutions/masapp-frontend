@@ -20,7 +20,6 @@ export default async (request: Request, context: Context) => {
     if (subdomain === "admin") {
       return context.next();
     }
-    
     // Subdomain validasyonu - veritabanından kontrol edilmeli
     // ÖNEMLİ: Yeni restoran eklendiğinde bu listeye subdomain'i eklemeyi unutmayın!
     // Frontend'deki restoranlarla senkronize tutulmalı:
@@ -38,6 +37,7 @@ export default async (request: Request, context: Context) => {
       'sushimaster',
       'coffeecorner',
       'steakhouse',
+      'kardesler',
     ];
 
     // Geçerli subdomain kontrolü
@@ -63,7 +63,7 @@ export default async (request: Request, context: Context) => {
         </html>`,
         {
           status: 404,
-          headers: { "Content-Type": "text/html" }
+          headers: { "Content-Type": "text/html" },
         }
       );
     }
