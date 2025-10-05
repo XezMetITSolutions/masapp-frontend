@@ -66,9 +66,12 @@ export default function SupportPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Demo ticket verileri
+  // Destek talepleri her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
   useEffect(() => {
-    const demoTickets: SupportTicket[] = [
+    // Eğer Kardeşler restoranı ise demo ticket verilerini ekle
+    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
+        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
+      const demoTickets: SupportTicket[] = [
       {
         id: 1,
         subject: 'QR Kod Tarama Sorunu',
@@ -95,9 +98,11 @@ export default function SupportPage() {
           { message: 'Fatura düzeltildi ve yeni fatura gönderildi.', from: 'Mali İşler', time: '2024-01-12 16:45' }
         ]
       }
-    ];
-    setTickets(demoTickets);
-  }, []);
+      ];
+      setTickets(demoTickets);
+    }
+    // Diğer restoranlar boş başlar
+  }, [authenticatedRestaurant]);
 
   const handleLogout = () => {
     logout();

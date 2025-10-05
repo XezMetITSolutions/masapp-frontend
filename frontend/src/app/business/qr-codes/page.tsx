@@ -75,9 +75,12 @@ export default function QRCodesPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Demo QR kod verileri
+  // QR kodlar her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
   useEffect(() => {
-    const demoQrCodes = [
+    // Eğer Kardeşler restoranı ise demo QR kodları ekle
+    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
+        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
+      const demoQrCodes = [
       {
         id: 1,
         name: 'Masa 1 - QR Menü',
@@ -174,11 +177,13 @@ export default function QRCodesPage() {
         expiresAt: '2024-02-15',
         notes: 'Sevgililer Günü etkinliği için'
       }
-    ];
+      ];
 
-    setQrCodes(demoQrCodes);
-    setFilteredQrCodes(demoQrCodes);
-  }, []);
+      setQrCodes(demoQrCodes);
+      setFilteredQrCodes(demoQrCodes);
+    }
+    // Diğer restoranlar boş başlar
+  }, [authenticatedRestaurant]);
 
   // Filtreleme ve arama
   useEffect(() => {
@@ -326,7 +331,7 @@ export default function QRCodesPage() {
         return;
       }
 
-      const newQrCodes = [];
+      const newQrCodes: any[] = [];
       for (let i = 1; i <= count; i++) {
         const token = generateToken();
         const baseUrl = `https://demo.masapp.com/masa/${i}`;

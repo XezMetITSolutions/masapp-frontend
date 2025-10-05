@@ -88,9 +88,12 @@ export default function StaffPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Demo personel verileri
+  // Personel her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
   useEffect(() => {
-    const demoStaff = [
+    // Eğer Kardeşler restoranı ise demo personel verilerini ekle
+    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
+        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
+      const demoStaff = [
       {
         id: 1,
         name: 'Ahmet Yılmaz',
@@ -171,11 +174,13 @@ export default function StaffPage() {
         notes: 'İzinli, 2 hafta sonra dönecek',
         avatar: null
       }
-    ];
+      ];
 
-    setStaff(demoStaff);
-    setFilteredStaff(demoStaff);
-  }, []);
+      setStaff(demoStaff);
+      setFilteredStaff(demoStaff);
+    }
+    // Diğer restoranlar boş başlar
+  }, [authenticatedRestaurant]);
 
   // Filtreleme ve arama
   useEffect(() => {

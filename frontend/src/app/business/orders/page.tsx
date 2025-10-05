@@ -51,9 +51,12 @@ export default function OrdersPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Demo sipariş verileri
+  // Siparişler her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
   useEffect(() => {
-    const demoOrders = [
+    // Eğer Kardeşler restoranı ise demo sipariş verilerini ekle
+    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
+        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
+      const demoOrders = [
       {
         id: 1,
         tableNumber: 5,
@@ -128,11 +131,13 @@ export default function OrdersPage() {
         calls: ['water'],
         priority: 'high'
       }
-    ];
+      ];
 
-    setOrders(demoOrders);
-    setFilteredOrders(demoOrders);
-  }, []);
+      setOrders(demoOrders);
+      setFilteredOrders(demoOrders);
+    }
+    // Diğer restoranlar boş başlar
+  }, [authenticatedRestaurant]);
 
   // Filtreleme ve arama
   useEffect(() => {
