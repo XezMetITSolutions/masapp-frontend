@@ -189,6 +189,87 @@ export default function RestaurantMenu() {
             isVegetarian: true
           }
         ]
+      },
+      'kardesler': {
+        id: '3',
+        name: 'Kardeşler Restoran',
+        description: 'Aile işletmesi geleneksel lezzetler',
+        address: 'Beyoğlu, İstanbul',
+        phone: '+90 212 555 0789',
+        email: 'info@kardesler.com',
+        openingHours: '10:00 - 24:00',
+        rating: 4.7,
+        cuisine: 'Türk Mutfağı',
+        categories: ['Ana Yemekler', 'Çorbalar', 'Mezeler', 'Tatlılar', 'İçecekler'],
+        menuItems: [
+          {
+            id: '1',
+            name: 'Karışık Izgara',
+            description: 'Kuzu pirzola, köfte ve tavuk şiş',
+            price: 120,
+            category: 'Ana Yemekler',
+            isAvailable: true,
+            preparationTime: 20,
+            rating: 4.8,
+            isVegetarian: false
+          },
+          {
+            id: '2',
+            name: 'Yayla Çorbası',
+            description: 'Yoğurt ve pirinçli geleneksel çorba',
+            price: 28,
+            category: 'Çorbalar',
+            isAvailable: true,
+            preparationTime: 10,
+            rating: 4.6,
+            isVegetarian: true
+          },
+          {
+            id: '3',
+            name: 'Karışık Meze Tabağı',
+            description: 'Humus, ezme, cacık ve zeytinyağlılar',
+            price: 65,
+            category: 'Mezeler',
+            isAvailable: true,
+            preparationTime: 8,
+            rating: 4.7,
+            isVegetarian: true
+          },
+          {
+            id: '4',
+            name: 'Künefe',
+            description: 'Peynirli kadayıf tatlısı',
+            price: 55,
+            category: 'Tatlılar',
+            isAvailable: true,
+            preparationTime: 12,
+            rating: 4.9,
+            isVegetarian: true
+          },
+          {
+            id: '5',
+            name: 'Türk Çayı',
+            description: 'Geleneksel demleme çay',
+            price: 8,
+            category: 'İçecekler',
+            isAvailable: true,
+            preparationTime: 3,
+            rating: 4.5,
+            isVegetarian: true,
+            isVegan: true
+          },
+          {
+            id: '6',
+            name: 'Lahmacun',
+            description: 'İnce hamur üzerine kıymalı karışım',
+            price: 18,
+            category: 'Ana Yemekler',
+            isAvailable: true,
+            preparationTime: 10,
+            rating: 4.6,
+            isVegetarian: false
+          }
+        ]
       }
     };
 
