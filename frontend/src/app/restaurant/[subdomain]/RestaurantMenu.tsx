@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
+import useRestaurantStore from '@/store/useRestaurantStore';
 import { 
   FaUtensils, 
   FaClock, 
@@ -51,236 +52,118 @@ export default function RestaurantMenu() {
   const params = useParams();
   const subdomain = params.subdomain as string;
   
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [currentRestaurant, setCurrentRestaurant] = useState<Restaurant | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
 
-  // Mock data - gerçek uygulamada API'den gelecek
-  useEffect(() => {
-    const mockRestaurants: { [key: string]: Restaurant } = {
-      'lezzet-duragi': {
+  const { restaurants } = useRestaurantStore();
+
+  // Zustand store'dan restoran verilerini al ve dinamik menü oluştur
+  const restaurant = useMemo(() => {
+    const storeRestaurant = restaurants.find(r => r.slug === subdomain);
+    if (!storeRestaurant) return null;
+
+    // Temel kategoriler
+    const defaultCategories = ['Ana Yemekler', 'Çorbalar', 'Salatalar', 'Tatlılar', 'İçecekler'];
+    
+    // Temel menü öğeleri (her restoran için)
+    const defaultMenuItems: MenuItem[] = [
+      {
         id: '1',
-        name: 'Lezzet Durağı',
-        description: 'Geleneksel Türk mutfağının en lezzetli örnekleri',
-        address: 'Kadıköy, İstanbul',
-        phone: '+90 216 555 0123',
-        email: 'info@lezzetduragi.com',
-        openingHours: '09:00 - 23:00',
-        rating: 4.8,
-        cuisine: 'Türk Mutfağı',
-        categories: ['Ana Yemekler', 'Çorbalar', 'Salatalar', 'Tatlılar', 'İçecekler'],
-        menuItems: [
-          {
-            id: '1',
-            name: 'Adana Kebap',
-            description: 'Acılı kıyma ile hazırlanan geleneksel Adana kebabı',
-            price: 85,
-            category: 'Ana Yemekler',
-            isAvailable: true,
-            preparationTime: 15,
-            rating: 4.9,
-            isVegetarian: false
-          },
-          {
-            id: '2',
-            name: 'Mercimek Çorbası',
-            description: 'Kırmızı mercimek ile hazırlanan geleneksel çorba',
-            price: 25,
-            category: 'Çorbalar',
-            isAvailable: true,
-            preparationTime: 10,
-            rating: 4.7,
-            isVegetarian: true,
-            isVegan: true
-          },
-          {
-            id: '3',
-            name: 'Çoban Salatası',
-            description: 'Domates, salatalık, soğan ve maydanoz ile hazırlanan salata',
-            price: 35,
-            category: 'Salatalar',
-            isAvailable: true,
-            preparationTime: 5,
-            rating: 4.5,
-            isVegetarian: true,
-            isVegan: true
-          },
-          {
-            id: '4',
-            name: 'Baklava',
-            description: 'Antep fıstığı ile hazırlanan geleneksel tatlı',
-            price: 45,
-            category: 'Tatlılar',
-            isAvailable: true,
-            preparationTime: 5,
-            rating: 4.8,
-            isVegetarian: true
-          },
-          {
-            id: '5',
-            name: 'Ayran',
-            description: 'Ev yapımı doğal ayran',
-            price: 12,
-            category: 'İçecekler',
-            isAvailable: true,
-            preparationTime: 2,
-            rating: 4.6,
-            isVegetarian: true
-          }
-        ]
+        name: 'Günün Menüsü',
+        description: 'Şefimizin özel hazırladığı günlük menü',
+        price: 65,
+        category: 'Ana Yemekler',
+        isAvailable: true,
+        preparationTime: 15,
+        rating: 4.5,
+        isVegetarian: false
       },
-      'cafe-corner': {
+      {
         id: '2',
-        name: 'Cafe Corner',
-        description: 'Modern cafe kültürü ve lezzetli kahveler',
-        address: 'Çankaya, Ankara',
-        phone: '+90 312 555 0456',
-        email: 'info@cafecorner.com',
-        openingHours: '07:00 - 22:00',
+        name: 'Mercimek Çorbası',
+        description: 'Geleneksel kırmızı mercimek çorbası',
+        price: 25,
+        category: 'Çorbalar',
+        isAvailable: true,
+        preparationTime: 10,
         rating: 4.6,
-        cuisine: 'Cafe & Kahve',
-        categories: ['Kahveler', 'Çaylar', 'Atıştırmalıklar', 'Sandviçler', 'Tatlılar'],
-        menuItems: [
-          {
-            id: '1',
-            name: 'Americano',
-            description: 'Sıcak su ile inceltilmiş espresso',
-            price: 18,
-            category: 'Kahveler',
-            isAvailable: true,
-            preparationTime: 3,
-            rating: 4.7,
-            isVegetarian: true,
-            isVegan: true
-          },
-          {
-            id: '2',
-            name: 'Cappuccino',
-            description: 'Espresso, sıcak süt ve süt köpüğü',
-            price: 22,
-            category: 'Kahveler',
-            isAvailable: true,
-            preparationTime: 4,
-            rating: 4.8,
-            isVegetarian: true
-          },
-          {
-            id: '3',
-            name: 'Club Sandviç',
-            description: 'Tavuk, marul, domates ve mayonez ile hazırlanan sandviç',
-            price: 38,
-            category: 'Sandviçler',
-            isAvailable: true,
-            preparationTime: 8,
-            rating: 4.5,
-            isVegetarian: false
-          },
-          {
-            id: '4',
-            name: 'Çikolatalı Kek',
-            description: 'Ev yapımı çikolatalı kek',
-            price: 28,
-            category: 'Tatlılar',
-            isAvailable: true,
-            preparationTime: 5,
-            rating: 4.6,
-            isVegetarian: true
-          }
-        ]
+        isVegetarian: true,
+        isVegan: true
       },
-      'kardesler': {
+      {
         id: '3',
-        name: 'Kardeşler Restoran',
-        description: 'Aile işletmesi geleneksel lezzetler',
-        address: 'Beyoğlu, İstanbul',
-        phone: '+90 212 555 0789',
-        email: 'info@kardesler.com',
-        openingHours: '10:00 - 24:00',
+        name: 'Mevsim Salatası',
+        description: 'Taze mevsim sebzeleri ile hazırlanan salata',
+        price: 35,
+        category: 'Salatalar',
+        isAvailable: true,
+        preparationTime: 5,
+        rating: 4.4,
+        isVegetarian: true,
+        isVegan: true
+      },
+      {
+        id: '4',
+        name: 'Ev Yapımı Tatlı',
+        description: 'Günlük taze hazırlanan özel tatlımız',
+        price: 45,
+        category: 'Tatlılar',
+        isAvailable: true,
+        preparationTime: 5,
         rating: 4.7,
-        cuisine: 'Türk Mutfağı',
-        categories: ['Ana Yemekler', 'Çorbalar', 'Mezeler', 'Tatlılar', 'İçecekler'],
-        menuItems: [
-          {
-            id: '1',
-            name: 'Karışık Izgara',
-            description: 'Kuzu pirzola, köfte ve tavuk şiş',
-            price: 120,
-            category: 'Ana Yemekler',
-            isAvailable: true,
-            preparationTime: 20,
-            rating: 4.8,
-            isVegetarian: false
-          },
-          {
-            id: '2',
-            name: 'Yayla Çorbası',
-            description: 'Yoğurt ve pirinçli geleneksel çorba',
-            price: 28,
-            category: 'Çorbalar',
-            isAvailable: true,
-            preparationTime: 10,
-            rating: 4.6,
-            isVegetarian: true
-          },
-          {
-            id: '3',
-            name: 'Karışık Meze Tabağı',
-            description: 'Humus, ezme, cacık ve zeytinyağlılar',
-            price: 65,
-            category: 'Mezeler',
-            isAvailable: true,
-            preparationTime: 8,
-            rating: 4.7,
-            isVegetarian: true
-          },
-          {
-            id: '4',
-            name: 'Künefe',
-            description: 'Peynirli kadayıf tatlısı',
-            price: 55,
-            category: 'Tatlılar',
-            isAvailable: true,
-            preparationTime: 12,
-            rating: 4.9,
-            isVegetarian: true
-          },
-          {
-            id: '5',
-            name: 'Türk Çayı',
-            description: 'Geleneksel demleme çay',
-            price: 8,
-            category: 'İçecekler',
-            isAvailable: true,
-            preparationTime: 3,
-            rating: 4.5,
-            isVegetarian: true,
-            isVegan: true
-          },
-          {
-            id: '6',
-            name: 'Lahmacun',
-            description: 'İnce hamur üzerine kıymalı karışım',
-            price: 18,
-            category: 'Ana Yemekler',
-            isAvailable: true,
-            preparationTime: 10,
-            rating: 4.6,
-            isVegetarian: false
-          }
-        ]
+        isVegetarian: true
+      },
+      {
+        id: '5',
+        name: 'Türk Çayı',
+        description: 'Geleneksel demleme çay',
+        price: 8,
+        category: 'İçecekler',
+        isAvailable: true,
+        preparationTime: 2,
+        rating: 4.5,
+        isVegetarian: true,
+        isVegan: true
+      },
+      {
+        id: '6',
+        name: 'Taze Sıkılmış Portakal Suyu',
+        description: 'Günlük taze sıkılmış doğal portakal suyu',
+        price: 18,
+        category: 'İçecekler',
+        isAvailable: true,
+        preparationTime: 3,
+        rating: 4.3,
+        isVegetarian: true,
+        isVegan: true
       }
+    ];
+
+    // Store'daki restoran verileriyle uyumlu format oluştur
+    return {
+      id: storeRestaurant.id,
+      name: storeRestaurant.name,
+      description: `${storeRestaurant.name} - Lezzetli yemekler ve kaliteli hizmet`,
+      address: storeRestaurant.address,
+      phone: storeRestaurant.phone,
+      email: storeRestaurant.email,
+      openingHours: '09:00 - 23:00', // Varsayılan çalışma saatleri
+      rating: 4.5, // Varsayılan rating
+      cuisine: 'Türk Mutfağı', // Varsayılan mutfak türü
+      categories: defaultCategories,
+      menuItems: defaultMenuItems
     };
+  }, [restaurants, subdomain]);
 
-    const restaurantData = mockRestaurants[subdomain];
-    if (restaurantData) {
-      setRestaurant(restaurantData);
-    }
+  useEffect(() => {
+    setCurrentRestaurant(restaurant);
     setLoading(false);
-  }, [subdomain]);
+  }, [restaurant]);
 
-  const filteredMenuItems = restaurant?.menuItems.filter(item => {
+  const filteredMenuItems = currentRestaurant?.menuItems.filter(item => {
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -308,7 +191,7 @@ export default function RestaurantMenu() {
 
   const getTotalPrice = () => {
     return Object.entries(cart).reduce((total, [itemId, quantity]) => {
-      const item = restaurant?.menuItems.find(item => item.id === itemId);
+      const item = currentRestaurant?.menuItems.find(item => item.id === itemId);
       return total + (item ? item.price * quantity : 0);
     }, 0);
   };
@@ -325,7 +208,7 @@ export default function RestaurantMenu() {
     );
   }
 
-  if (!restaurant) {
+  if (!currentRestaurant) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -353,25 +236,25 @@ export default function RestaurantMenu() {
             </div>
             
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{restaurant.name}</h1>
-              <p className="text-gray-600 mb-4">{restaurant.description}</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentRestaurant.name}</h1>
+              <p className="text-gray-600 mb-4">{currentRestaurant.description}</p>
               
               <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-500">
                 <div className="flex items-center">
                   <FaStar className="text-yellow-400 mr-1" />
-                  {restaurant.rating}
+                  {currentRestaurant.rating}
                 </div>
                 <div className="flex items-center">
                   <FaClock className="mr-1" />
-                  {restaurant.openingHours}
+                  {currentRestaurant.openingHours}
                 </div>
                 <div className="flex items-center">
                   <FaMapMarkerAlt className="mr-1" />
-                  {restaurant.address}
+                  {currentRestaurant.address}
                 </div>
                 <div className="flex items-center">
                   <FaPhone className="mr-1" />
-                  {restaurant.phone}
+                  {currentRestaurant.phone}
                 </div>
               </div>
             </div>
@@ -397,7 +280,7 @@ export default function RestaurantMenu() {
                 >
                   Tümü
                 </button>
-                {restaurant.categories.map(category => (
+                {currentRestaurant.categories.map(category => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
@@ -539,7 +422,7 @@ export default function RestaurantMenu() {
               ) : (
                 <div className="space-y-3 mb-4">
                   {Object.entries(cart).map(([itemId, quantity]) => {
-                    const item = restaurant.menuItems.find(item => item.id === itemId);
+                    const item = currentRestaurant.menuItems.find(item => item.id === itemId);
                     if (!item) return null;
                     
                     return (
