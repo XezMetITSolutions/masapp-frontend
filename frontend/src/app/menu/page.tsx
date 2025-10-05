@@ -39,7 +39,12 @@ export function MenuPageContent() {
   
   // URL'de restaurant parametresi varsa onu kullan, yoksa authenticated restaurant
   const activeRestaurant = restaurantSlug 
-    ? restaurants.find(r => r.username === restaurantSlug || r.id === restaurantSlug)
+    ? restaurants.find(r => 
+        r.username === restaurantSlug || 
+        r.id === restaurantSlug ||
+        r.name.toLowerCase() === restaurantSlug.toLowerCase() ||
+        r.name.toLowerCase().replace(/\s+/g, '-') === restaurantSlug.toLowerCase()
+      )
     : authenticatedRestaurant;
   
   // Menü verilerini restoran bazlı al

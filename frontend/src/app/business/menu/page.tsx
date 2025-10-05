@@ -987,7 +987,7 @@ export default function MenuManagement() {
                     </div>
 
                     {/* Fiyat ve Kategori */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Fiyat (₺)
@@ -1025,24 +1025,7 @@ export default function MenuManagement() {
                           </p>
                         )}
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Alt Kategori
-                        </label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                          <option value="">Alt Kategori Seçin</option>
-                          <option value="soguk-baslangiclar">Soğuk Başlangıçlar</option>
-                          <option value="sicak-baslangiclar">Sıcak Başlangıçlar</option>
-                          <option value="et-yemekleri">Et Yemekleri</option>
-                          <option value="tavuk-yemekleri">Tavuk Yemekleri</option>
-                          <option value="balik-yemekleri">Balık Yemekleri</option>
-                          <option value="vegan-yemekler">Vegan Yemekler</option>
-                          <option value="soguk-tatlilar">Soğuk Tatlılar</option>
-                          <option value="sicak-tatlilar">Sıcak Tatlılar</option>
-                          <option value="soguk-icecekler">Soğuk İçecekler</option>
-                          <option value="sicak-icecekler">Sıcak İçecekler</option>
-                        </select>
-                      </div>
+                      {/* Alt Kategori özelliği şimdilik devre dışı */}
                     </div>
 
                     {/* Kalori ve Hazırlık Süresi */}
