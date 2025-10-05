@@ -32,8 +32,7 @@ import BusinessPaymentModal from '@/components/BusinessPaymentModal';
 
 export default function BusinessDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
-  const { currentRestaurant } = useRestaurantStore();
+  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
   
   // Premium plan state'leri
   const [currentPlan, setCurrentPlan] = useState('premium'); // basic, premium, enterprise
@@ -145,31 +144,14 @@ export default function BusinessDashboard() {
   };
 
   useEffect(() => {
-    // Sayfa yüklendiğinde demo işletme kullanıcısı oluştur
-    const timer = setTimeout(() => {
-      if (!user) {
-        const demoUser = {
-          id: 'masapp-demo-1',
-          name: 'MasApp',
-          email: 'info@masapp.com',
-          role: 'restaurant_owner' as const,
-          restaurantId: 'masapp-demo-1',
-          status: 'active' as const,
-          createdAt: new Date()
-        };
-        
-        // Demo kullanıcıyı login et
-        const { login } = useAuthStore.getState();
-        login(demoUser, 'demo-token', 'demo-refresh-token');
-      }
-    }, 100); // Kısa bir gecikme ile
-
-    return () => clearTimeout(timer);
-  }, [user]);
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   const handleLogout = () => {
     logout();
-    router.push('/business/login');
+    router.push('/login');
   };
 
   // Plan yükseltme fonksiyonları
@@ -356,23 +338,23 @@ export default function BusinessDashboard() {
               </button>
             <div>
                 <h2 className="text-lg sm:text-2xl font-semibold text-gray-800">Kontrol Paneli</h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Hoş geldiniz{user?.name ? `, ${user.name}` : ''} 👋</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 hidden sm:block">Hoş geldiniz{authenticatedRestaurant?.name ? `, ${authenticatedRestaurant.name}` : ''} 👋</p>
             </div>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-4">
               <button 
                 onClick={() => setShowUpgradeModal(true)}
                 className={`px-2 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all hover:scale-105 ${
-                  (currentRestaurant?.subscription?.plan || 'premium') === 'premium' 
+                  (authenticatedRestaurant?.subscription?.plan || 'premium') === 'premium' 
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 }`}
               >
                 <span className="hidden sm:inline">
-                {(currentRestaurant?.subscription?.plan || 'premium') === 'premium' ? 'Premium' : 'Premium'} Plan
+                {(authenticatedRestaurant?.subscription?.plan || 'premium') === 'premium' ? 'Premium' : 'Premium'} Plan
                 </span>
                 <span className="sm:hidden">
-                  {(currentRestaurant?.subscription?.plan || 'premium') === 'premium' ? 'P' : 'P'}
+                  {(authenticatedRestaurant?.subscription?.plan || 'premium') === 'premium' ? 'P' : 'P'}
                 </span>
               </button>
             </div>
@@ -440,7 +422,7 @@ export default function BusinessDashboard() {
                 </div>
                 <span className="text-xs sm:text-sm text-orange-600 font-medium">{stats.activeTables} aktif</span>
               </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{currentRestaurant?.tableCount || 15}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{authenticatedRestaurant?.tableCount || 15}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Masa</p>
             </div>
           </div>

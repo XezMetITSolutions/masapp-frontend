@@ -21,7 +21,7 @@ export default function LoginPage() {
 
     if (restaurant) {
       login(restaurant);
-      router.push('/dashboard');
+      router.push('/business/dashboard');
     } else {
       setError('Geçersiz kullanıcı adı veya şifre');
     }
