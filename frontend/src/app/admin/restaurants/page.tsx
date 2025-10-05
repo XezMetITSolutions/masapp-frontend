@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ResponsiveTable from '@/components/ResponsiveTable';
 import AdminLayout from '@/components/admin/AdminLayout';
+import useRestaurantStore from '@/store/useRestaurantStore';
+import { Restaurant } from '@/types';
 import { 
   FaBuilding, 
   FaSearch, 
@@ -23,33 +25,13 @@ import {
   FaQrcode
 } from 'react-icons/fa';
 
-interface Restaurant {
-  id: string;
-  name: string;
-  subdomain: string;
-  category: string;
-  address: string;
-  phone: string;
-  email: string;
-  status: 'active' | 'inactive' | 'pending' | 'suspended';
-  rating: number;
-  totalOrders: number;
-  monthlyRevenue: number;
-  owner: string;
-  createdAt: string;
-  lastActivity: string;
-}
-
 export default function RestaurantsManagement() {
   const router = useRouter();
+  const { restaurants } = useRestaurantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
-
-  const restaurants: Restaurant[] = [
-    // Demo veriler temizlendi - boş başlangıç
-  ];
 
   const getStatusClass = (status: string) => {
     switch(status) {
@@ -94,10 +76,10 @@ export default function RestaurantsManagement() {
           </div>
           <div>
             <div className="text-sm font-medium text-gray-900">{value}</div>
-            <div className="text-xs text-gray-500">{row.category}</div>
+            <div className="text-xs text-gray-500">{row.subscription.plan}</div>
             <div className="text-xs text-blue-600 mt-1">
-              <a href={`https://${row.subdomain}.guzellestir.com`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                {row.subdomain}.guzellestir.com
+              <a href={`https://${row.slug}.guzellestir.com`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                {row.slug}.guzellestir.com
               </a>
             </div>
           </div>
@@ -115,47 +97,49 @@ export default function RestaurantsManagement() {
       )
     },
     {
-      key: 'rating',
-      label: 'Puan',
+      key: 'tableCount',
+      label: 'Masa Sayısı',
       sortable: true,
       render: (value: number) => (
         <div className="flex items-center">
-          <FaStar className="text-yellow-400 mr-1" />
-          <span className="text-sm font-medium">{value > 0 ? value.toFixed(1) : '-'}</span>
+          <FaUsers className="text-blue-500 mr-1" />
+          <span className="text-sm font-medium">{value}</span>
         </div>
       )
     },
     {
-      key: 'totalOrders',
-      label: 'Toplam Sipariş',
+      key: 'subscription',
+      label: 'Abonelik',
       sortable: true,
-      render: (value: number) => value.toLocaleString()
+      render: (value: any) => (
+        <div className="flex items-center">
+          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+            value.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          }`}>
+            {value.plan}
+          </span>
+        </div>
+      )
     },
     {
-      key: 'monthlyRevenue',
-      label: 'Aylık Gelir',
-      sortable: true,
-      render: (value: number) => `${value.toLocaleString()} ₺`
-    },
-    {
-      key: 'owner',
-      label: 'Sahip',
+      key: 'ownerId',
+      label: 'Sahip ID',
       sortable: true
     },
     {
       key: 'createdAt',
       label: 'Kayıt Tarihi',
       sortable: true,
-      render: (value: string) => new Date(value).toLocaleDateString('tr-TR')
+      render: (value: Date) => new Date(value).toLocaleDateString('tr-TR')
     }
   ];
 
   const filteredRestaurants = restaurants.filter(restaurant => {
     const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         restaurant.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.owner.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || restaurant.category === categoryFilter;
+                         restaurant.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === 'all';
     const matchesStatus = statusFilter === 'all' || restaurant.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
   });
