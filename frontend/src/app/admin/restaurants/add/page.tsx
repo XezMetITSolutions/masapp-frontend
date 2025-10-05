@@ -24,6 +24,7 @@ export default function AddRestaurantPage() {
   
   const [formData, setFormData] = useState({
     name: '',
+    subdomain: '',
     email: '',
     phone: '',
     address: '',
@@ -43,11 +44,8 @@ export default function AddRestaurantPage() {
     autoAcceptOrders: false
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    const slug = formData.name
+  const generateSlug = (name: string) => {
+    return name
       .toLowerCase()
       .replace(/ğ/g, 'g')
       .replace(/ü/g, 'u')
@@ -58,6 +56,20 @@ export default function AddRestaurantPage() {
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
+  };
+
+  const handleNameChange = (name: string) => {
+    setFormData({ ...formData, name });
+    if (!formData.subdomain) {
+      setFormData({ ...formData, name, subdomain: generateSlug(name) });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const slug = formData.subdomain || generateSlug(formData.name);
 
     const newRestaurant: Restaurant = {
       id: `rest_${Date.now()}`,
@@ -141,10 +153,32 @@ export default function AddRestaurantPage() {
                         type="text"
                         required
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onChange={(e) => handleNameChange(e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                         placeholder="Örn: Lezzet Durağı"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Subdomain *
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          required
+                          value={formData.subdomain}
+                          onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          placeholder="lezzet-duragi"
+                        />
+                        <span className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm">
+                          .guzellestir.com
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Restoran adınızdan otomatik oluşturulur, düzenleyebilirsiniz
+                      </p>
                     </div>
 
                     <div>

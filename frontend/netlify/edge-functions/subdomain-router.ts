@@ -22,7 +22,10 @@ export default async (request: Request, context: Context) => {
     }
     
     // Subdomain validasyonu - veritabanından kontrol edilmeli
-    // Şimdilik statik liste kullanıyoruz, backend API ile entegre edilebilir
+    // ÖNEMLİ: Yeni restoran eklendiğinde bu listeye subdomain'i eklemeyi unutmayın!
+    // Frontend'deki restoranlarla senkronize tutulmalı:
+    // - src/app/admin/restaurants/page.tsx (restoran listesi)
+    // - Her yeni restoran eklediğinizde subdomain'i buraya ekleyin
     const validSubdomains = [
       'lezzet-duragi',
       'cafe-corner',

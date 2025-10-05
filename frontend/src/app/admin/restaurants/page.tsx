@@ -25,6 +25,7 @@ import {
 interface Restaurant {
   id: string;
   name: string;
+  subdomain: string;
   category: string;
   address: string;
   phone: string;
@@ -49,6 +50,7 @@ export default function RestaurantsManagement() {
     {
       id: 'rest-1',
       name: 'Pizza Palace',
+      subdomain: 'pizzapalace',
       category: 'İtalyan',
       address: 'Kadıköy, İstanbul',
       phone: '+90 555 123 4567',
@@ -64,6 +66,7 @@ export default function RestaurantsManagement() {
     {
       id: 'rest-2',
       name: 'Burger King',
+      subdomain: 'burgerking',
       category: 'Fast Food',
       address: 'Beşiktaş, İstanbul',
       phone: '+90 555 234 5678',
@@ -79,6 +82,7 @@ export default function RestaurantsManagement() {
     {
       id: 'rest-3',
       name: 'Sushi Master',
+      subdomain: 'sushimaster',
       category: 'Japon',
       address: 'Şişli, İstanbul',
       phone: '+90 555 345 6789',
@@ -94,6 +98,7 @@ export default function RestaurantsManagement() {
     {
       id: 'rest-4',
       name: 'Coffee Corner',
+      subdomain: 'coffeecorner',
       category: 'Kahve',
       address: 'Beyoğlu, İstanbul',
       phone: '+90 555 456 7890',
@@ -109,6 +114,7 @@ export default function RestaurantsManagement() {
     {
       id: 'rest-5',
       name: 'Steak House',
+      subdomain: 'steakhouse',
       category: 'Et Restoranı',
       address: 'Etiler, İstanbul',
       phone: '+90 555 567 8901',
@@ -166,7 +172,12 @@ export default function RestaurantsManagement() {
           </div>
           <div>
             <div className="text-sm font-medium text-gray-900">{value}</div>
-            <div className="text-sm text-gray-500">{row.category}</div>
+            <div className="text-xs text-gray-500">{row.category}</div>
+            <div className="text-xs text-blue-600 mt-1">
+              <a href={`https://${row.subdomain}.guzellestir.com`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                {row.subdomain}.guzellestir.com
+              </a>
+            </div>
           </div>
         </div>
       )
