@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaCog, 
   FaSearch, 
@@ -327,7 +328,7 @@ export default function SystemManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="Sistem Durumu" description="Sistem durumu ve performans metrikleri">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-8 py-6">
@@ -699,6 +700,6 @@ export default function SystemManagement() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

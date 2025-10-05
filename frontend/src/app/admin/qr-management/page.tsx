@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaQrcode, 
   FaStore,
@@ -109,7 +110,7 @@ export default function QRManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="QR Kod Yönetimi" description="QR kodları yönetin ve izleyin">
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white">
         <div className="p-6">
@@ -314,6 +315,6 @@ export default function QRManagementPage() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

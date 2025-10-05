@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaChartLine, 
   FaDownload,
@@ -37,7 +38,7 @@ export default function AnalyticsDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="Analitik" description="Sistem analitikleri ve raporları">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-8 py-6">
@@ -267,7 +268,7 @@ export default function AnalyticsDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 

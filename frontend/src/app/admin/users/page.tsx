@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ResponsiveTable from '@/components/ResponsiveTable';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaUsers, 
   FaSearch, 
@@ -217,7 +218,7 @@ export default function UsersManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="Kullanıcı Yönetimi" description="Kullanıcı hesaplarını yönetin">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-8 py-6">
@@ -360,6 +361,6 @@ export default function UsersManagement() {
           mobileView="card"
         />
       </div>
-    </div>
+    </AdminLayout>
   );
 }

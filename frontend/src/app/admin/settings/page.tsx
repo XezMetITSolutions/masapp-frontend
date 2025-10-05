@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaCog, 
   FaSave, 
@@ -97,7 +98,7 @@ export default function SystemSettings() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="Sistem Ayarları" description="Sistem genel ayarları">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-8 py-6">
@@ -293,6 +294,6 @@ export default function SystemSettings() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

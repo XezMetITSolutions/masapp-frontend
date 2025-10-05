@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ResponsiveTable from '@/components/ResponsiveTable';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaBuilding, 
   FaSearch, 
@@ -308,43 +309,32 @@ export default function RestaurantsManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Restoran Yönetimi</h1>
-              <p className="text-gray-600 mt-1">İşletmeleri görüntüle ve yönet</p>
-            </div>
-            <div className="flex space-x-3">
-              <button 
-                onClick={handleAddRestaurant}
-                disabled={isLoading}
-                className="bg-blue-100 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed text-blue-700 px-4 py-2 rounded-lg flex items-center transition-colors"
-              >
-                <FaPlus className="mr-2" />
-                Yeni Restoran
-              </button>
-              <button 
-                onClick={handleBulkApprove}
-                disabled={isLoading}
-                className="bg-green-100 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed text-green-700 px-4 py-2 rounded-lg flex items-center transition-colors"
-              >
-                <FaCheck className="mr-2" />
-                Toplu Onay
-              </button>
-              <button 
-                onClick={handleQRManagement}
-                disabled={isLoading}
-                className="bg-purple-100 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed text-purple-700 px-4 py-2 rounded-lg flex items-center transition-colors"
-              >
-                <FaQrcode className="mr-2" />
-                QR Kodlar
-              </button>
-            </div>
-          </div>
-        </div>
+    <AdminLayout title="Restoran Yönetimi" description="Restoranları yönetin ve izleyin">
+      <div className="flex justify-end px-8 py-4">
+        <button 
+          onClick={handleAddRestaurant}
+          disabled={isLoading}
+          className="bg-blue-100 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed text-blue-700 px-4 py-2 rounded-lg flex items-center transition-colors"
+        >
+          <FaPlus className="mr-2" />
+          Yeni Restoran
+        </button>
+        <button 
+          onClick={handleBulkApprove}
+          disabled={isLoading}
+          className="bg-green-100 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed text-green-700 px-4 py-2 rounded-lg flex items-center transition-colors ml-3"
+        >
+          <FaCheck className="mr-2" />
+          Toplu Onay
+        </button>
+        <button 
+          onClick={handleQRManagement}
+          disabled={isLoading}
+          className="bg-purple-100 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed text-purple-700 px-4 py-2 rounded-lg flex items-center transition-colors ml-3"
+        >
+          <FaQrcode className="mr-2" />
+          QR Kodlar
+        </button>
       </div>
 
       {/* Filters */}
@@ -473,6 +463,6 @@ export default function RestaurantsManagement() {
           isLoading={isLoading}
         />
       </div>
-    </div>
+    </AdminLayout>
   );
 }
