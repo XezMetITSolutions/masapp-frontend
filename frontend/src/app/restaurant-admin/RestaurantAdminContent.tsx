@@ -1,18 +1,27 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import useRestaurantStore from '@/store/useRestaurantStore';
 
-export default function RestaurantAdminPage() {
-  const params = useParams();
-  const subdomain = params.subdomain as string;
+export default function RestaurantAdminContent() {
+  const searchParams = useSearchParams();
+  const subdomain = searchParams.get('subdomain');
 
   const { restaurants } = useRestaurantStore();
 
   const restaurant = useMemo(() => {
+    if (!subdomain) return null;
     return restaurants.find(r => r.slug === subdomain);
   }, [restaurants, subdomain]);
+
+  if (!subdomain) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Restoran belirtilmedi.</p>
+      </div>
+    );
+  }
 
   if (!restaurant) {
     return (

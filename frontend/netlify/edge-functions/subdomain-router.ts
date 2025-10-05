@@ -70,7 +70,7 @@ export default async (request: Request, context: Context) => {
     
     // Path'e göre yönlendirme yap: /admin ise işletme paneline, değilse menüye
     if (url.pathname.startsWith('/admin')) {
-      const newPath = `/restaurant-admin/${subdomain}`;
+      const newPath = `/restaurant-admin?subdomain=${subdomain}`;
       return context.rewrite(newPath);
     } else {
       const newPath = `/restaurant/${subdomain}${url.pathname}`;
