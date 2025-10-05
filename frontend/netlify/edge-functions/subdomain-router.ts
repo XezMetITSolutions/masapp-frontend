@@ -68,10 +68,14 @@ export default async (request: Request, context: Context) => {
       );
     }
     
-    // Subdomain için restoran menü sayfasına yönlendir
-    // URL'deki path'i koruyarak restoran sayfasına yönlendir
-    const newPath = `/restaurant/${subdomain}${url.pathname}`;
-    return context.rewrite(newPath);
+    // Path'e göre yönlendirme yap: /admin ise işletme paneline, değilse menüye
+    if (url.pathname.startsWith('/admin')) {
+      const newPath = `/restaurant-admin/${subdomain}`;
+      return context.rewrite(newPath);
+    } else {
+      const newPath = `/restaurant/${subdomain}${url.pathname}`;
+      return context.rewrite(newPath);
+    }
   }
   
   // Diğer durumlar için normal işlem
