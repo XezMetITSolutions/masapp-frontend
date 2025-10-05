@@ -155,10 +155,9 @@ export default function RestaurantsManagement() {
       // Farklı aksiyonlar için gerçek işlevler
       switch(action) {
         case 'view':
-          // Restoranı seç ve menü sayfasına yönlendir
-          const { setCurrentRestaurant } = useRestaurantStore.getState();
-          setCurrentRestaurant(restaurant);
-          router.push('/business/menu');
+          // Müşteri menüsüne yönlendir (restoran username ile)
+          const slug = restaurant.username || restaurant.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          window.open(`/r/${slug}/menu`, '_blank');
           break;
         case 'edit':
           setSelectedRestaurant(restaurant);
