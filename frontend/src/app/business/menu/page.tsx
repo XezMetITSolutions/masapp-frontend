@@ -32,7 +32,7 @@ import {
   FaBars,
   FaMoneyBillWave
 } from 'react-icons/fa';
-import useMenuStore from '@/store/useMenuStore';
+// useMenuStore kaldırıldı - useRestaurantStore kullanıyoruz
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { lazy, Suspense } from 'react';
@@ -44,18 +44,27 @@ const BulkImportModal = lazy(() => import('@/components/BulkImportModal'));
 
 export default function MenuManagement() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
-  const { currentRestaurant } = useRestaurantStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { 
+    currentRestaurant, 
+    categories: allCategories, 
+    menuItems: allMenuItems,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem
+  } = useRestaurantStore();
   
-  const {
-    items,
-    categories,
-    isLoading,
-    fetchMenu,
-    getItemsByCategory,
-    bulkUpdatePrices,
-    updateItemPrice
-  } = useMenuStore();
+  // Giriş yapan restoranın ID'si
+  const currentRestaurantId = authenticatedRestaurant?.id || currentRestaurant?.id;
+  
+  // Sadece bu restorana ait kategorileri ve ürünleri filtrele
+  const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
+  const items = allMenuItems.filter(i => i.restaurantId === currentRestaurantId);
+  
+  const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
 
   const [activeTab, setActiveTab] = useState<'items' | 'categories' | 'stats'>('items');
   const [searchTerm, setSearchTerm] = useState('');
@@ -92,16 +101,10 @@ export default function MenuManagement() {
   });
 
   useEffect(() => {
-    fetchMenu();
-  }, [fetchMenu]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   const handleLogout = () => {
     logout();

@@ -9,6 +9,7 @@ import {
   FaCog
 } from 'react-icons/fa';
 import useRestaurantStore from '@/store/useRestaurantStore';
+import { kardeslerMenuCategories, kardeslerMenuItems } from '@/data/kardeslerDemoData';
 import { Restaurant } from '@/types';
 import { updateSubdomainsFile } from '@/lib/subdomains';
 
@@ -18,7 +19,7 @@ interface AddRestaurantFormProps {
 
 export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
   const router = useRouter();
-  const { addRestaurant } = useRestaurantStore();
+  const { addRestaurant, addCategory, addMenuItem } = useRestaurantStore();
   const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -92,7 +93,35 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
 
     addRestaurant(newRestaurant);
     
-    alert('Restoran başarıyla eklendi!');
+    // Eğer "Kardeşler" restoranı ise demo menü verilerini ekle
+    if (formData.name.toLowerCase() === 'kardeşler' || formData.name.toLowerCase() === 'kardesler') {
+      console.log('Kardeşler restoranı oluşturuluyor, demo verileri ekleniyor...');
+      
+      // Kategorileri ekle
+      kardeslerMenuCategories.forEach(category => {
+        addCategory({
+          ...category,
+          restaurantId: newRestaurant.id
+        });
+      });
+      
+      // Ürünleri ekle
+      kardeslerMenuItems.forEach((item, index) => {
+        addMenuItem({
+          ...item,
+          restaurantId: newRestaurant.id,
+          order: index + 1,
+          allergens: { 
+            tr: Array.isArray((item as any).allergens) ? (item as any).allergens : [], 
+            en: Array.isArray((item as any).allergens) ? (item as any).allergens : [] 
+          }
+        } as any);
+      });
+      
+      alert('Kardeşler restoranı demo menü ile birlikte oluşturuldu!');
+    } else {
+      alert('Restoran başarıyla eklendi!');
+    }
     
     onClose();
     router.refresh();

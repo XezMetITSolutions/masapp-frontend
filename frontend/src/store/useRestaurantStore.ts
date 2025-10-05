@@ -53,7 +53,7 @@ interface RestaurantState {
 
 const useRestaurantStore = create<RestaurantState>()(
   persist(
-    (set) => ({ 
+    (set, get) => ({ 
       restaurants: [],
       currentRestaurant: null,
       categories: [],
@@ -84,12 +84,13 @@ const useRestaurantStore = create<RestaurantState>()(
         restaurants: state.restaurants.filter(r => r.id !== id)
       })),
       
-      // Category Actions
+      // Category Actions (restoran bazlı)
       setCategories: (categories) => set({ categories }),
       
-      addCategory: (category) => set((state) => ({
-        categories: [...state.categories, category]
-      })),
+      addCategory: (category) => set((state) => {
+        console.log('Adding category:', category);
+        return { categories: [...state.categories, category] };
+      }),
       
       updateCategory: (id, updates) => set((state) => ({
         categories: state.categories.map(c => 
