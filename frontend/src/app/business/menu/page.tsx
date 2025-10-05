@@ -99,6 +99,15 @@ export default function MenuManagement() {
     calories: '',
     isAvailable: true
   });
+  
+  const [categoryFormData, setCategoryFormData] = useState({
+    nameTr: '',
+    nameEn: '',
+    descriptionTr: '',
+    descriptionEn: '',
+    order: 0,
+    isActive: true
+  });
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -152,6 +161,15 @@ export default function MenuManagement() {
 
   const handleAddCategory = () => {
     setEditingCategory(null);
+    setCategoryFormData({
+      nameTr: '',
+      nameEn: '',
+      descriptionTr: '',
+      descriptionEn: '',
+      order: categories.length,
+      isActive: true
+    });
+    setSubcategories([]);
     setShowCategoryForm(true);
   };
 
@@ -1275,9 +1293,11 @@ export default function MenuManagement() {
                         </label>
                         <input
                           type="text"
-                          defaultValue={editingCategory?.name?.tr || ''}
+                          value={categoryFormData.nameTr}
+                          onChange={(e) => setCategoryFormData({...categoryFormData, nameTr: e.target.value})}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="Örn: Başlangıçlar"
+                          required
                         />
                       </div>
                       <div>
@@ -1286,7 +1306,8 @@ export default function MenuManagement() {
                         </label>
                         <input
                           type="text"
-                          defaultValue={editingCategory?.name?.en || ''}
+                          value={categoryFormData.nameEn}
+                          onChange={(e) => setCategoryFormData({...categoryFormData, nameEn: e.target.value})}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="Örn: Starters"
                         />
@@ -1390,14 +1411,42 @@ export default function MenuManagement() {
                     <button
                       onClick={() => {
                         // Gerçek kategori güncelleme işlemi
+                        if (!categoryFormData.nameTr) {
+                          alert('Lütfen kategori adını girin!');
+                          return;
+                        }
+                        
                         if (editingCategory) {
+                          updateCategory({
+                            ...editingCategory,
+                            name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
+                            description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                            order: categoryFormData.order,
+                            isActive: categoryFormData.isActive
+                          });
                           console.log('Kategori güncellendi:', editingCategory);
                         } else {
+                          addCategory({
+                            id: `cat_${Date.now()}`,
+                            restaurantId: currentRestaurantId!,
+                            name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
+                            description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                            order: categories.length,
+                            isActive: categoryFormData.isActive
+                          });
                           console.log('Yeni kategori eklendi');
                         }
                         setShowCategoryForm(false);
                         setEditingCategory(null);
                         setSubcategories([]); // Formu temizle
+                        setCategoryFormData({
+                          nameTr: '',
+                          nameEn: '',
+                          descriptionTr: '',
+                          descriptionEn: '',
+                          order: 0,
+                          isActive: true
+                        });
                       }}
                       className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                     >
