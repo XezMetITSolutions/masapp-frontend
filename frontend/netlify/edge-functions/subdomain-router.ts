@@ -20,24 +20,23 @@ export default async (request: Request, context: Context) => {
     if (subdomain === "admin") {
       return context.next();
     }
-    // Subdomain validasyonu - veritabanından kontrol edilmeli
-    // ÖNEMLİ: Yeni restoran eklendiğinde bu listeye subdomain'i eklemeyi unutmayın!
-    // Frontend'deki restoranlarla senkronize tutulmalı:
-    // - src/app/admin/restaurants/page.tsx (restoran listesi)
-    // - Her yeni restoran eklediğinizde subdomain'i buraya ekleyin
+    // JSON dosyasından geçerli subdomain'leri oku
+    // Not: Edge function'lar dinamik import'u veya dosya sistemi erişimini doğrudan desteklemez.
+    // Bu nedenle, subdomain listesini build zamanında buraya dahil etmek en iyisidir.
+    // Şimdilik, listeyi manuel olarak senkronize tutuyoruz.
     const validSubdomains = [
-      'lezzet-duragi',
-      'cafe-corner',
-      'bistro-34',
-      'demo',
-      'example',
-      'test',
-      'pizzapalace',
-      'burgerking',
-      'sushimaster',
-      'coffeecorner',
-      'steakhouse',
-      'kardesler',
+      "lezzet-duragi",
+      "cafe-corner",
+      "bistro-34",
+      "demo",
+      "example",
+      "test",
+      "pizzapalace",
+      "burgerking",
+      "sushimaster",
+      "coffeecorner",
+      "steakhouse",
+      "kardesler"
     ];
 
     // Geçerli subdomain kontrolü

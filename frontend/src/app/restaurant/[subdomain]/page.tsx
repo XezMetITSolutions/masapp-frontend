@@ -1,15 +1,10 @@
 import RestaurantMenu from './RestaurantMenu';
 
+import subdomains from '@/data/subdomains.json';
+
 // Static params generation for build
 export async function generateStaticParams() {
-  return [
-    { subdomain: 'lezzet-duragi' },
-    { subdomain: 'cafe-corner' },
-    { subdomain: 'bistro-34' },
-    { subdomain: 'demo' },
-    { subdomain: 'example' },
-    { subdomain: 'test' }
-  ];
+  return subdomains.map((subdomain) => ({ subdomain }));
 }
 
 export default function RestaurantMenuPage() {
