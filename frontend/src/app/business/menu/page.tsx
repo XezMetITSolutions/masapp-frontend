@@ -333,9 +333,9 @@ export default function MenuManagement() {
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
           <div className="border-t border-purple-700 pt-3 sm:pt-4">
             <div className="flex items-center justify-between">
-              <div className="hidden sm:block">
-                <p className="text-sm font-medium">MasApp</p>
-                <p className="text-xs text-purple-300">info@masapp.com</p>
+              <div>
+                <p className="text-sm font-medium">{displayName}</p>
+                <p className="text-xs text-purple-300">{authenticatedRestaurant?.email || authenticatedStaff?.email}</p>
               </div>
               <button
                 onClick={handleLogout}

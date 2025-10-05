@@ -21,7 +21,10 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function ReportsPage() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  
+  const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
+  const displayEmail = authenticatedRestaurant?.email || authenticatedStaff?.email || '';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'revenue' | 'hours'>('overview');
   const [dateRange, setDateRange] = useState({
@@ -330,8 +333,8 @@ export default function ReportsPage() {
           <div className="border-t border-purple-700 pt-4">
           <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">MasApp</p>
-                <p className="text-xs text-purple-300">info@masapp.com</p>
+                <p className="text-sm font-medium">{displayName}</p>
+                <p className="text-xs text-purple-300">{displayEmail}</p>
               </div>
               <button
                 onClick={handleLogout}

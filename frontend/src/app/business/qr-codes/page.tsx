@@ -661,11 +661,21 @@ export default function QRCodesPage() {
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-6">
-          <button onClick={handleLogout} 
-            className="flex items-center justify-between w-full p-2 hover:bg-purple-700 rounded-lg">
-            <span className="text-sm">{authenticatedRestaurant?.name}</span>
-            <FaSignOutAlt />
-          </button>
+          <div className="border-t border-purple-700 pt-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">{authenticatedRestaurant?.name || authenticatedStaff?.name}</p>
+                <p className="text-xs text-purple-300">{authenticatedRestaurant?.email || authenticatedStaff?.email}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 hover:bg-purple-700 rounded-lg"
+                title="Çıkış Yap"
+              >
+                <FaSignOutAlt />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
