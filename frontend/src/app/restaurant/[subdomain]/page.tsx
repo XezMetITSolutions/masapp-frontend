@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation';
 import subdomains from '@/data/subdomains.json';
+import { LanguageProvider } from '@/context/LanguageContext';
+import { MenuPageContent } from '@/app/menu/page';
 
 // Static params generation for build
 export async function generateStaticParams() {
@@ -7,6 +8,10 @@ export async function generateStaticParams() {
 }
 
 export default function RestaurantMenuPage() {
-  // Modern menü sayfasına yönlendir
-  redirect('/menu');
+  // Modern menü tasarimını kullan
+  return (
+    <LanguageProvider>
+      <MenuPageContent />
+    </LanguageProvider>
+  );
 }

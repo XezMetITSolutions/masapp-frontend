@@ -14,7 +14,7 @@ import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 
-function MenuPageContent() {
+export function MenuPageContent() {
   // Store states
   const { currentLanguage, translate } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
