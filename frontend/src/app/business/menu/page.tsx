@@ -97,7 +97,8 @@ export default function MenuManagement() {
     category: '',
     preparationTime: '',
     calories: '',
-    isAvailable: true
+    isAvailable: true,
+    isPopular: false
   });
   
   const [categoryFormData, setCategoryFormData] = useState({
@@ -122,6 +123,7 @@ export default function MenuManagement() {
 
   const handleAddItem = () => {
     setEditingItem(null);
+    setCapturedImage(null);
     setFormData({
       nameTr: '',
       nameEn: '',
@@ -131,7 +133,8 @@ export default function MenuManagement() {
       category: '',
       preparationTime: '',
       calories: '',
-      isAvailable: true
+      isAvailable: true,
+      isPopular: false
     });
     setShowItemForm(true);
   };
@@ -147,7 +150,8 @@ export default function MenuManagement() {
       category: item.categoryId || '',
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
-      isAvailable: item.isAvailable !== false
+      isAvailable: item.isAvailable !== false,
+      isPopular: item.isPopular || false
     });
     // Resmi de yükle
     if (item.image) {
@@ -563,7 +567,7 @@ export default function MenuManagement() {
                           <div>
                             <div className="text-sm font-medium text-gray-900">
                               {item.name.tr}
-                              {item.popular && (
+                              {item.isPopular && (
                                 <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200">
                                   <FaFire className="mr-1 text-yellow-600" />
                                   Popüler
@@ -633,7 +637,7 @@ export default function MenuManagement() {
                         <h3 className="text-sm font-medium text-gray-900 truncate">
                           {item.name.tr}
                         </h3>
-                        {item.popular && (
+                        {item.isPopular && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200 mt-1">
                             <FaFire className="mr-1 text-yellow-600" />
                             Popüler
@@ -787,7 +791,7 @@ export default function MenuManagement() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {label:'Toplam Ürün', value: items.length, icon:<FaUtensils className='text-blue-600' />, bg:'bg-blue-100'},
-              {label:'Popüler Ürünler', value: items.filter(i=>i.popular).length, icon:<FaFire className='text-red-600' />, bg:'bg-red-100'},
+              {label:'Popüler Ürünler', value: items.filter(i=>i.isPopular).length, icon:<FaFire className='text-red-600' />, bg:'bg-red-100'},
               {label:'Kategori Sayısı', value: categories.length, icon:<FaTag className='text-green-600' />, bg:'bg-green-100'},
               {label:'Ortalama Fiyat', value:`₺${items.length>0? Math.round(items.reduce((s,i)=>s+i.price,0)/items.length):0}`, icon:<FaChartBar className='text-purple-600' />, bg:'bg-purple-100'}
             ].map((kpi,idx)=> (
@@ -1154,7 +1158,8 @@ export default function MenuManagement() {
                           <label className="flex items-center p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg hover:from-yellow-100 hover:to-orange-100 transition-colors">
                             <input
                               type="checkbox"
-                              defaultChecked={editingItem?.popular || false}
+                              checked={formData.isPopular}
+                              onChange={(e) => setFormData({...formData, isPopular: e.target.checked})}
                               className="w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500"
                             />
                             <span className="ml-3 text-sm font-medium text-yellow-800 flex items-center gap-2">
@@ -1212,6 +1217,7 @@ export default function MenuManagement() {
                             preparationTime: Number(formData.preparationTime) || 0,
                             calories: Number(formData.calories) || 0,
                             isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
                             image: capturedImage || editingItem.image
                           });
                           console.log('Ürün güncellendi:', formData);
@@ -1231,12 +1237,10 @@ export default function MenuManagement() {
                             image: capturedImage || '/placeholder-food.jpg',
                             order: items.length + 1,
                             isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
                             preparationTime: Number(formData.preparationTime) || 0,
                             calories: Number(formData.calories) || 0,
-                            allergens: { tr: [], en: [] },
-                            isVegetarian: false,
-                            isVegan: false,
-                            isPopular: false
+                            allergens: { tr: [], en: [] }
                           });
                           console.log('Yeni ürün eklendi:', formData);
                         }
@@ -1253,7 +1257,8 @@ export default function MenuManagement() {
                           category: '',
                           preparationTime: '',
                           calories: '',
-                          isAvailable: true
+                          isAvailable: true,
+                          isPopular: false
                         });
                       }}
                       className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
