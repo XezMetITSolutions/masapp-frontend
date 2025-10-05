@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   FaArrowLeft,
@@ -15,8 +15,8 @@ import { Restaurant } from '@/types';
 
 export default function EditRestaurantPage() {
   const router = useRouter();
-  const params = useParams();
-  const restaurantId = Array.isArray(params?.id) ? params?.id[0] : (params?.id as string);
+  const searchParams = useSearchParams();
+  const restaurantId = searchParams.get('id') || '';
 
   const { restaurants, updateRestaurant } = useRestaurantStore();
 
@@ -49,7 +49,6 @@ export default function EditRestaurantPage() {
   useEffect(() => {
     if (!restaurantId) return;
     if (!restaurant) return;
-    // Prefill form from existing restaurant
     setFormData({
       name: restaurant.name,
       subdomain: restaurant.slug,
@@ -106,13 +105,23 @@ export default function EditRestaurantPage() {
       };
 
       updateRestaurant(restaurant.id, updates);
-
-      // küçük bir gecikme ve geri dön
       setTimeout(() => router.push('/admin/restaurants'), 300);
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!restaurantId) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Geçersiz istek</h2>
+          <p className="text-gray-600 mb-6">Düzenleme için bir restoran ID'si gerekli.</p>
+          <Link href="/admin/restaurants" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Geri Dön</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!restaurant) {
     return (

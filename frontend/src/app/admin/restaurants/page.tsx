@@ -159,8 +159,8 @@ export default function RestaurantsManagement() {
           router.push(`/admin/restaurants/${restaurant.id}`);
           break;
         case 'edit':
-          // Restoran düzenleme sayfasına yönlendir
-          router.push(`/admin/restaurants/${restaurant.id}/edit`);
+          // Restoran düzenleme sayfasına yönlendir (static export uyumlu)
+          router.push(`/admin/restaurants/edit?id=${restaurant.id}`);
           break;
         case 'delete':
           // Restoranı kalıcı olarak kaldır (Zustand store + persist)
