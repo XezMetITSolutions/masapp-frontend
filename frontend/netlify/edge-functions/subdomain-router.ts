@@ -70,8 +70,8 @@ export default async (request: Request, context: Context) => {
       const redirectUrl = `https://${mainDomain}/restaurant-admin?subdomain=${subdomain}`;
       return Response.redirect(redirectUrl, 302);
     } else {
-      // Menü sayfasına yönlendir
-      const redirectUrl = `https://${mainDomain}/restaurant/${subdomain}${url.pathname}`;
+      // Modern menü sayfasına yönlendir
+      const redirectUrl = `https://${mainDomain}/menu${url.pathname}`;
       return Response.redirect(redirectUrl, 302);
     }
   }
