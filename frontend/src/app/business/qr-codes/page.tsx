@@ -75,115 +75,33 @@ export default function QRCodesPage() {
     }
   }, [isAuthenticated, router]);
 
-  // QR kodlar her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
+  // QR kodlar her restoran için ayrı localStorage'dan yükle
   useEffect(() => {
-    // Eğer Kardeşler restoranı ise demo QR kodları ekle
-    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
-        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
-      const demoQrCodes = [
-      {
-        id: 1,
-        name: 'Masa 1 - QR Menü',
-        type: 'table',
-        tableNumber: 1,
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://demo.masapp.com/masa/1',
-        url: 'https://demo.masapp.com/masa/1',
-        description: 'Masa 1 için QR kod menü',
-        theme: 'default',
-        isActive: true,
-        scanCount: 45,
-        lastScanned: '2024-01-15 14:30',
-        createdAt: '2024-01-01',
-        expiresAt: null,
-        notes: 'Ana giriş masası'
-      },
-      {
-        id: 2,
-        name: 'Masa 5 - QR Menü',
-        type: 'table',
-        tableNumber: 5,
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://demo.masapp.com/masa/5',
-        url: 'https://demo.masapp.com/masa/5',
-        description: 'Masa 5 için QR kod menü',
-        theme: 'modern',
-        isActive: true,
-        scanCount: 32,
-        lastScanned: '2024-01-15 14:25',
-        createdAt: '2024-01-01',
-        expiresAt: null,
-        notes: 'Pencere kenarı masa'
-      },
-      {
-        id: 3,
-        name: 'Masa 8 - QR Menü',
-        type: 'table',
-        tableNumber: 8,
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://demo.masapp.com/masa/8',
-        url: 'https://demo.masapp.com/masa/8',
-        description: 'Masa 8 için QR kod menü',
-        theme: 'classic',
-        isActive: true,
-        scanCount: 28,
-        lastScanned: '2024-01-15 14:20',
-        createdAt: '2024-01-01',
-        expiresAt: null,
-        notes: 'Köşe masa'
-      },
-      {
-        id: 4,
-        name: 'Genel Menü QR',
-        type: 'general',
-        tableNumber: null,
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://demo.masapp.com/menu',
-        url: 'https://demo.masapp.com/menu',
-        description: 'Genel menü erişimi için QR kod',
-        theme: 'minimal',
-        isActive: true,
-        scanCount: 156,
-        lastScanned: '2024-01-15 14:35',
-        createdAt: '2024-01-01',
-        expiresAt: null,
-        notes: 'Giriş kapısında asılı'
-      },
-      {
-        id: 5,
-        name: 'Masa 12 - QR Menü',
-        type: 'table',
-        tableNumber: 12,
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://demo.masapp.com/masa/12',
-        url: 'https://demo.masapp.com/masa/12',
-        description: 'Masa 12 için QR kod menü',
-        theme: 'default',
-        isActive: false,
-        scanCount: 15,
-        lastScanned: '2024-01-10 16:45',
-        createdAt: '2024-01-01',
-        expiresAt: '2024-02-01',
-        notes: 'Geçici olarak devre dışı'
-      },
-      {
-        id: 6,
-        name: 'Özel Etkinlik QR',
-        type: 'event',
-        tableNumber: null,
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://demo.masapp.com/event/valentine',
-        url: 'https://demo.masapp.com/event/valentine',
-        description: 'Sevgililer Günü özel menüsü',
-        theme: 'romantic',
-        isActive: true,
-        scanCount: 89,
-        lastScanned: '2024-01-14 20:30',
-        createdAt: '2024-01-10',
-        expiresAt: '2024-02-15',
-        notes: 'Sevgililer Günü etkinliği için'
+    if (!authenticatedRestaurant) return;
+    
+    const storageKey = `qr-codes-${authenticatedRestaurant.id}`;
+    const savedQrCodes = localStorage.getItem(storageKey);
+    
+    if (savedQrCodes) {
+      try {
+        setQrCodes(JSON.parse(savedQrCodes));
+      } catch (error) {
+        console.error('QR kodları yüklenemedi:', error);
+        setQrCodes([]);
       }
-      ];
-
-      setQrCodes(demoQrCodes);
-      setFilteredQrCodes(demoQrCodes);
+    } else {
+      // İlk kez açılıyorsa boş başlat
+      setQrCodes([]);
     }
-    // Diğer restoranlar boş başlar
-  }, [authenticatedRestaurant]);
+  }, [authenticatedRestaurant?.id]);
+
+  // QR kodları değiştiğinde localStorage'a kaydet
+  useEffect(() => {
+    if (!authenticatedRestaurant || qrCodes.length === 0) return;
+    
+    const storageKey = `qr-codes-${authenticatedRestaurant.id}`;
+    localStorage.setItem(storageKey, JSON.stringify(qrCodes));
+  }, [qrCodes, authenticatedRestaurant?.id]);
 
   // Filtreleme ve arama
   useEffect(() => {
@@ -323,6 +241,14 @@ export default function QRCodesPage() {
   };
 
   const handleAddQrCode = () => {
+    // Restaurant bilgisi kontrolü
+    if (!authenticatedRestaurant) {
+      alert('Restoran bilgisi bulunamadı!');
+      return;
+    }
+
+    const restaurantSlug = authenticatedRestaurant.username || authenticatedRestaurant.name.toLowerCase().replace(/\s+/g, '-');
+
     // Toplu oluşturma modu
     if (bulkCreateMode) {
       const count = parseInt(bulkTableCount);
@@ -333,9 +259,8 @@ export default function QRCodesPage() {
 
       const newQrCodes: any[] = [];
       for (let i = 1; i <= count; i++) {
-        const token = generateToken();
-        const baseUrl = `https://demo.masapp.com/masa/${i}`;
-        const urlWithToken = `${baseUrl}?token=${token}`;
+        // Restaurant-specific URL oluştur
+        const menuUrl = `https://guzellestir.com/menu?restaurant=${restaurantSlug}&table=${i}`;
         const now = new Date().toISOString();
 
         newQrCodes.push({
@@ -343,18 +268,17 @@ export default function QRCodesPage() {
           name: `Masa ${i} - QR Menü`,
           type: 'table',
           tableNumber: i,
-          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlWithToken)}`,
-          url: urlWithToken,
-          token: token,
-          tokenCreatedAt: now,
-          description: `Masa ${i} için QR kod menü`,
+          restaurantId: authenticatedRestaurant.id,
+          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(menuUrl)}`,
+          url: menuUrl,
+          description: `Masa ${i} için QR kod menü - ${authenticatedRestaurant.name}`,
           theme: 'default',
           isActive: true,
           scanCount: 0,
           lastScanned: null,
           createdAt: now.split('T')[0],
           expiresAt: null,
-          notes: ''
+          notes: `${authenticatedRestaurant.name} - Masa ${i}`
         });
       }
 
@@ -398,15 +322,13 @@ export default function QRCodesPage() {
       }
     };
 
-    // Yeni QR kod oluştur (token ile)
-    const token = generateToken();
-    const baseUrl = newQrCode.type === 'custom' 
+    // Yeni QR kod oluştur (restaurant-specific)
+    const menuUrl = newQrCode.type === 'custom' 
       ? newQrCode.customUrl 
       : newQrCode.type === 'table' 
-        ? `https://demo.masapp.com/masa/${newQrCode.tableNumber}`
-        : 'https://demo.masapp.com/menu';
+        ? `https://guzellestir.com/menu?restaurant=${restaurantSlug}&table=${newQrCode.tableNumber}`
+        : `https://guzellestir.com/menu?restaurant=${restaurantSlug}`;
     
-    const urlWithToken = `${baseUrl}?token=${token}`;
     const now = new Date().toISOString();
 
     const newQr = {
@@ -414,10 +336,9 @@ export default function QRCodesPage() {
       name: newQrCode.name,
       type: newQrCode.type,
       tableNumber: newQrCode.type === 'table' ? parseInt(newQrCode.tableNumber) : null,
-      qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlWithToken)}${getThemeParams(newQrCode.theme)}`,
-      url: urlWithToken,
-      token: token,
-      tokenCreatedAt: now,
+      restaurantId: authenticatedRestaurant.id,
+      qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(menuUrl)}${getThemeParams(newQrCode.theme)}`,
+      url: menuUrl,
       description: newQrCode.description,
       theme: newQrCode.theme,
       isActive: newQrCode.isActive,
