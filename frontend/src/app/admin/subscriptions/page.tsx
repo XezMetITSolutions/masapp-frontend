@@ -56,50 +56,8 @@ export default function SubscriptionsManagement() {
   const [isLoading, setIsLoading] = useState(false);
 
   const subscriptions: Subscription[] = [
-    {
-      id: 'sub-1',
-      restaurantId: 'rest-1',
-      restaurantName: 'Pizza Palace',
-      owner: 'Ahmet Yılmaz',
-      email: 'ahmet@pizzapalace.com',
-      phone: '+90 532 123 4567',
-      plan: 'premium',
-      status: 'active',
-      startDate: '2024-01-15',
-      endDate: '2025-01-15',
-      nextBillingDate: '2024-04-15',
-      amount: 4980,
-      currency: 'TRY',
-      billingCycle: 'monthly',
-      paymentMethod: 'card',
-      lastPaymentDate: '2024-03-15',
-      lastPaymentAmount: 4980,
-      failedPayments: 0,
-      totalRevenue: 14940,
-      notes: 'Mükemmel müşteri, hiç sorun yaşamadık'
-    },
-    {
-      id: 'sub-2',
-      restaurantId: 'rest-2',
-      restaurantName: 'Burger King',
-      owner: 'Mehmet Demir',
-      email: 'mehmet@burgerking.com',
-      phone: '+90 533 987 6543',
-      plan: 'pro',
-      status: 'expired',
-      startDate: '2023-12-01',
-      endDate: '2024-03-01',
-      nextBillingDate: '2024-04-01',
-      amount: 3490,
-      currency: 'TRY',
-      billingCycle: 'monthly',
-      paymentMethod: 'card',
-      lastPaymentDate: '2024-02-01',
-      lastPaymentAmount: 3490,
-      failedPayments: 2,
-      totalRevenue: 10470,
-      notes: 'Ödeme sorunları yaşıyor, iletişime geçilmeli'
-    },
+    // Demo veriler temizlendi - boş başlangıç
+  ];
     {
       id: 'sub-3',
       restaurantId: 'rest-3',

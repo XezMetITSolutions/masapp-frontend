@@ -74,39 +74,8 @@ export default function UserApprovalsManagement() {
   const [isLoading, setIsLoading] = useState(false);
 
   const userApprovals: UserApproval[] = [
-    {
-      id: 'app-1',
-      userId: 'user-1',
-      restaurantId: 'rest-1',
-      restaurantName: 'Pizza Palace',
-      firstName: 'Ahmet',
-      lastName: 'Yılmaz',
-      email: 'ahmet.yilmaz@email.com',
-      phone: '+90 532 123 4567',
-      role: 'manager',
-      position: 'Restoran Müdürü',
-      status: 'pending',
-      appliedAt: '2024-03-15T10:30:00Z',
-      notes: 'Deneyimli restoran müdürü, önceki işletmede 3 yıl çalışmış',
-      documents: [
-        {
-          id: 'doc-1',
-          name: 'CV.pdf',
-          type: 'cv',
-          url: '/documents/cv-1.pdf',
-          uploadedAt: '2024-03-15T10:30:00Z'
-        },
-        {
-          id: 'doc-2',
-          name: 'Kimlik Fotokopisi.pdf',
-          type: 'id',
-          url: '/documents/id-1.pdf',
-          uploadedAt: '2024-03-15T10:32:00Z'
-        }
-      ],
-      experience: '5 yıl restoran yönetimi deneyimi',
-      education: 'İşletme Fakültesi Mezunu',
-      languages: ['Türkçe', 'İngilizce'],
+    // Demo veriler temizlendi - boş başlangıç
+  ];
       availability: 'Tam zamanlı',
       expectedSalary: 15000,
       references: [

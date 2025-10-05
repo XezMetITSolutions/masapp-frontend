@@ -64,29 +64,8 @@ export default function PaymentErrorsManagement() {
   const [isLoading, setIsLoading] = useState(false);
 
   const paymentErrors: PaymentError[] = [
-    {
-      id: 'err-1',
-      subscriptionId: 'sub-2',
-      restaurantId: 'rest-2',
-      restaurantName: 'Burger King',
-      owner: 'Mehmet Demir',
-      email: 'mehmet@burgerking.com',
-      phone: '+90 533 987 6543',
-      plan: 'Pro',
-      amount: 3490,
-      currency: 'TRY',
-      errorCode: 'card_declined',
-      errorMessage: 'Kart reddedildi - Yetersiz bakiye',
-      errorType: 'insufficient_funds',
-      paymentMethod: 'card',
-      last4: '4242',
-      attemptCount: 3,
-      firstAttempt: '2024-03-01T10:30:00Z',
-      lastAttempt: '2024-03-03T14:20:00Z',
-      nextRetry: '2024-03-05T10:00:00Z',
-      status: 'pending',
-      notes: 'Müşteri ile iletişime geçildi, yeni kart bilgileri bekleniyor'
-    },
+    // Demo veriler temizlendi - boş başlangıç
+  ];
     {
       id: 'err-2',
       subscriptionId: 'sub-3',

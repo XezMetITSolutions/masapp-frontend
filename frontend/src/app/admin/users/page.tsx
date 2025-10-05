@@ -41,59 +41,7 @@ export default function UsersManagement() {
   const [isLoading, setIsLoading] = useState(false);
 
   const users: User[] = [
-    {
-      id: 'user-1',
-      name: 'Ahmet Yılmaz',
-      email: 'ahmet@example.com',
-      phone: '+90 555 123 4567',
-      role: 'manager',
-      status: 'active',
-      restaurant: 'Pizza Palace',
-      lastLogin: '2024-03-15T10:30:00Z',
-      createdAt: '2024-01-15T08:00:00Z'
-    },
-    {
-      id: 'user-2',
-      name: 'Ayşe Demir',
-      email: 'ayse@example.com',
-      phone: '+90 555 234 5678',
-      role: 'staff',
-      status: 'active',
-      restaurant: 'Burger King',
-      lastLogin: '2024-03-15T09:15:00Z',
-      createdAt: '2024-02-01T10:30:00Z'
-    },
-    {
-      id: 'user-3',
-      name: 'Mehmet Kaya',
-      email: 'mehmet@example.com',
-      phone: '+90 555 345 6789',
-      role: 'admin',
-      status: 'active',
-      lastLogin: '2024-03-15T11:45:00Z',
-      createdAt: '2023-12-01T12:00:00Z'
-    },
-    {
-      id: 'user-4',
-      name: 'Fatma Özkan',
-      email: 'fatma@example.com',
-      phone: '+90 555 456 7890',
-      role: 'customer',
-      status: 'pending',
-      lastLogin: '2024-03-14T16:20:00Z',
-      createdAt: '2024-03-14T16:20:00Z'
-    },
-    {
-      id: 'user-5',
-      name: 'Ali Veli',
-      email: 'ali@example.com',
-      phone: '+90 555 567 8901',
-      role: 'manager',
-      status: 'suspended',
-      restaurant: 'Sushi Master',
-      lastLogin: '2024-03-10T14:30:00Z',
-      createdAt: '2024-01-20T09:15:00Z'
-    }
+    // Demo veriler temizlendi - boş başlangıç
   ];
 
   const getRoleClass = (role: string) => {
