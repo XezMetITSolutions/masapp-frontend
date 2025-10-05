@@ -62,8 +62,43 @@ export default function RestaurantMenu() {
 
   // Zustand store'dan restoran verilerini al ve dinamik menü oluştur
   const restaurant = useMemo(() => {
-    const storeRestaurant = restaurants.find(r => r.slug === subdomain);
-    if (!storeRestaurant) return null;
+    let storeRestaurant = restaurants.find(r => r.slug === subdomain);
+    
+    // Eğer store'da restoran bulunamazsa, temel bir restoran oluştur
+    if (!storeRestaurant) {
+      // Temel fallback restoran
+      storeRestaurant = {
+        id: subdomain,
+        name: subdomain.charAt(0).toUpperCase() + subdomain.slice(1).replace(/-/g, ' '),
+        slug: subdomain,
+        address: 'İstanbul, Türkiye',
+        phone: '+90 212 555 0000',
+        email: `info@${subdomain}.com`,
+        primaryColor: '#3B82F6',
+        secondaryColor: '#10B981',
+        ownerId: 'temp',
+        tableCount: 10,
+        qrCodes: [],
+        settings: {
+          language: ['tr'],
+          currency: 'TRY',
+          taxRate: 18,
+          serviceChargeRate: 0,
+          allowTips: true,
+          allowOnlinePayment: true,
+          autoAcceptOrders: false,
+          workingHours: []
+        },
+        subscription: {
+          plan: 'basic' as const,
+          startDate: new Date(),
+          endDate: new Date(),
+          status: 'active' as const
+        },
+        createdAt: new Date(),
+        status: 'active' as const
+      };
+    }
 
     // Temel kategoriler
     const defaultCategories = ['Ana Yemekler', 'Çorbalar', 'Salatalar', 'Tatlılar', 'İçecekler'];
