@@ -113,17 +113,6 @@ export default function AdminLayout({
                     Bildirimler
                   </Link>
                 </li>
-                <li>
-                  <Link 
-                    href="/admin/subdomains" 
-                    className={`flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white ${
-                      title === 'Subdomain Yönetimi' ? 'bg-blue-600 text-white' : ''
-                    }`}
-                  >
-                    <FaGlobe className="mr-3" />
-                    Subdomain Yönetimi
-                  </Link>
-                </li>
               </ul>
             </div>
 
