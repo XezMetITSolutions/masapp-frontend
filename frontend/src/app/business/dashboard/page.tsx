@@ -226,24 +226,19 @@ export default function BusinessDashboard() {
     setSelectedFeatures([]);
   };
 
-  // Demo istatistikler
+  // Gerçek verileri (veya şimdilik varsayılanları) kullan
   const stats = {
-    todayOrders: 24,
-    activeOrders: 3,
-    todayRevenue: 2450,
-    monthlyRevenue: 48500,
-    totalMenuItems: 45,
-    activeCategories: 8,
-    totalWaiters: 5,
-    activeTables: 12
+    todayOrders: 0, // Bu veriler daha sonra sipariş sisteminden gelecek
+    activeOrders: 0,
+    todayRevenue: 0,
+    monthlyRevenue: 0,
+    totalMenuItems: 0, // Bu veriler menü sisteminden gelecek
+    activeCategories: 0,
+    totalWaiters: 0, // Bu veriler personel sisteminden gelecek
+    activeTables: 0
   };
 
-  // Demo aktif siparişler
-  const activeOrders = [
-    { id: 1, table: 5, items: 3, total: 145, status: 'preparing', time: '10 dk' },
-    { id: 2, table: 8, items: 2, total: 89, status: 'ready', time: '2 dk' },
-    { id: 3, table: 3, items: 5, total: 210, status: 'preparing', time: '15 dk' }
-  ];
+  const activeOrders: any[] = []; // Bu veriler sipariş sisteminden gelecek
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -391,6 +386,7 @@ export default function BusinessDashboard() {
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.todayOrders}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
@@ -402,6 +398,7 @@ export default function BusinessDashboard() {
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{stats.todayRevenue.toLocaleString('tr-TR')}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
@@ -412,6 +409,7 @@ export default function BusinessDashboard() {
                 <span className="text-xs sm:text-sm text-gray-600">{stats.activeCategories} kategori</span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.totalMenuItems}</h3>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
             </div>
 
@@ -506,7 +504,7 @@ export default function BusinessDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
                     <p className="text-3xl font-bold">₺{stats.monthlyRevenue.toLocaleString('tr-TR')}</p>
-                    <p className="text-purple-200 text-sm">Toplam Ciro</p>
+                    <p className="text-purple-200 text-sm">Aylık Ciro</p>
                   </div>
                   <div>
                     <p className="text-3xl font-bold">486</p>
