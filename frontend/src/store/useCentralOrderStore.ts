@@ -196,9 +196,8 @@ const useCentralOrderStore = create<CentralOrderState>()(
       },
       
       initializeDemoData: () => {
-        // Demo verileri her zaman yükle (test için)
-        console.log('🔄 Demo verileri yükleniyor...');
-        console.log('🔄 Mevcut sipariş sayısı:', get().orders.length);
+        // Demo verileri temizlendi - boş başlangıç
+        console.log('🔄 Demo verileri temizleniyor...');
         const demoOrders: CentralOrder[] = [
           // 1. Hazırlanıyor - Yüksek Öncelik
           {
@@ -713,9 +712,8 @@ const useCentralOrderStore = create<CentralOrderState>()(
           }
         ];
         
-        set({ orders: demoOrders });
-        console.log('✅ Merkezi store demo verileri yüklendi:', demoOrders.length, 'sipariş');
-        console.log('📊 Demo sipariş durumları:', demoOrders.map(o => ({ id: o.id, table: o.tableNumber, status: o.status })));
+        set({ orders: [] });
+        console.log('✅ Merkezi store temizlendi - demo veriler kaldırıldı');
       }
     }),
     {

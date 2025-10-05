@@ -150,8 +150,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Toplam Restoran</p>
-                  <h3 className="text-3xl font-bold text-gray-900">1,247</h3>
-                  <p className="text-sm text-green-600 mt-1">+12 bu ay</p>
+                  <h3 className="text-3xl font-bold text-gray-900">0</h3>
+                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
                 </div>
                 <div className="h-16 w-16 bg-blue-100 rounded-xl flex items-center justify-center">
                   <FaBuilding className="text-2xl text-blue-600" />
@@ -163,8 +163,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Aktif Restoran</p>
-                  <h3 className="text-3xl font-bold text-gray-900">1,189</h3>
-                  <p className="text-sm text-green-600 mt-1">%95.3 aktif</p>
+                  <h3 className="text-3xl font-bold text-gray-900">0</h3>
+                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
                 </div>
                 <div className="h-16 w-16 bg-green-100 rounded-xl flex items-center justify-center">
                   <FaChartBar className="text-2xl text-green-600" />
@@ -176,8 +176,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Toplam Kullanıcı</p>
-                  <h3 className="text-3xl font-bold text-gray-900">15,432</h3>
-                  <p className="text-sm text-green-600 mt-1">+8.2% bu ay</p>
+                  <h3 className="text-3xl font-bold text-gray-900">0</h3>
+                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
                 </div>
                 <div className="h-16 w-16 bg-purple-100 rounded-xl flex items-center justify-center">
                   <FaUsers className="text-2xl text-purple-600" />
@@ -189,8 +189,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Aylık Gelir</p>
-                  <h3 className="text-3xl font-bold text-gray-900">₺2.4M</h3>
-                  <p className="text-sm text-green-600 mt-1">+15.3% bu ay</p>
+                  <h3 className="text-3xl font-bold text-gray-900">₺0</h3>
+                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
                 </div>
                 <div className="h-16 w-16 bg-yellow-100 rounded-xl flex items-center justify-center">
                   <FaChartLine className="text-2xl text-yellow-600" />
@@ -253,45 +253,12 @@ export default function SuperAdminDashboard() {
           {/* Son Aktiviteler */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Son Aktiviteler</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <FaBuilding className="text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Yeni Restoran Kaydı</p>
-                    <p className="text-sm text-gray-500">Pizza Palace - 2 saat önce</p>
-                  </div>
-                </div>
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Onaylandı</span>
+            <div className="text-center py-8">
+              <div className="text-gray-400 mb-2">
+                <FaChartBar className="text-4xl mx-auto" />
               </div>
-              
-              <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                    <FaExclamationTriangle className="text-yellow-600" />
-                </div>
-                  <div>
-                    <p className="font-medium text-gray-900">Ödeme Hatası</p>
-                    <p className="text-sm text-gray-500">Cafe Central - 4 saat önce</p>
-              </div>
-                </div>
-                <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">Beklemede</span>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 border border-gray-100 rounded-lg">
-                        <div className="flex items-center">
-                  <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    <FaUserCheck className="text-green-600" />
-                          </div>
-                          <div>
-                    <p className="font-medium text-gray-900">Kullanıcı Onayı</p>
-                    <p className="text-sm text-gray-500">John Doe - 6 saat önce</p>
-                          </div>
-                        </div>
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Tamamlandı</span>
-              </div>
+              <p className="text-gray-500">Henüz aktivite bulunmuyor</p>
+              <p className="text-sm text-gray-400">Sistem kullanılmaya başlandığında aktiviteler burada görünecek</p>
             </div>
           </div>
       </main>
