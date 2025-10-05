@@ -23,15 +23,25 @@ export function MenuPageContent() {
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
   
-  // URL parametrelerinden restaurant slug'ını al
+  // URL parametrelerinden restaurant slug'ını ve masa numarasını al
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
+  const setTableNumber = useCartStore(state => state.setTableNumber);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       setRestaurantSlug(params.get('restaurant'));
+      
+      // Masa numarasını URL'den al ve store'a kaydet
+      const tableParam = params.get('table') || params.get('masa');
+      if (tableParam) {
+        const tableNum = parseInt(tableParam, 10);
+        if (!isNaN(tableNum)) {
+          setTableNumber(tableNum);
+        }
+      }
     }
-  }, []);
+  }, [setTableNumber]);
   
   // Restaurant store
   const { authenticatedRestaurant } = useAuthStore();
@@ -241,9 +251,11 @@ export function MenuPageContent() {
               <h1 className="text-dynamic-lg font-bold text-primary">
                 <TranslatedText>Menü</TranslatedText>
               </h1>
-              <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
-                <TranslatedText>Masa</TranslatedText> #{tableNumber}
-              </div>
+              {tableNumber && (
+                <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
+                  <TranslatedText>Masa</TranslatedText> #{tableNumber}
+                </div>
+              )}
             </div>
           </div>
           {/* Dil seçici sağ üstte, arama ve diğer içerikten tamamen ayrı */}
