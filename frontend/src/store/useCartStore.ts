@@ -24,6 +24,7 @@ interface CartState {
   tableNumber: number;
   orderStatus: 'idle' | 'preparing' | 'ready' | 'completed';
   paid: boolean;
+  restaurantId: string | null; // Her restoran için ayrı sepet
   
   // Actions
   addItem: (item: Omit<CartItem, 'id'>) => void;
@@ -35,6 +36,7 @@ interface CartState {
   setTipPercentage: (percentage: number) => void;
   setTableNumber: (tableNumber: number) => void;
   setOrderStatus: (status: 'idle' | 'preparing' | 'ready' | 'completed') => void;
+  setRestaurantId: (restaurantId: string) => void; // Restaurant değiştiğinde sepeti temizle
   markPaidAndClear: () => void;
   resetTable: () => void;
   moveToPreparing: () => void; // Aktif ürünleri hazırlanan bölümüne taşı
@@ -58,6 +60,7 @@ const useCartStore = create<CartState>()(
       tableNumber: 5, // Default table number
       orderStatus: 'idle', // Default order status
       paid: false,
+      restaurantId: null, // Restaurant ID
       
       addItem: (item) => {
         const state = get();
@@ -120,6 +123,25 @@ const useCartStore = create<CartState>()(
       
       setOrderStatus: (status) => {
         set({ orderStatus: status });
+      },
+      
+      // Restaurant değiştiğinde sepeti temizle
+      setRestaurantId: (restaurantId) => {
+        const currentRestaurantId = get().restaurantId;
+        // Eğer farklı bir restorana geçiyorsa sepeti temizle
+        if (currentRestaurantId && currentRestaurantId !== restaurantId) {
+          set({ 
+            items: [], 
+            preparingItems: [], 
+            couponCode: null, 
+            tipPercentage: 10, 
+            orderStatus: 'idle', 
+            paid: false,
+            restaurantId 
+          });
+        } else {
+          set({ restaurantId });
+        }
       },
 
       // Ödeme alındıktan sonra sepeti sıfırla ve paid=true kaydet

@@ -24,6 +24,7 @@ export function MenuPageContent() {
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
+  const setRestaurantId = useCartStore(state => state.setRestaurantId);
   
   // Session token state
   const [sessionToken, setSessionToken] = useState<string | null>(null);
@@ -113,6 +114,13 @@ export function MenuPageContent() {
         r.name.toLowerCase().replace(/\s+/g, '-') === restaurantSlug.toLowerCase()
       )
     : authenticatedRestaurant;
+  
+  // Restaurant değiştiğinde cart'ı restaurant-specific yap
+  useEffect(() => {
+    if (activeRestaurant?.id) {
+      setRestaurantId(activeRestaurant.id);
+    }
+  }, [activeRestaurant?.id, setRestaurantId]);
   
   // Menü verilerini restoran bazlı al
   const allCategories = useRestaurantStore(state => state.categories);
