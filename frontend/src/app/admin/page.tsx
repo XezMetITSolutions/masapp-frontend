@@ -69,12 +69,6 @@ export default function SuperAdminDashboard() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/admin/subdomains" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaCogs className="mr-3" />
-                    Subdomain Yönetimi
-                  </Link>
-                </li>
-                <li>
                   <Link href="/admin/users" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
                     <FaUsers className="mr-3" />
                     Kullanıcı Yönetimi

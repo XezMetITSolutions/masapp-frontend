@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaBell, 
   FaSearch, 
@@ -314,7 +315,7 @@ export default function NotificationsManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="Bildirim Yönetimi" description="Sistem bildirimlerini yönetin">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-8 py-6">
@@ -683,6 +684,6 @@ export default function NotificationsManagement() {
             </div>
           </div>
         </div>
-    </div>
+    </AdminLayout>
   );
 }

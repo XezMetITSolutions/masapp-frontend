@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaUserCheck, 
   FaSearch, 
@@ -315,7 +316,7 @@ export default function UserApprovalsManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayout title="Kullanıcı Onayları" description="Kullanıcı onaylarını yönetin">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-8 py-6">
@@ -694,6 +695,6 @@ export default function UserApprovalsManagement() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
