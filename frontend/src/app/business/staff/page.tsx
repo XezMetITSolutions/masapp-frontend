@@ -78,7 +78,6 @@ export default function StaffPage() {
     phone: '',
     role: 'waiter',
     department: 'service',
-    salary: '',
     startDate: '',
     notes: ''
   });
@@ -288,7 +287,6 @@ export default function StaffPage() {
       phone: newStaff.phone.trim(),
       role: newStaff.role,
       department: newStaff.department,
-      salary: Number(newStaff.salary || 0),
       startDate: newStaff.startDate || now.toISOString().slice(0, 10),
       status: 'active',
       lastLogin: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`,
@@ -306,7 +304,6 @@ export default function StaffPage() {
       phone: '',
       role: 'waiter',
       department: 'service',
-      salary: '',
       startDate: '',
       notes: ''
     });
@@ -324,12 +321,7 @@ export default function StaffPage() {
     if (!name) { alert('Ad Soyad zorunludur.'); return; }
     if (!email) { alert('E-posta zorunludur.'); return; }
 
-    const updated = {
-      ...selectedStaff,
-      salary: Number(selectedStaff.salary || 0)
-    };
-
-    setStaff(prev => prev.map(s => s.id === updated.id ? updated : s));
+    setStaff(prev => prev.map(s => s.id === selectedStaff.id ? selectedStaff : s));
     setShowEditModal(false);
   };
 
@@ -880,12 +872,6 @@ export default function StaffPage() {
                         <p className="text-sm text-gray-600">
                           {getDepartmentText(member.department)}
                         </p>
-                        <p className="text-sm text-gray-500">
-                          ₺{member.salary.toLocaleString('tr-TR')}/ay
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {member.rating} ⭐
-                        </p>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -982,14 +968,6 @@ export default function StaffPage() {
                             {getStatusText(member.status)}
                           </span>
                         </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <span className="text-sm font-medium text-gray-900">
-                          ₺{member.salary.toLocaleString('tr-TR')}/ay
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {member.rating} ⭐
-                        </span>
                       </div>
                     </div>
                     
@@ -1180,31 +1158,16 @@ export default function StaffPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                      Maaş (₺)
-                    </label>
-                    <input
-                      type="number"
-                      value={newStaff.salary}
-                      onChange={(e) => setNewStaff({...newStaff, salary: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
-                      placeholder="4500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-                      İşe Başlama
-                    </label>
-                    <input
-                      type="date"
-                      value={newStaff.startDate}
-                      onChange={(e) => setNewStaff({...newStaff, startDate: e.target.value})}
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                    İşe Başlama
+                  </label>
+                  <input
+                    type="date"
+                    value={newStaff.startDate}
+                    onChange={(e) => setNewStaff({...newStaff, startDate: e.target.value})}
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-sm"
+                  />
                 </div>
 
                 <div>
@@ -1316,35 +1279,6 @@ export default function StaffPage() {
                       <option value="on_leave">İzinli</option>
                       <option value="terminated">İşten Ayrıldı</option>
                     </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Maaş (₺)
-                    </label>
-                    <input
-                      type="number"
-                      value={selectedStaff.salary}
-                      onChange={(e) => setSelectedStaff({...selectedStaff, salary: parseInt(e.target.value)})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Puan
-                    </label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="5"
-                      value={selectedStaff.rating}
-                      onChange={(e) => setSelectedStaff({...selectedStaff, rating: parseFloat(e.target.value)})}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    />
                   </div>
                 </div>
 
