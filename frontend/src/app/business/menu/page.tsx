@@ -870,6 +870,7 @@ export default function MenuManagement() {
                               className="w-full h-48 object-cover rounded-lg border border-gray-200"
                             />
                             <button
+                              type="button"
                               onClick={() => setCapturedImage(null)}
                               className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
                             >
@@ -878,6 +879,7 @@ export default function MenuManagement() {
                           </div>
                           <div className="flex gap-2">
                             <button
+                              type="button"
                               onClick={handleImageUpload}
                               className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
                             >
@@ -885,6 +887,7 @@ export default function MenuManagement() {
                               Yeniden Çek
                             </button>
                             <button
+                              type="button"
                               onClick={() => setCapturedImage(null)}
                               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                             >
@@ -897,6 +900,7 @@ export default function MenuManagement() {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <button
+                              type="button"
                               onClick={handleImageUpload}
                               className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-400 hover:bg-purple-50 transition-colors"
                             >
@@ -908,6 +912,7 @@ export default function MenuManagement() {
                             </button>
                             
                             <button
+                              type="button"
                               onClick={handleFileUpload}
                               className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 hover:bg-gray-50 transition-colors"
                             >
@@ -966,12 +971,12 @@ export default function MenuManagement() {
                           value={formData.category}
                           onChange={(e) => setFormData({...formData, category: e.target.value})}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          required
                         >
                           <option value="">Kategori Seçin</option>
-                          <option value="baslangiclar">Başlangıçlar</option>
-                          <option value="ana-yemekler">Ana Yemekler</option>
-                          <option value="tatlilar">Tatlılar</option>
-                          <option value="icecekler">İçecekler</option>
+                          {categories.map(cat => (
+                            <option key={cat.id} value={cat.id}>{cat.name.tr}</option>
+                          ))}
                         </select>
                       </div>
                       <div>
@@ -1154,17 +1159,59 @@ export default function MenuManagement() {
                       onClick={() => {
                         // Gerçek güncelleme işlemi
                         if (editingItem) {
-                          // Fiyat güncelleme
-                          if (formData.price && !isNaN(Number(formData.price))) {
-                            updateItemPrice(editingItem.id, Number(formData.price));
-                          }
+                          // Ürün güncelleme
+                          updateMenuItem({
+                            ...editingItem,
+                            name: { tr: formData.nameTr, en: formData.nameEn },
+                            description: { tr: formData.descriptionTr, en: formData.descriptionEn },
+                            price: Number(formData.price),
+                            categoryId: formData.category,
+                            preparationTime: Number(formData.preparationTime) || 0,
+                            calories: Number(formData.calories) || 0,
+                            isAvailable: formData.isAvailable,
+                            image: capturedImage || editingItem.image
+                          });
                           console.log('Ürün güncellendi:', formData);
                         } else {
-                          // Yeni ürün ekleme işlemi burada yapılacak
+                          // Yeni ürün ekleme
+                          if (!formData.nameTr || !formData.price || !formData.category) {
+                            alert('Lütfen ürün adı, fiyat ve kategori alanlarını doldurun!');
+                            return;
+                          }
+                          addMenuItem({
+                            id: `item_${Date.now()}`,
+                            restaurantId: currentRestaurantId!,
+                            categoryId: formData.category,
+                            name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
+                            description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                            price: Number(formData.price),
+                            image: capturedImage || '/placeholder-food.jpg',
+                            order: items.length + 1,
+                            isAvailable: formData.isAvailable,
+                            preparationTime: Number(formData.preparationTime) || 0,
+                            calories: Number(formData.calories) || 0,
+                            allergens: { tr: [], en: [] },
+                            isVegetarian: false,
+                            isVegan: false,
+                            isPopular: false
+                          });
                           console.log('Yeni ürün eklendi:', formData);
                         }
                         setShowItemForm(false);
                         setEditingItem(null);
+                        setCapturedImage(null);
+                        // Form resetle
+                        setFormData({
+                          nameTr: '',
+                          nameEn: '',
+                          descriptionTr: '',
+                          descriptionEn: '',
+                          price: '',
+                          category: '',
+                          preparationTime: '',
+                          calories: '',
+                          isAvailable: true
+                        });
                       }}
                       className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                     >
