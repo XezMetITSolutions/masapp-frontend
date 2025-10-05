@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter, FaQrcode } from 'react-icons/fa';
+import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter, FaQrcode, FaMoneyBillWave, FaTint, FaBroom, FaClipboardList, FaStickyNote } from 'react-icons/fa';
 import { useCartStore } from '@/store';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -36,6 +36,10 @@ export function MenuPageContent() {
   
   // Toast message state
   const [toastMessage, setToastMessage] = useState<string>('Ürün sepete eklendi!');
+  
+  // Waiter call modal
+  const [showWaiterModal, setShowWaiterModal] = useState(false);
+  const [customNote, setCustomNote] = useState<string>('');
   
   // URL parametrelerinden restaurant slug'ını ve masa numarasını al
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
@@ -276,13 +280,32 @@ export function MenuPageContent() {
     setSelectedItem(null);
   };
   
-  // Garson çağır - notification oluştur
+  // Garson çağır modal aç
   const handleCallWaiter = () => {
+    setShowWaiterModal(true);
+  };
+  
+  // Hızlı seçenek ile garson çağır
+  const handleQuickRequest = (requestType: string, message: string) => {
     if (tableNumber) {
-      createWaiterCallNotification(tableNumber);
-      setToastMessage(`Garson çağrıldı! Masa ${tableNumber}`);
+      createWaiterCallNotification(tableNumber, message);
+      setToastMessage(message);
       setToastVisible(true);
       setTimeout(() => setToastVisible(false), 3000);
+      setShowWaiterModal(false);
+      setCustomNote('');
+    }
+  };
+  
+  // Özel not ile garson çağır
+  const handleCustomRequest = () => {
+    if (tableNumber && customNote.trim()) {
+      createWaiterCallNotification(tableNumber, customNote);
+      setToastMessage('Özel talebiniz iletildi');
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+      setShowWaiterModal(false);
+      setCustomNote('');
     }
   };
 
@@ -374,6 +397,95 @@ export function MenuPageContent() {
         onClose={() => setToastVisible(false)} 
       />
       <AnnouncementPopup />
+      
+      {/* Garson Çağır Modal */}
+      {showWaiterModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-800">
+                <TranslatedText>Garson Çağır</TranslatedText>
+              </h3>
+              <button 
+                onClick={() => {
+                  setShowWaiterModal(false);
+                  setCustomNote('');
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Hızlı Seçenekler */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <button 
+                onClick={() => handleQuickRequest('bill', 'Hesap istiyorum')}
+                className="flex flex-col items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
+              >
+                <FaMoneyBillWave className="text-green-600 text-2xl mb-2" />
+                <span className="text-sm font-medium text-green-800">
+                  <TranslatedText>Hesap Öde</TranslatedText>
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleQuickRequest('water', 'Su istiyorum')}
+                className="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+              >
+                <FaTint className="text-blue-600 text-2xl mb-2" />
+                <span className="text-sm font-medium text-blue-800">
+                  <TranslatedText>Su İste</TranslatedText>
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleQuickRequest('clean', 'Masayı temizleyebilir misiniz?')}
+                className="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
+              >
+                <FaBroom className="text-purple-600 text-2xl mb-2" />
+                <span className="text-sm font-medium text-purple-800">
+                  <TranslatedText>Masa Temizliği</TranslatedText>
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleQuickRequest('cutlery', 'Yeni tabak/çatal bıçak istiyorum')}
+                className="flex flex-col items-center p-4 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"
+              >
+                <FaClipboardList className="text-orange-600 text-2xl mb-2" />
+                <span className="text-sm font-medium text-orange-800">
+                  <TranslatedText>Tabak/Çatal</TranslatedText>
+                </span>
+              </button>
+            </div>
+            
+            {/* Özel Not */}
+            <div className="border-t pt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <FaStickyNote className="inline mr-2" />
+                <TranslatedText>Özel Not</TranslatedText>
+              </label>
+              <textarea
+                value={customNote}
+                onChange={(e) => setCustomNote(e.target.value)}
+                placeholder="Özel bir talebiniz varsa buraya yazın..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                rows={3}
+              />
+              <button
+                onClick={handleCustomRequest}
+                disabled={!customNote.trim()}
+                className="w-full mt-3 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              >
+                <TranslatedText>Gönder</TranslatedText>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <main className="min-h-screen pb-20">
         {/* Header */}
         <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
