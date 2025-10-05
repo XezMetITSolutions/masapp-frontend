@@ -1,0 +1,365 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import ResponsiveTable from '@/components/ResponsiveTable';
+import { 
+  FaUsers, 
+  FaSearch, 
+  FaFilter, 
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaEye,
+  FaCheck,
+  FaTimes,
+  FaUserCheck,
+  FaUserTimes,
+  FaEnvelope,
+  FaPhone,
+  FaCalendar,
+  FaShieldAlt
+} from 'react-icons/fa';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: 'admin' | 'manager' | 'staff' | 'customer';
+  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  restaurant?: string;
+  lastLogin: string;
+  createdAt: string;
+  avatar?: string;
+}
+
+export default function UsersManagement() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const users: User[] = [
+    {
+      id: 'user-1',
+      name: 'Ahmet Yılmaz',
+      email: 'ahmet@example.com',
+      phone: '+90 555 123 4567',
+      role: 'manager',
+      status: 'active',
+      restaurant: 'Pizza Palace',
+      lastLogin: '2024-03-15T10:30:00Z',
+      createdAt: '2024-01-15T08:00:00Z'
+    },
+    {
+      id: 'user-2',
+      name: 'Ayşe Demir',
+      email: 'ayse@example.com',
+      phone: '+90 555 234 5678',
+      role: 'staff',
+      status: 'active',
+      restaurant: 'Burger King',
+      lastLogin: '2024-03-15T09:15:00Z',
+      createdAt: '2024-02-01T10:30:00Z'
+    },
+    {
+      id: 'user-3',
+      name: 'Mehmet Kaya',
+      email: 'mehmet@example.com',
+      phone: '+90 555 345 6789',
+      role: 'admin',
+      status: 'active',
+      lastLogin: '2024-03-15T11:45:00Z',
+      createdAt: '2023-12-01T12:00:00Z'
+    },
+    {
+      id: 'user-4',
+      name: 'Fatma Özkan',
+      email: 'fatma@example.com',
+      phone: '+90 555 456 7890',
+      role: 'customer',
+      status: 'pending',
+      lastLogin: '2024-03-14T16:20:00Z',
+      createdAt: '2024-03-14T16:20:00Z'
+    },
+    {
+      id: 'user-5',
+      name: 'Ali Veli',
+      email: 'ali@example.com',
+      phone: '+90 555 567 8901',
+      role: 'manager',
+      status: 'suspended',
+      restaurant: 'Sushi Master',
+      lastLogin: '2024-03-10T14:30:00Z',
+      createdAt: '2024-01-20T09:15:00Z'
+    }
+  ];
+
+  const getRoleClass = (role: string) => {
+    switch(role) {
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'manager': return 'bg-blue-100 text-blue-800';
+      case 'staff': return 'bg-green-100 text-green-800';
+      case 'customer': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getRoleText = (role: string) => {
+    switch(role) {
+      case 'admin': return 'Admin';
+      case 'manager': return 'Yönetici';
+      case 'staff': return 'Personel';
+      case 'customer': return 'Müşteri';
+      default: return role;
+    }
+  };
+
+  const getStatusClass = (status: string) => {
+    switch(status) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'inactive': return 'bg-gray-100 text-gray-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'suspended': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch(status) {
+      case 'active': return 'Aktif';
+      case 'inactive': return 'Pasif';
+      case 'pending': return 'Beklemede';
+      case 'suspended': return 'Askıya Alındı';
+      default: return status;
+    }
+  };
+
+  const columns = [
+    {
+      key: 'name',
+      label: 'Kullanıcı',
+      sortable: true,
+      render: (value: string, row: User) => (
+        <div className="flex items-center">
+          <div className="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+            <FaUsers className="text-gray-600" />
+          </div>
+          <div>
+            <div className="text-sm font-medium text-gray-900">{value}</div>
+            <div className="text-sm text-gray-500">{row.email}</div>
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'role',
+      label: 'Rol',
+      sortable: true,
+      render: (value: string) => (
+        <span className={`px-2 py-1 text-xs rounded-full font-medium ${getRoleClass(value)}`}>
+          {getRoleText(value)}
+        </span>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Durum',
+      sortable: true,
+      render: (value: string) => (
+        <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusClass(value)}`}>
+          {getStatusText(value)}
+        </span>
+      )
+    },
+    {
+      key: 'restaurant',
+      label: 'İşletme',
+      sortable: true,
+      render: (value: string) => value || '-'
+    },
+    {
+      key: 'lastLogin',
+      label: 'Son Giriş',
+      sortable: true,
+      render: (value: string) => new Date(value).toLocaleDateString('tr-TR')
+    },
+    {
+      key: 'createdAt',
+      label: 'Kayıt Tarihi',
+      sortable: true,
+      render: (value: string) => new Date(value).toLocaleDateString('tr-TR')
+    }
+  ];
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.phone.includes(searchTerm);
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+
+  const handleUserAction = async (action: string, user: User) => {
+    setIsLoading(true);
+    try {
+      // Demo: Kullanıcı işlemi simülasyonu
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log(`${action} işlemi:`, user);
+      alert(`${action} işlemi tamamlandı`);
+    } catch (error) {
+      console.error('User action error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
+              <p className="text-gray-600 mt-1">Sistem kullanıcılarını görüntüle ve yönet</p>
+            </div>
+            <div className="flex space-x-3">
+              <button className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg flex items-center">
+                <FaPlus className="mr-2" />
+                Yeni Kullanıcı
+              </button>
+              <button className="bg-green-100 hover:bg-green-200 text-green-700 px-4 py-2 rounded-lg flex items-center">
+                <FaUserCheck className="mr-2" />
+                Toplu Onay
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="px-8 py-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Arama</label>
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Ad, email veya telefon..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">Tüm Roller</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Yönetici</option>
+                <option value="staff">Personel</option>
+                <option value="customer">Müşteri</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">Tüm Durumlar</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
+                <option value="pending">Beklemede</option>
+                <option value="suspended">Askıya Alındı</option>
+              </select>
+            </div>
+            
+            <div className="flex items-end">
+              <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center justify-center">
+                <FaFilter className="mr-2" />
+                Filtrele
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      <div className="px-8 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                <FaUsers className="text-blue-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Toplam Kullanıcı</p>
+                <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                <FaCheck className="text-green-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Aktif Kullanıcı</p>
+                <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.status === 'active').length}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                <FaTimes className="text-yellow-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Beklemede</p>
+                <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.status === 'pending').length}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                <FaShieldAlt className="text-red-600 text-xl" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Admin</p>
+                <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.role === 'admin').length}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="px-8">
+        <ResponsiveTable
+          columns={columns}
+          data={filteredUsers}
+          onAction={handleUserAction}
+          mobileView="card"
+        />
+      </div>
+    </div>
+  );
+}
