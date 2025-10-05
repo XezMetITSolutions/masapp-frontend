@@ -58,22 +58,19 @@ export default async (request: Request, context: Context) => {
         </body>
         </html>`,
         {
-          status: 404,
           headers: { "Content-Type": "text/html" },
         }
       );
     }
 
-    // Redirect kullanarak yönlendirme yap (rewrite yerine)
     // /admin path'i için işletme admin paneline yönlendir
     if (url.pathname.startsWith('/admin')) {
-      const redirectUrl = `https://${mainDomain}/restaurant-admin?subdomain=${subdomain}`;
-      return Response.redirect(redirectUrl, 302);
-    } else {
-      // Modern menü sayfasına yönlendir
-      const redirectUrl = `https://${mainDomain}/menu${url.pathname}`;
-      return Response.redirect(redirectUrl, 302);
+      const newPath = `/restaurant-admin?subdomain=${subdomain}`;
+      return context.rewrite(newPath);
     }
+
+    // Diğer tüm istekleri doğrudan /menu sayfasına rewrite et
+    return context.rewrite('/menu');
   }
 
   return context.next();
