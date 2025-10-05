@@ -44,7 +44,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function QRCodesPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [qrCodes, setQrCodes] = useState<any[]>([]);
   const [filteredQrCodes, setFilteredQrCodes] = useState<any[]>([]);
