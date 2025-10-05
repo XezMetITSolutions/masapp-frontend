@@ -44,12 +44,14 @@ import {
 import AnnouncementQuickModal from '@/components/AnnouncementQuickModal';
 import PhonePreview from '@/components/PhonePreview';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useBusinessSettingsStore } from '@/store/useBusinessSettingsStore';
+import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Restaurant-specific settings kullan
   const {
     settings,
     accountInfo,
@@ -75,7 +77,7 @@ export default function SettingsPage() {
     setLoading,
     exportSettings,
     validateSubdomain
-  } = useBusinessSettingsStore();
+  } = useRestaurantSettings(authenticatedRestaurant?.id);
 
   const [showPassword, setShowPassword] = useState<{[key: string]: boolean}>({});
   const [showAnnModal, setShowAnnModal] = useState(false);

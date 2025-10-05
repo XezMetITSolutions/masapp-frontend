@@ -13,7 +13,7 @@ import MenuItemModal from '@/components/MenuItemModal';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
-import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
+import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 import SetBrandColor from '@/components/SetBrandColor';
 
 export function MenuPageContent() {
@@ -75,7 +75,9 @@ export function MenuPageContent() {
   const [toastVisible, setToastVisible] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
-  const { settings } = useBusinessSettingsStore();
+  
+  // Restaurant-specific settings kullan
+  const { settings } = useRestaurantSettings(activeRestaurant?.id);
   const [showSplash, setShowSplash] = useState(false);
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
