@@ -257,8 +257,8 @@ export default function BusinessDashboard() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Restoran Yönetim Sistemi</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{authenticatedRestaurant?.name}</h1>
+              <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -304,8 +304,8 @@ export default function BusinessDashboard() {
           <div className="border-t border-purple-700 pt-3 sm:pt-4">
             <div className="flex items-center justify-between">
               <div className="hidden sm:block">
-                <p className="text-sm font-medium">MasApp</p>
-                <p className="text-xs text-purple-300">info@masapp.com</p>
+                <p className="text-sm font-medium">{authenticatedRestaurant?.name}</p>
+                <p className="text-xs text-purple-300">{authenticatedRestaurant?.email}</p>
               </div>
               <button
                 onClick={handleLogout}
