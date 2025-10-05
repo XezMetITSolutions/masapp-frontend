@@ -48,7 +48,7 @@ import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 
 export default function StaffPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const { 
     settings, 
     updateStaffCredentials, 
@@ -393,7 +393,7 @@ export default function StaffPage() {
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <button onClick={handleLogout} 
             className="flex items-center justify-between w-full p-2 hover:bg-purple-700 rounded-lg">
-            <span className="text-sm">{user?.name}</span>
+            <span className="text-sm">{authenticatedRestaurant?.name || authenticatedStaff?.name}</span>
             <FaSignOutAlt />
           </button>
         </div>

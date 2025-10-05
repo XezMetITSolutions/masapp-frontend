@@ -48,7 +48,7 @@ import { useBusinessSettingsStore } from '@/store/useBusinessSettingsStore';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
     settings,
@@ -391,8 +391,8 @@ export default function SettingsPage() {
           <div className="border-t border-purple-700 pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">{user?.name}</p>
-                <p className="text-xs text-purple-300">{user?.email}</p>
+                <p className="text-sm font-medium">{authenticatedRestaurant?.name || authenticatedStaff?.name}</p>
+                <p className="text-xs text-purple-300">{authenticatedRestaurant?.email || authenticatedStaff?.email}</p>
               </div>
               <button
                 onClick={handleLogout}
