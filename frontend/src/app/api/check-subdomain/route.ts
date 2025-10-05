@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic'; // Defaults to 'auto'
+
 // Bu listeyi veritabanınızdan gelen dinamik veriyle değiştirin.
 const VALID_SUBDOMAINS = [
   'lezzet-duragi',
