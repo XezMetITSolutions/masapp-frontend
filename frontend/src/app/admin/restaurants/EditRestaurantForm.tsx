@@ -28,7 +28,7 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    subdomain: '',
+    username: '',
     email: '',
     phone: '',
     address: '',
@@ -42,7 +42,7 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
     if (restaurant) {
       setFormData({
         name: restaurant.name,
-        subdomain: restaurant.slug,
+        username: restaurant.username,
         email: restaurant.email,
         phone: restaurant.phone,
         address: restaurant.address,
@@ -61,7 +61,7 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
 
     const updates: Partial<Restaurant> = {
       name: formData.name,
-      slug: formData.subdomain,
+      username: formData.username,
       email: formData.email,
       phone: formData.phone,
       address: formData.address,
@@ -104,17 +104,14 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subdomain *</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    required
-                    value={formData.subdomain}
-                    onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm">.guzellestir.com</span>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Adı *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">E-posta *</label>

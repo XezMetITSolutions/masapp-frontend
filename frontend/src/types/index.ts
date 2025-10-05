@@ -17,7 +17,8 @@ export interface User {
 export interface Restaurant {
   id: string;
   name: string;
-  slug: string; // URL için: masapp.com/r/restaurant-slug
+  username: string;
+  password?: string; // Şifreyi her zaman göndermek istemeyebiliriz // URL için: masapp.com/r/restaurant-slug
   logo?: string;
   primaryColor: string;
   secondaryColor: string;

@@ -83,11 +83,6 @@ export default function RestaurantsManagement() {
           <div>
             <div className="text-sm font-medium text-gray-900">{value}</div>
             <div className="text-xs text-gray-500">{row.subscription.plan}</div>
-            <div className="text-xs text-blue-600 mt-1">
-              <a href={`https://${row.slug}.guzellestir.com`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                {row.slug}.guzellestir.com
-              </a>
-            </div>
           </div>
         </div>
       )
@@ -142,7 +137,6 @@ export default function RestaurantsManagement() {
 
   const filteredRestaurants = restaurants.filter(restaurant => {
     const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         restaurant.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          restaurant.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all';
@@ -173,7 +167,7 @@ export default function RestaurantsManagement() {
           deleteRestaurant(restaurant.id);
           
           // Kullanıcıya subdomain'i JSON dosyasından kaldırması gerektiği konusunda bilgi ver
-          alert(`Restoran silindi!\n\nÖNEMLİ: Subdomain'in (${restaurant.slug}) tamamen kaldırılması için lütfen şu adımları takip edin:\n\n1. src/data/subdomains.json dosyasını açın\n2. "${restaurant.slug}" değerini listeden kaldırın\n3. Değişiklikleri kaydedin ve git push yapın\n\nBu işlem yapılmadan ${restaurant.slug}.guzellestir.com adresi hala çalışır durumda kalacaktır.`);
+          alert('Restoran başarıyla silindi!');
           
           // Görünümü güncelle
           router.refresh();

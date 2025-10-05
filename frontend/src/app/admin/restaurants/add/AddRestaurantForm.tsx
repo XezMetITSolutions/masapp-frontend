@@ -23,7 +23,8 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
   
   const [formData, setFormData] = useState({
     name: '',
-    subdomain: '',
+    username: '',
+    password: '',
     email: '',
     phone: '',
     address: '',
@@ -43,37 +44,16 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
     autoAcceptOrders: false
   });
 
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/ğ/g, 'g')
-      .replace(/ü/g, 'u')
-      .replace(/ş/g, 's')
-      .replace(/ı/g, 'i')
-      .replace(/ö/g, 'o')
-      .replace(/ç/g, 'c')
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  };
-
-  const handleNameChange = (name: string) => {
-    setFormData({ ...formData, name });
-    if (!formData.subdomain) {
-      setFormData({ ...formData, name, subdomain: generateSlug(name) });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const slug = formData.subdomain || generateSlug(formData.name);
-
     const newRestaurant: Restaurant = {
       id: `rest_${Date.now()}`,
       name: formData.name,
-      slug,
+      username: formData.username,
+      password: formData.password,
       primaryColor: formData.primaryColor,
       secondaryColor: formData.secondaryColor,
       address: formData.address,
@@ -112,11 +92,7 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
 
     addRestaurant(newRestaurant);
     
-    // Subdomain'i JSON dosyasına ekleme konusunda bilgi ver
-    updateSubdomainsFile([slug]); // Bu sadece konsola uyarı yazdırır
-    
-    // Kullanıcıya bilgi ver
-    alert(`Restoran başarıyla eklendi!\n\nÖNEMLİ: Subdomain'in (${slug}) çalışması için lütfen şu adımları takip edin:\n\n1. src/data/subdomains.json dosyasını açın\n2. "${slug}" değerini listeye ekleyin\n3. Değişiklikleri kaydedin ve git push yapın\n\nBu işlem yapılmadan ${slug}.guzellestir.com adresi çalışmayacaktır.`);
+    alert('Restoran başarıyla eklendi!');
     
     onClose();
     router.refresh();
@@ -141,7 +117,7 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="Örn: Lezzet Durağı"
                 />
@@ -149,24 +125,30 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subdomain *
+                  Kullanıcı Adı *
                 </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    required
-                    value={formData.subdomain}
-                    onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="lezzet-duragi"
-                  />
-                  <span className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm">
-                    .guzellestir.com
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Restoran adınızdan otomatik oluşturulur, düzenleyebilirsiniz
-                </p>
+                <input
+                  type="text"
+                  required
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="restoran_kullanici_adi"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Şifre *
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="••••••••"
+                />
               </div>
 
               <div>
