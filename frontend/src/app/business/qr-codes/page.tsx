@@ -55,6 +55,8 @@ export default function QRCodesPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedQrCode, setSelectedQrCode] = useState<any>(null);
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+  const [bulkCreateMode, setBulkCreateMode] = useState(false);
+  const [bulkTableCount, setBulkTableCount] = useState('');
   const [newQrCode, setNewQrCode] = useState({
     name: '',
     type: 'table',
@@ -295,7 +297,86 @@ export default function QRCodesPage() {
     avgScansPerQr: qrCodes.length > 0 ? Math.round(qrCodes.reduce((acc, qr) => acc + qr.scanCount, 0) / qrCodes.length) : 0
   };
 
+  // Token oluşturma fonksiyonu
+  const generateToken = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  };
+
+  // Token geçerlilik kontrolü (2 saat)
+  const isTokenValid = (createdAt: string) => {
+    const created = new Date(createdAt).getTime();
+    const now = Date.now();
+    const twoHours = 2 * 60 * 60 * 1000; // 2 saat milisaniye cinsinden
+    return (now - created) < twoHours;
+  };
+
+  // Token yenileme
+  const handleRefreshToken = (qrCodeId: number) => {
+    setQrCodes(prev => prev.map(qr => {
+      if (qr.id === qrCodeId) {
+        const newToken = generateToken();
+        const baseUrl = qr.type === 'table' 
+          ? `https://demo.masapp.com/masa/${qr.tableNumber}`
+          : 'https://demo.masapp.com/menu';
+        const urlWithToken = `${baseUrl}?token=${newToken}`;
+        
+        return {
+          ...qr,
+          token: newToken,
+          tokenCreatedAt: new Date().toISOString(),
+          url: urlWithToken,
+          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlWithToken)}`
+        };
+      }
+      return qr;
+    }));
+    showToast('Token yenilendi');
+  };
+
   const handleAddQrCode = () => {
+    // Toplu oluşturma modu
+    if (bulkCreateMode) {
+      const count = parseInt(bulkTableCount);
+      if (!count || count < 1 || count > 100) {
+        alert('Lütfen 1-100 arası geçerli bir masa sayısı girin!');
+        return;
+      }
+
+      const newQrCodes = [];
+      for (let i = 1; i <= count; i++) {
+        const token = generateToken();
+        const baseUrl = `https://demo.masapp.com/masa/${i}`;
+        const urlWithToken = `${baseUrl}?token=${token}`;
+        const now = new Date().toISOString();
+
+        newQrCodes.push({
+          id: Date.now() + i,
+          name: `Masa ${i} - QR Menü`,
+          type: 'table',
+          tableNumber: i,
+          qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlWithToken)}`,
+          url: urlWithToken,
+          token: token,
+          tokenCreatedAt: now,
+          description: `Masa ${i} için QR kod menü`,
+          theme: 'default',
+          isActive: true,
+          scanCount: 0,
+          lastScanned: null,
+          createdAt: now.split('T')[0],
+          expiresAt: null,
+          notes: ''
+        });
+      }
+
+      setQrCodes(prev => [...prev, ...newQrCodes]);
+      setShowAddModal(false);
+      setBulkCreateMode(false);
+      setBulkTableCount('');
+      showToast(`${count} adet QR kod oluşturuldu`);
+      return;
+    }
+
     // Form validasyonu
     if (!newQrCode.name.trim()) {
       alert('QR kod adı gereklidir!');
@@ -328,26 +409,32 @@ export default function QRCodesPage() {
       }
     };
 
-    // Yeni QR kod oluştur
+    // Yeni QR kod oluştur (token ile)
+    const token = generateToken();
     const baseUrl = newQrCode.type === 'custom' 
       ? newQrCode.customUrl 
       : newQrCode.type === 'table' 
         ? `https://demo.masapp.com/masa/${newQrCode.tableNumber}`
         : 'https://demo.masapp.com/menu';
+    
+    const urlWithToken = `${baseUrl}?token=${token}`;
+    const now = new Date().toISOString();
 
     const newQr = {
-      id: Date.now(), // Basit ID oluşturma
+      id: Date.now(),
       name: newQrCode.name,
       type: newQrCode.type,
       tableNumber: newQrCode.type === 'table' ? parseInt(newQrCode.tableNumber) : null,
-      qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(baseUrl)}${getThemeParams(newQrCode.theme)}`,
-      url: baseUrl,
+      qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlWithToken)}${getThemeParams(newQrCode.theme)}`,
+      url: urlWithToken,
+      token: token,
+      tokenCreatedAt: now,
       description: newQrCode.description,
       theme: newQrCode.theme,
       isActive: newQrCode.isActive,
       scanCount: 0,
       lastScanned: null,
-      createdAt: new Date().toISOString().split('T')[0],
+      createdAt: now.split('T')[0],
       expiresAt: newQrCode.expiresAt || null,
       notes: newQrCode.notes
     };
@@ -807,6 +894,19 @@ export default function QRCodesPage() {
                       <span>Son: {qrCode.lastScanned}</span>
                     </div>
 
+                    {qrCode.tokenCreatedAt && (
+                      <div className={`flex items-center gap-2 text-sm ${
+                        isTokenValid(qrCode.tokenCreatedAt) ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        <FaClock className={isTokenValid(qrCode.tokenCreatedAt) ? 'text-green-400' : 'text-red-400'} />
+                        <span>
+                          {isTokenValid(qrCode.tokenCreatedAt) 
+                            ? 'Token Geçerli (' + Math.floor((2 * 60 * 60 * 1000 - (Date.now() - new Date(qrCode.tokenCreatedAt).getTime())) / (60 * 1000)) + ' dk kaldı)'
+                            : 'Token Süresi Doldu'}
+                        </span>
+                      </div>
+                    )}
+
                     {qrCode.expiresAt && (
                       <div className="flex items-center gap-2 text-sm text-orange-600">
                         <FaCalendarAlt className="text-orange-400" />
@@ -822,39 +922,50 @@ export default function QRCodesPage() {
                   </div>
 
                   {/* İşlem Butonları */}
-                  <div className="mt-4 grid grid-cols-2 sm:flex gap-2">
-                    <button
-                      onClick={() => handleCopyUrl(qrCode.url)}
-                      className="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
-                      title="URL'yi Kopyala"
-                    >
-                      <FaCopy />
-                      Kopyala
-                    </button>
-                    <button
-                      onClick={() => handleDownloadQr(qrCode)}
-                      className="flex-1 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
-                      title="İndir"
-                    >
-                      <FaDownload />
-                      İndir
-                    </button>
-                    <button
-                      onClick={() => handleEditQrCode(qrCode)}
-                      className="flex-1 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
-                      title="Düzenle"
-                    >
-                      <FaEdit />
-                      Düzenle
-                    </button>
-                    <button
-                      onClick={() => handleDeleteQrCode(qrCode.id)}
-                      className="flex-1 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
-                      title="Sil"
-                    >
-                      <FaTrash />
-                      Sil
-                    </button>
+                  <div className="mt-4 space-y-2">
+                    {qrCode.tokenCreatedAt && !isTokenValid(qrCode.tokenCreatedAt) && (
+                      <button
+                        onClick={() => handleRefreshToken(qrCode.id)}
+                        className="w-full py-2 bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 flex items-center justify-center gap-2 font-medium border border-yellow-200"
+                      >
+                        <FaClock />
+                        Token Yenile (2 Saat Geçerli)
+                      </button>
+                    )}
+                    <div className="grid grid-cols-2 sm:flex gap-2">
+                      <button
+                        onClick={() => handleCopyUrl(qrCode.url)}
+                        className="flex-1 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
+                        title="URL'yi Kopyala"
+                      >
+                        <FaCopy />
+                        Kopyala
+                      </button>
+                      <button
+                        onClick={() => handleDownloadQr(qrCode)}
+                        className="flex-1 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
+                        title="İndir"
+                      >
+                        <FaDownload />
+                        İndir
+                      </button>
+                      <button
+                        onClick={() => handleEditQrCode(qrCode)}
+                        className="flex-1 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
+                        title="Düzenle"
+                      >
+                        <FaEdit />
+                        Düzenle
+                      </button>
+                      <button
+                        onClick={() => handleDeleteQrCode(qrCode.id)}
+                        className="flex-1 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 flex items-center justify-center gap-1 text-xs sm:text-sm"
+                        title="Sil"
+                      >
+                        <FaTrash />
+                        Sil
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -887,18 +998,52 @@ export default function QRCodesPage() {
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    QR Kod Adı *
-                  </label>
+                {/* Toplu Oluşturma Toggle */}
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">Toplu QR Kod Oluştur</p>
+                    <p className="text-sm text-gray-600">Birden fazla masa için aynı anda QR kod oluşturun</p>
+                  </div>
                   <input
-                    type="text"
-                    value={newQrCode.name}
-                    onChange={(e) => setNewQrCode({...newQrCode, name: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    placeholder="Örn: Masa 1 - QR Menü"
+                    type="checkbox"
+                    checked={bulkCreateMode}
+                    onChange={(e) => setBulkCreateMode(e.target.checked)}
+                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 w-5 h-5"
                   />
                 </div>
+
+                {bulkCreateMode ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Masa Sayısı *
+                    </label>
+                    <input
+                      type="number"
+                      value={bulkTableCount}
+                      onChange={(e) => setBulkTableCount(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                      placeholder="Örn: 10"
+                      min="1"
+                      max="100"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Masa 1'den başlayarak {bulkTableCount || '0'} adete kadar QR kod oluşturulacak. Her kod 2 saat geçerli olacak.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        QR Kod Adı *
+                      </label>
+                      <input
+                        type="text"
+                        value={newQrCode.name}
+                        onChange={(e) => setNewQrCode({...newQrCode, name: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        placeholder="Örn: Masa 1 - QR Menü"
+                      />
+                    </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1016,13 +1161,25 @@ export default function QRCodesPage() {
                   />
                 </div>
 
-                <button
-                  onClick={handleAddQrCode}
-                  className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
-                >
-                  <FaQrcode />
-                  QR Kod Oluştur
-                </button>
+                    <button
+                      onClick={handleAddQrCode}
+                      className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
+                    >
+                      <FaQrcode />
+                      QR Kod Oluştur
+                    </button>
+                  </>
+                )}
+
+                {bulkCreateMode && (
+                  <button
+                    onClick={handleAddQrCode}
+                    className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
+                  >
+                    <FaQrcode />
+                    {bulkTableCount} Adet QR Kod Oluştur
+                  </button>
+                )}
               </div>
             </div>
           </div>
