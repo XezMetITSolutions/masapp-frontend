@@ -310,8 +310,9 @@ export default function QRCodesPage() {
 
       const newQrCodes: any[] = [];
       for (let i = 1; i <= count; i++) {
-        // Restaurant-specific URL oluştur
-        const menuUrl = `https://guzellestir.com/menu?restaurant=${restaurantSlug}&table=${i}`;
+        // Restaurant-specific URL oluştur (subdomain format)
+        const token = generateToken();
+        const menuUrl = `https://${restaurantSlug}.guzellestir.com/menu/masa/${i}?token=${token}`;
         const now = new Date().toISOString();
 
         newQrCodes.push({
@@ -374,11 +375,12 @@ export default function QRCodesPage() {
     };
 
     // Yeni QR kod oluştur (restaurant-specific)
+    const token = generateToken();
     const menuUrl = newQrCode.type === 'custom' 
       ? newQrCode.customUrl 
       : newQrCode.type === 'table' 
-        ? `https://guzellestir.com/menu?restaurant=${restaurantSlug}&table=${newQrCode.tableNumber}`
-        : `https://guzellestir.com/menu?restaurant=${restaurantSlug}`;
+        ? `https://${restaurantSlug}.guzellestir.com/menu/masa/${newQrCode.tableNumber}?token=${token}`
+        : `https://${restaurantSlug}.guzellestir.com/menu?token=${token}`;
     
     const now = new Date().toISOString();
 

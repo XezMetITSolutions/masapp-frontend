@@ -27,6 +27,22 @@ export function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL('/business/cashier', request.url));
     }
     
+    // Menu routing - /menu/masa/[table] → /menu?restaurant=subdomain&table=[table]
+    if (pathname.startsWith('/menu/masa/')) {
+      const tableNumber = pathname.split('/')[3];
+      const url = new URL('/menu', request.url);
+      url.searchParams.set('restaurant', subdomain || querySubdomain || 'demo');
+      url.searchParams.set('table', tableNumber || '1');
+      
+      // Mevcut token'ı koru
+      const token = searchParams.get('token');
+      if (token) {
+        url.searchParams.set('token', token);
+      }
+      
+      return NextResponse.rewrite(url);
+    }
+    
     // Subdomain ana sayfası business dashboard'a yönlendir
     if (pathname === '/' && querySubdomain) {
       return NextResponse.rewrite(new URL('/business/dashboard', request.url));
