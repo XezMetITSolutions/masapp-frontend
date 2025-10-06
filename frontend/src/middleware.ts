@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
   
   // Subdomain routing kontrolü
@@ -11,8 +11,11 @@ export function middleware(request: NextRequest) {
   // Ana domain'ler (subdomain routing yapılmayacak)
   const mainDomains = ['localhost', 'guzellestir', 'masapp', 'www'];
   
-  // Eğer subdomain varsa ve ana domain değilse
-  if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
+  // Query parameter'dan subdomain bilgisi al (geçici çözüm)
+  const querySubdomain = searchParams.get('subdomain');
+  
+  // Eğer subdomain varsa ve ana domain değilse VEYA query parameter varsa
+  if ((!mainDomains.includes(subdomain) && hostname.includes('.')) || querySubdomain) {
     // Subdomain-based routing
     if (pathname === '/mutfak') {
       return NextResponse.rewrite(new URL('/business/kitchen', request.url));
@@ -25,7 +28,7 @@ export function middleware(request: NextRequest) {
     }
     
     // Subdomain ana sayfası business dashboard'a yönlendir
-    if (pathname === '/') {
+    if (pathname === '/' && querySubdomain) {
       return NextResponse.rewrite(new URL('/business/dashboard', request.url));
     }
   }

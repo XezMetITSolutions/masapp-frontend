@@ -419,6 +419,25 @@ export default function StaffPage() {
                     </div>
                   </div>
                   <div className="text-xs sm:text-sm">
+                    <span className="text-gray-600">Geçici URL (DNS ayarları tamamlanana kadar):</span>
+                    <div className="flex items-center gap-1 sm:gap-2 mt-1">
+                      <span className="font-mono text-xs bg-yellow-50 px-2 py-1 rounded flex-1 truncate text-yellow-800">
+                        guzellestir.com/mutfak?subdomain={settings.basicInfo.subdomain}
+                      </span>
+                      <button
+                        onClick={() => {
+                          const url = `https://guzellestir.com/mutfak?subdomain=${settings.basicInfo.subdomain}`;
+                          navigator.clipboard.writeText(url);
+                          alert('Geçici URL kopyalandı!');
+                        }}
+                        className="p-1 text-gray-500 hover:text-yellow-600 transition-colors flex-shrink-0"
+                        title="Geçici URL Kopyala"
+                      >
+                        <FaCopy size={10} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-xs sm:text-sm">
                     <span className="text-gray-600">Giriş:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <input

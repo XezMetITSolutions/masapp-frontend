@@ -12,6 +12,14 @@
   to = "/.netlify/functions/subdomain-validate"
   status = 200
 
+# Subdomain routing - wildcard domain desteği
+[[redirects]]
+  from = "https://*.masapp.com/*"
+  to = "https://guzellestir.com/:splat"
+  status = 200
+  force = true
+  headers = {X-Subdomain = ":subdomain"}
+
 # Frontend routing
 [[redirects]]
   from = "/*"
