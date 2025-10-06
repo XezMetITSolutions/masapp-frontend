@@ -64,11 +64,16 @@ export function MenuPageContent() {
   };
   
   useEffect(() => {
+    console.log('🚀 MENU PAGE LOADING...');
+    
     if (typeof window !== 'undefined') {
       // Önce subdomain'den restaurant bilgisini almaya çalış
       const hostname = window.location.hostname;
       const subdomain = hostname.split('.')[0];
       const mainDomains = ['localhost', 'www', 'guzellestir'];
+      
+      console.log('🌐 Hostname:', hostname);
+      console.log('🏷️ Subdomain:', subdomain);
       
       let restaurantFromUrl = null;
       let tableFromUrl = null;
@@ -76,6 +81,7 @@ export function MenuPageContent() {
       // Eğer subdomain varsa ve ana domain değilse, subdomain'i restaurant olarak kullan
       if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
         restaurantFromUrl = subdomain;
+        console.log('✅ Restaurant from subdomain:', restaurantFromUrl);
         
         // URL path'inden masa numarasını al (/menu/masa/5 formatında)
         const pathParts = window.location.pathname.split('/');
@@ -93,6 +99,8 @@ export function MenuPageContent() {
       // Subdomain'den gelen bilgileri öncelikle kullan
       const finalRestaurant = restaurantFromUrl || restaurant;
       const finalTable = tableFromUrl || tableParam;
+      
+      console.log('🎯 Final Restaurant:', finalRestaurant);
       
       setRestaurantSlug(finalRestaurant);
       setRestaurantName(getRestaurantDisplayName(finalRestaurant));
@@ -112,6 +120,9 @@ export function MenuPageContent() {
       
       // Her durumda token'ı geçerli kabul et
       setTokenValid(true);
+      
+      // Debug alert
+      alert(`Menu yüklendi!\nRestaurant: ${finalRestaurant}\nHostname: ${hostname}`);
     }
   }, [setTableNumber]);
   
@@ -140,23 +151,22 @@ export function MenuPageContent() {
   const allMenuItems = useRestaurantStore(state => state.menuItems);
   
   // Debug: Restaurant bilgilerini kontrol et
-  console.log('🔍 Menu Debug:', {
-    restaurantSlug,
-    activeRestaurant: activeRestaurant?.name,
-    activeRestaurantId: activeRestaurant?.id,
-    totalRestaurants: restaurants.length,
-    totalCategories: allCategories.length,
-    totalMenuItems: allMenuItems.length
-  });
+  console.log('🔍 MENU DEBUG START 🔍');
+  console.log('Restaurant Slug:', restaurantSlug);
+  console.log('Active Restaurant:', activeRestaurant?.name || 'NOT FOUND');
+  console.log('Active Restaurant ID:', activeRestaurant?.id || 'NO ID');
+  console.log('Total Restaurants:', restaurants.length);
+  console.log('Total Categories:', allCategories.length);
+  console.log('Total Menu Items:', allMenuItems.length);
+  console.log('All Restaurants:', restaurants.map(r => ({ name: r.name, id: r.id, username: r.username })));
   
   // Sadece bu restoranın kategorilerini ve ürünlerini filtrele
   const categories = allCategories.filter(c => c.restaurantId === activeRestaurant?.id);
   const items = allMenuItems.filter(i => i.restaurantId === activeRestaurant?.id);
   
-  console.log('📋 Filtered Data:', {
-    filteredCategories: categories.length,
-    filteredItems: items.length
-  });
+  console.log('Filtered Categories:', categories.length);
+  console.log('Filtered Items:', items.length);
+  console.log('🔍 MENU DEBUG END 🔍');
   const subcategories: any[] = []; // Şimdilik subcategory yok
   
   // Local states
