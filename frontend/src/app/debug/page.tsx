@@ -170,6 +170,194 @@ export default function DebugPage() {
     }
   };
 
+  // Lezzet ve Kardeşler restaurant'larını oluştur
+  const createLezzetAndKardesler = () => {
+    const timestamp = Date.now();
+    
+    const lezzetRestaurant = {
+      id: `rest_${timestamp}`,
+      name: 'Lezzet Restaurant',
+      username: 'lezzet',
+      email: 'info@lezzet.com',
+      phone: '+90 555 987 6543',
+      address: 'İstanbul, Türkiye',
+      primaryColor: '#8B4513',
+      secondaryColor: '#D2691E',
+      isActive: true,
+      ownerId: `owner_${timestamp}`,
+      tableCount: 20,
+      qrCodes: [],
+      settings: {
+        language: ['tr'],
+        currency: 'TRY',
+        taxRate: 18,
+        serviceChargeRate: 0,
+        allowTips: true,
+        allowOnlinePayment: true,
+        autoAcceptOrders: false,
+        workingHours: [
+          { day: 'Pazartesi', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Salı', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Çarşamba', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Perşembe', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Cuma', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Cumartesi', open: '09:00', close: '23:00', isOpen: true },
+          { day: 'Pazar', open: '09:00', close: '23:00', isOpen: true }
+        ]
+      },
+      subscription: {
+        plan: 'premium',
+        startDate: new Date(),
+        endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+        status: 'active'
+      },
+      createdAt: new Date(),
+      status: 'active'
+    };
+
+    const kardeslerRestaurant = {
+      id: `rest_${timestamp + 1}`,
+      name: 'Kardeşler Lokantası',
+      username: 'kardesler',
+      email: 'info@kardesler.com',
+      phone: '+90 555 123 4567',
+      address: 'Ankara, Türkiye',
+      primaryColor: '#2E8B57',
+      secondaryColor: '#90EE90',
+      isActive: true,
+      ownerId: `owner_${timestamp + 1}`,
+      tableCount: 15,
+      qrCodes: [],
+      settings: {
+        language: ['tr'],
+        currency: 'TRY',
+        taxRate: 18,
+        serviceChargeRate: 0,
+        allowTips: true,
+        allowOnlinePayment: true,
+        autoAcceptOrders: false,
+        workingHours: [
+          { day: 'Pazartesi', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Salı', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Çarşamba', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Perşembe', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Cuma', open: '09:00', close: '22:00', isOpen: true },
+          { day: 'Cumartesi', open: '09:00', close: '23:00', isOpen: true },
+          { day: 'Pazar', open: '09:00', close: '23:00', isOpen: true }
+        ]
+      },
+      subscription: {
+        plan: 'premium',
+        startDate: new Date(),
+        endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+        status: 'active'
+      },
+      createdAt: new Date(),
+      status: 'active'
+    };
+
+    // Kardeşler için demo kategoriler
+    const kardeslerCategories = [
+      {
+        id: `cat_${timestamp}_1`,
+        restaurantId: kardeslerRestaurant.id,
+        name: { tr: 'Ana Yemekler', en: 'Main Dishes' },
+        description: { tr: 'Kardeşler ana yemekleri', en: 'Kardesler main dishes' },
+        displayOrder: 1,
+        order: 1,
+        isActive: true
+      },
+      {
+        id: `cat_${timestamp}_2`,
+        restaurantId: kardeslerRestaurant.id,
+        name: { tr: 'İçecekler', en: 'Beverages' },
+        description: { tr: 'Soğuk ve sıcak içecekler', en: 'Cold and hot beverages' },
+        displayOrder: 2,
+        order: 2,
+        isActive: true
+      }
+    ];
+
+    // Kardeşler için 20 demo ürün
+    const kardeslerItems = [
+      ...Array.from({ length: 15 }, (_, i) => ({
+        id: `item_${timestamp}_${i + 1}`,
+        restaurantId: kardeslerRestaurant.id,
+        categoryId: kardeslerCategories[0].id,
+        name: { tr: `Kardeşler Yemeği ${i + 1}`, en: `Kardesler Dish ${i + 1}` },
+        description: { tr: `Özel ${i + 1}. yemek`, en: `Special dish ${i + 1}` },
+        price: 25 + (i * 5),
+        image: '/placeholder-food.jpg',
+        isActive: true,
+        isAvailable: true,
+        isPopular: i < 3,
+        allergens: { tr: [], en: [] },
+        nutritionalInfo: {},
+        preparationTime: 10 + i,
+        displayOrder: i + 1,
+        order: i + 1
+      })),
+      ...Array.from({ length: 5 }, (_, i) => ({
+        id: `item_${timestamp}_${i + 16}`,
+        restaurantId: kardeslerRestaurant.id,
+        categoryId: kardeslerCategories[1].id,
+        name: { tr: `İçecek ${i + 1}`, en: `Beverage ${i + 1}` },
+        description: { tr: `Soğuk içecek ${i + 1}`, en: `Cold beverage ${i + 1}` },
+        price: 10 + (i * 2),
+        image: '/placeholder-food.jpg',
+        isActive: true,
+        isAvailable: true,
+        isPopular: false,
+        allergens: { tr: [], en: [] },
+        nutritionalInfo: {},
+        preparationTime: 2,
+        displayOrder: i + 16,
+        order: i + 16
+      }))
+    ];
+
+    // Lezzet için 1 kategori
+    const lezzetCategories = [
+      {
+        id: `cat_${timestamp}_3`,
+        restaurantId: lezzetRestaurant.id,
+        name: { tr: 'Ana Yemekler', en: 'Main Dishes' },
+        description: { tr: 'Lezzet ana yemekleri', en: 'Lezzet main dishes' },
+        displayOrder: 1,
+        order: 1,
+        isActive: true
+      }
+    ];
+
+    // Lezzet için 1 demo ürün
+    const lezzetItems = [
+      {
+        id: `item_${timestamp}_21`,
+        restaurantId: lezzetRestaurant.id,
+        categoryId: lezzetCategories[0].id,
+        name: { tr: 'Lezzet Kebap', en: 'Lezzet Kebab' },
+        description: { tr: 'Özel baharatlarla marine edilmiş', en: 'Marinated with special spices' },
+        price: 75,
+        image: '/placeholder-food.jpg',
+        isActive: true,
+        isAvailable: true,
+        isPopular: true,
+        allergens: { tr: [], en: [] },
+        nutritionalInfo: {},
+        preparationTime: 15,
+        displayOrder: 1,
+        order: 1
+      }
+    ];
+
+    // Store'a ekle
+    setRestaurants([lezzetRestaurant, kardeslerRestaurant] as any);
+    setCategories([...lezzetCategories, ...kardeslerCategories] as any);
+    setMenuItems([...lezzetItems, ...kardeslerItems] as any);
+
+    alert(`Başarıyla oluşturuldu!\n\nLezzet Restaurant:\n- 1 kategori\n- 1 ürün\n\nKardeşler Lokantası:\n- 2 kategori\n- 20 ürün`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
@@ -181,6 +369,12 @@ export default function DebugPage() {
               className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium"
             >
               🗑️ Tüm Verileri Sil
+            </button>
+            <button
+              onClick={createLezzetAndKardesler}
+              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium"
+            >
+              🏢 Lezzet & Kardeşler Oluştur
             </button>
             <button
               onClick={loadDemoData}
