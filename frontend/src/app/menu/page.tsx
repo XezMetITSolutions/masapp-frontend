@@ -121,7 +121,7 @@ export function MenuPageContent() {
       // Her durumda token'ı geçerli kabul et
       setTokenValid(true);
       
-      // Debug alert
+      // Debug alert - basit
       alert(`Menu yüklendi!\nRestaurant: ${finalRestaurant}\nHostname: ${hostname}`);
     }
   }, [setTableNumber]);
@@ -159,6 +159,15 @@ export function MenuPageContent() {
   console.log('Total Categories:', allCategories.length);
   console.log('Total Menu Items:', allMenuItems.length);
   console.log('All Restaurants:', restaurants.map(r => ({ name: r.name, id: r.id, username: r.username })));
+  
+  // Restaurant store boşsa uyarı ver
+  if (restaurants.length === 0) {
+    console.log('⚠️ Restaurant store is empty!');
+  }
+  
+  if (!activeRestaurant && restaurantSlug) {
+    console.log('⚠️ Restaurant not found in store for slug:', restaurantSlug);
+  }
   
   // Sadece bu restoranın kategorilerini ve ürünlerini filtrele
   const categories = allCategories.filter(c => c.restaurantId === activeRestaurant?.id);
