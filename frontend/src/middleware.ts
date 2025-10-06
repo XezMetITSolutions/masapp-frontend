@@ -43,9 +43,16 @@ export function middleware(request: NextRequest) {
       return NextResponse.rewrite(url);
     }
     
-    // Subdomain ana sayfası business dashboard'a yönlendir
-    if (pathname === '/' && querySubdomain) {
-      return NextResponse.rewrite(new URL('/business/dashboard', request.url));
+    // Subdomain ana sayfası menüye yönlendir (müşteri deneyimi için)
+    if (pathname === '/') {
+      const url = new URL('/menu', request.url);
+      url.searchParams.set('restaurant', subdomain || querySubdomain || 'demo');
+      
+      // Token oluştur (genel menü için)
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      url.searchParams.set('token', token);
+      
+      return NextResponse.rewrite(url);
     }
   }
   
