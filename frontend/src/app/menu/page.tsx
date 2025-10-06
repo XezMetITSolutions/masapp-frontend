@@ -139,9 +139,24 @@ export function MenuPageContent() {
   const allCategories = useRestaurantStore(state => state.categories);
   const allMenuItems = useRestaurantStore(state => state.menuItems);
   
+  // Debug: Restaurant bilgilerini kontrol et
+  console.log('🔍 Menu Debug:', {
+    restaurantSlug,
+    activeRestaurant: activeRestaurant?.name,
+    activeRestaurantId: activeRestaurant?.id,
+    totalRestaurants: restaurants.length,
+    totalCategories: allCategories.length,
+    totalMenuItems: allMenuItems.length
+  });
+  
   // Sadece bu restoranın kategorilerini ve ürünlerini filtrele
   const categories = allCategories.filter(c => c.restaurantId === activeRestaurant?.id);
   const items = allMenuItems.filter(i => i.restaurantId === activeRestaurant?.id);
+  
+  console.log('📋 Filtered Data:', {
+    filteredCategories: categories.length,
+    filteredItems: items.length
+  });
   const subcategories: any[] = []; // Şimdilik subcategory yok
   
   // Local states
