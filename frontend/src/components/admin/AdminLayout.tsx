@@ -16,7 +16,8 @@ import {
   FaTimes,
   FaBars,
   FaGlobe,
-  FaBox
+  FaBox,
+  FaCog
 } from 'react-icons/fa';
 
 interface AdminLayoutProps {
@@ -101,6 +102,17 @@ export default function AdminLayout({
                   >
                     <FaBox className="mr-3" />
                     Plan Yönetimi
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/admin/restaurant-features" 
+                    className={`flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white ${
+                      title === 'Restoran Özellik Yönetimi' ? 'bg-blue-600 text-white' : ''
+                    }`}
+                  >
+                    <FaCog className="mr-3" />
+                    Özellik Yönetimi
                   </Link>
                 </li>
                 <li>
