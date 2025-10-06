@@ -10,7 +10,6 @@ import {
   FaChartBar,
   FaHeadset,
   FaCog,
-  FaCreditCard,
   FaSignOutAlt,
   FaBars
 } from 'react-icons/fa';
@@ -37,13 +36,6 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
       icon: FaChartLine,
       label: 'Kontrol Paneli',
       active: pathname === '/business/dashboard',
-      visible: true // Her zaman görünür
-    },
-    {
-      href: '/admin/payment',
-      icon: FaCreditCard,
-      label: 'Ödeme & Abonelik',
-      active: pathname === '/admin/payment',
       visible: true // Her zaman görünür
     },
     {
