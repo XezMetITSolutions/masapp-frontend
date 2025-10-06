@@ -406,78 +406,7 @@ export default function CashierDashboard() {
     const savedNotifications = JSON.parse(localStorage.getItem('cashier_notifications') || '[]');
     setNotifications(prev => [...prev, ...savedNotifications]);
     
-    // Örnek siparişler oluştur (sadece bir kez)
-    const sampleOrders = [
-      {
-        id: 'order-1',
-        tableNumber: 5,
-        items: [
-          { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 85, quantity: 2, notes: '' },
-          { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 15, quantity: 2, notes: '' }
-        ],
-        status: 'ready' as const,
-        paymentStatus: 'pending' as const,
-        total: 200,
-        subtotal: 200,
-        tipAmount: 20,
-        supportAmount: 0,
-        discount: 0,
-        couponCode: null,
-        paymentMethod: undefined,
-        timestamp: Date.now() - 10 * 60 * 1000
-      },
-      {
-        id: 'order-2',
-        tableNumber: 8,
-        items: [
-          { id: '3', itemId: '3', name: { en: 'Lahmacun', tr: 'Lahmacun' }, price: 25, quantity: 4, notes: '' },
-          { id: '4', itemId: '4', name: { en: 'Tea', tr: 'Çay' }, price: 8, quantity: 4, notes: '' }
-        ],
-        status: 'delivered' as const,
-        paymentStatus: 'paid' as const,
-        total: 132,
-        subtotal: 132,
-        tipAmount: 13,
-        supportAmount: 0,
-        discount: 0,
-        couponCode: null,
-        paymentMethod: undefined,
-        timestamp: Date.now() - 5 * 60 * 1000
-      },
-      {
-        id: 'order-3',
-        tableNumber: 12,
-        items: [
-          { id: '5', itemId: '5', name: { en: 'Doner', tr: 'Döner' }, price: 35, quantity: 1, notes: '' },
-          { id: '6', itemId: '6', name: { en: 'Cola', tr: 'Kola' }, price: 12, quantity: 1, notes: '' }
-        ],
-        status: 'pending' as const,
-        paymentStatus: 'pending' as const,
-        total: 47,
-        subtotal: 47,
-        tipAmount: 5,
-        supportAmount: 0,
-        discount: 0,
-        couponCode: null,
-        paymentMethod: undefined,
-        timestamp: Date.now() - 2 * 60 * 1000
-      }
-    ];
-    
-    setDemoOrders(sampleOrders);
-    console.log('💰 Kasa paneli için örnek siparişler oluşturuldu:', sampleOrders);
-
-    // Örnek bir "hesap talebi" oluştur (sadece yoksa)
-    try {
-      const existingPending = getBillRequestsByStatus('pending');
-      const alreadyForTable12 = existingPending.some(req => req.tableNumber === 12);
-      if (!alreadyForTable12) {
-        const demoReqId = useBillRequestStore.getState().createBillRequest('order-3', 12, 47, 'customer');
-        console.log('🧾 Demo hesap talebi oluşturuldu:', demoReqId);
-      }
-    } catch (e) {
-      console.warn('Demo hesap talebi oluşturulamadı:', e);
-    }
+    // Demo veriler kaldırıldı - gerçek veriler API'den gelecek
     
     // Masa değişikliği bildirimlerini kontrol et
     const checkTableTransferNotifications = () => {
