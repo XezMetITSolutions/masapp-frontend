@@ -14,7 +14,7 @@
 
 # Subdomain routing - wildcard domain desteği
 [[redirects]]
-  from = "https://*.masapp.com/*"
+  from = "https://*.guzellestir.com/*"
   to = "https://guzellestir.com/:splat"
   status = 200
   force = true

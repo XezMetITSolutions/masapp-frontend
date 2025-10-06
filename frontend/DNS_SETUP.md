@@ -6,8 +6,8 @@
 
 Netlify dashboard'da:
 1. **Site Settings** → **Domain management**
-2. **Add custom domain**: `masapp.com`
-3. **Add domain alias**: `*.masapp.com` (wildcard)
+2. **Add custom domain**: `guzellestir.com` (zaten mevcut)
+3. **Add domain alias**: `*.guzellestir.com` (wildcard)
 
 ### 2. DNS Kayıtları (Domain Provider'da)
 
@@ -28,7 +28,7 @@ CNAME   *       guzellestir.netlify.app        3600
 ```toml
 # Wildcard subdomain routing
 [[redirects]]
-  from = "https://*.masapp.com/*"
+  from = "https://*.guzellestir.com/*"
   to = "https://guzellestir.com/:splat"
   status = 200
   force = true
@@ -40,22 +40,22 @@ CNAME   *       guzellestir.netlify.app        3600
 Kurulum tamamlandıktan sonra test edin:
 
 ```
-https://lezzet.masapp.com/mutfak
-https://pizza.masapp.com/garson
-https://cafe.masapp.com/kasa
+https://lezzet.guzellestir.com/mutfak
+https://pizza.guzellestir.com/garson
+https://cafe.guzellestir.com/kasa
 ```
 
 ### 5. Propagation Süresi
 
 - DNS değişiklikleri **2-48 saat** sürebilir
-- `nslookup lezzet.masapp.com` ile kontrol edin
+- `nslookup lezzet.guzellestir.com` ile kontrol edin
 - Online DNS checker araçları kullanın
 
 ### 6. SSL Sertifikası
 
 Netlify otomatik olarak Let's Encrypt SSL sertifikası oluşturacak:
-- Ana domain: `masapp.com`
-- Wildcard: `*.masapp.com`
+- Ana domain: `guzellestir.com`
+- Wildcard: `*.guzellestir.com`
 
 ### 7. Alternatif Çözüm (Geçici)
 
