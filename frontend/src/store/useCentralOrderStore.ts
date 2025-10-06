@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getStorageKey } from '@/utils/subdomain';
 // Simple ID generator
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
@@ -717,7 +718,7 @@ const useCentralOrderStore = create<CentralOrderState>()(
       }
     }),
     {
-      name: 'central-order-store',
+      name: getStorageKey('central-order-store'),
     }
   )
 );

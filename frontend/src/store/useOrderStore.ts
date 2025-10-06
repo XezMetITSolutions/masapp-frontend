@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getStorageKey } from '@/utils/subdomain';
 // Simple ID generator
 const generateId = () => Math.random().toString(36).substring(2, 15);
 import { CartItem } from './useCartStore';
@@ -90,7 +91,7 @@ const useOrderStore = create<OrderState>()(
       },
     }),
     {
-      name: 'masapp-order-storage',
+      name: getStorageKey('masapp-order-storage'),
     }
   )
 );

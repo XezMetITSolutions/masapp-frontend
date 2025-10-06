@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Restaurant, Staff } from '@/types';
+import { getStorageKey } from '@/utils/subdomain';
 
 interface AuthState {
   authenticatedRestaurant: Restaurant | null;
@@ -32,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'restaurant-auth-storage',
+      name: getStorageKey('restaurant-auth-storage'),
       partialize: (state) => ({ 
         authenticatedRestaurant: state.authenticatedRestaurant,
         authenticatedStaff: state.authenticatedStaff 

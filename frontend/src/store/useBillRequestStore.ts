@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getStorageKey } from '@/utils/subdomain';
 import { BillRequest, Bill, BillItem } from '@/types';
 
 // Simple ID generator
@@ -184,7 +185,7 @@ export const useBillRequestStore = create<BillRequestState>()(
       }
     }),
     {
-      name: 'masapp-bill-request-storage',
+      name: getStorageKey('masapp-bill-request-storage'),
     }
   )
 );
