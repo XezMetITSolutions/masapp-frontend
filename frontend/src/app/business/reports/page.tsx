@@ -144,9 +144,7 @@ export default function ReportsPage() {
     if (activeTab === 'hours') {
       const ws = XLSX.utils.aoa_to_sheet([
         ['Saat Aralığı', 'Sipariş'],
-        ['12:00-13:00', 45],
-        ['19:00-20:00', 38],
-        ['20:00-21:00', 32]
+        // Boş veriler - gerçek veriler API'den gelecek
       ]);
       XLSX.utils.book_append_sheet(wb, ws, 'Yoğun Saatler');
     }
@@ -203,88 +201,50 @@ export default function ReportsPage() {
     }
   };
   
-  // Demo veriler - Gerçekçi restoran verileri
+  // Boş veriler - Gerçek veriler API'den gelecek
   const currentDailyReport = {
-    totalSales: 2450.50,
-    totalOrders: 28,
-    averageOrderValue: 87.50,
-    totalTables: 12,
-    averageTableTime: 45
+    totalSales: 0,
+    totalOrders: 0,
+    averageOrderValue: 0,
+    totalTables: 0,
+    averageTableTime: 0
   };
 
-  // Günlük/Haftalık/Aylık Ciro Verileri
+  // Günlük/Haftalık/Aylık Ciro Verileri - Boş veriler
   const revenueData = {
     daily: {
-      today: 2450.50,
-      yesterday: 2180.30,
-      change: 12.4
+      today: 0,
+      yesterday: 0,
+      change: 0
     },
     weekly: {
-      thisWeek: 16850.75,
-      lastWeek: 15230.40,
-      change: 10.6
+      thisWeek: 0,
+      lastWeek: 0,
+      change: 0
     },
     monthly: {
-      thisMonth: 67850.25,
-      lastMonth: 61200.80,
-      change: 10.8
+      thisMonth: 0,
+      lastMonth: 0,
+      change: 0
     }
   };
 
-  // Günlük ciro trendi (son 7 gün)
-  const dailyTrend = [
-    { date: '2024-01-15', revenue: 2180.30, orders: 24 },
-    { date: '2024-01-16', revenue: 2450.50, orders: 28 },
-    { date: '2024-01-17', revenue: 1920.75, orders: 22 },
-    { date: '2024-01-18', revenue: 2680.40, orders: 31 },
-    { date: '2024-01-19', revenue: 3120.60, orders: 35 },
-    { date: '2024-01-20', revenue: 2890.25, orders: 33 },
-    { date: '2024-01-21', revenue: 2450.50, orders: 28 }
-  ];
+  // Günlük ciro trendi - Boş veriler
+  const dailyTrend: { date: string; revenue: number; orders: number }[] = [];
+  const maxDailyRevenue = 0;
 
-  // Mobilde bar genişliklerini orantılamak için maksimum ciro
-  const maxDailyRevenue = Math.max(...dailyTrend.map(d => d.revenue));
+  // Haftalık ciro trendi - Boş veriler
+  const weeklyTrend: { week: string; revenue: number; orders: number }[] = [];
 
-  // Haftalık ciro trendi (son 4 hafta)
-  const weeklyTrend = [
-    { week: '1. Hafta', revenue: 15230.40, orders: 168 },
-    { week: '2. Hafta', revenue: 16850.75, orders: 185 },
-    { week: '3. Hafta', revenue: 14200.60, orders: 156 },
-    { week: '4. Hafta', revenue: 16850.75, orders: 185 }
-  ];
+  // Aylık ciro trendi - Boş veriler
+  const monthlyTrend: { month: string; revenue: number; orders: number }[] = [];
 
-  // Aylık ciro trendi (son 6 ay)
-  const monthlyTrend = [
-    { month: 'Ağustos', revenue: 58200.80, orders: 642 },
-    { month: 'Eylül', revenue: 61200.80, orders: 675 },
-    { month: 'Ekim', revenue: 67850.25, orders: 748 },
-    { month: 'Kasım', revenue: 64500.60, orders: 712 },
-    { month: 'Aralık', revenue: 67850.25, orders: 748 },
-    { month: 'Ocak', revenue: 67850.25, orders: 748 }
-  ];
+  // En çok satan ürünler - Boş veriler
+  const topProducts: { productId: string; productName: string; totalQuantity: number; totalRevenue: number; orderCount: number }[] = [];
 
-  const topProducts = [
-    { productId: '1', productName: 'Izgara Köfte', totalQuantity: 15, totalRevenue: 1800, orderCount: 12 },
-    { productId: '2', productName: 'Çoban Salata', totalQuantity: 22, totalRevenue: 770, orderCount: 18 },
-    { productId: '3', productName: 'Humus', totalQuantity: 18, totalRevenue: 810, orderCount: 15 }
-  ];
-
-  // Saatlik satışları, sayfadaki günlük örnek verilerle tutarlı olacak şekilde dağıt
-  // En yoğun saatler: 12-13 ve 19-21 arası olacak şekilde ağırlıklar
-  const baseHourRatios = [0.03, 0.04, 0.06, 0.07, 0.09, 0.10, 0.12, 0.16, 0.12, 0.09, 0.07, 0.05];
-  const selectedDaily = dailyTrend[dailyTrend.length - 1];
-  const targetOrders = selectedDaily?.orders || 0;
-  let hourlySales = baseHourRatios.map(r => Math.round(r * targetOrders));
-  // Toplamı hedefe eşitle (yuvarlama farkını dağıt)
-  const diff = targetOrders - hourlySales.reduce((a, b) => a + b, 0);
-  if (diff !== 0) {
-    const step = diff > 0 ? 1 : -1;
-    for (let i = 0; i < Math.abs(diff); i++) {
-      const idx = (7 + i) % hourlySales.length; // yoğun saatlere öncelik ver
-      hourlySales[idx] = Math.max(0, hourlySales[idx] + step);
-    }
-  }
-  const maxHourly = Math.max(0, ...hourlySales);
+  // Saatlik satış verileri - Boş veriler
+  const hourlySales: number[] = [];
+  const maxHourly = 0;
   const hourLabels = Array.from({ length: 12 }, (_, i) => `${i + 8}:00`);
   const profitableHours = new Set([12, 19, 20]);
 
