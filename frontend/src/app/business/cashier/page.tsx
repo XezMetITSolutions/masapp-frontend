@@ -96,8 +96,29 @@ export default function CashierDashboard() {
     return un;
   }, []);
 
-  // Siparişler - gerçek veriler API'den gelecek
-  const [demoOrders, setDemoOrders] = useState<Order[]>([]);
+  // Siparişler - CentralOrderStore'dan al
+  const centralOrders = getActiveOrders();
+  
+  // CentralOrder'ı Order formatına çevir
+  const demoOrders: Order[] = centralOrders.map(centralOrder => ({
+    id: centralOrder.id,
+    tableNumber: centralOrder.tableNumber,
+    items: centralOrder.items.map(item => ({
+      id: item.id,
+      name: { tr: item.name, en: item.name },
+      price: item.price,
+      quantity: item.quantity,
+      category: item.category || 'food',
+      notes: item.notes || ''
+    })),
+    total: centralOrder.totalAmount,
+    status: centralOrder.status as 'pending' | 'preparing' | 'ready' | 'delivered' | 'paid',
+    timestamp: new Date(centralOrder.createdAt).getTime(),
+    notes: '',
+    paymentMethod: null,
+    customerName: '',
+    customerPhone: ''
+  }));
 
   const filteredOrders = demoOrders.filter(order => {
     const matchesSearch = order.tableNumber.toString().includes(searchTerm) ||    
