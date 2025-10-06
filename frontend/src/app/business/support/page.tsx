@@ -27,6 +27,7 @@ import {
   FaSearch
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
+import BusinessSidebar from '@/components/BusinessSidebar';
 
 interface SupportTicket {
   id: number;
@@ -218,82 +219,11 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-purple-900 to-purple-800 text-white transform transition-transform duration-300 ease-in-out z-50 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}>
-        <div className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">{displayName}</h1>
-              <p className="text-purple-200 text-sm mt-1">Yönetim Paneli</p>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 hover:bg-purple-700 rounded-lg"
-            >
-              <FaTimes />
-            </button>
-          </div>
-        </div>
-
-        <nav className="mt-6">
-          <Link href="/business/dashboard" className="flex items-center px-6 py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors">
-            <FaChartLine className="mr-3" />
-            <span>Kontrol Paneli</span>
-          </Link>
-          <Link href="/business/menu" className="flex items-center px-6 py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors">
-            <FaUtensils className="mr-3" />
-            <span>Menü Yönetimi</span>
-          </Link>
-          <Link href="/business/orders" className="flex items-center px-6 py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors">
-            <FaShoppingCart className="mr-3" />
-            <span>Siparişler</span>
-          </Link>
-          <Link href="/business/staff" className="flex items-center px-6 py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors">
-            <FaUsers className="mr-3" />
-            <span>Personel</span>
-          </Link>
-          <Link href="/business/qr-codes" className="flex items-center px-6 py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors">
-            <FaQrcode className="mr-3" />
-            <span>QR Kodlar</span>
-          </Link>
-          <Link href="/business/settings" className="flex items-center px-6 py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors">
-            <FaCog className="mr-3" />
-            <span>Ayarlar</span>
-          </Link>
-          <Link href="/business/support" className="flex items-center px-6 py-3 bg-purple-700 bg-opacity-50 border-l-4 border-white">
-            <FaHeadset className="mr-3" />
-            <span>Destek</span>
-          </Link>
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <div className="border-t border-purple-700 pt-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">{displayName}</p>
-                <p className="text-xs text-purple-300">{displayEmail}</p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 hover:bg-purple-700 rounded-lg"
-                title="Çıkış Yap"
-              >
-                <FaSignOutAlt />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <BusinessSidebar 
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <div className="ml-0 lg:ml-64">

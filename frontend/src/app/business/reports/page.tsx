@@ -18,10 +18,16 @@ import {
   FaTimes
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
+import BusinessSidebar from '@/components/BusinessSidebar';
+import { useFeature } from '@/hooks/useFeature';
 
 export default function ReportsPage() {
   const router = useRouter();
   const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  
+  // Feature kontrolü
+  const hasBasicReports = useFeature('basic_reports');
+  const hasAdvancedAnalytics = useFeature('advanced_analytics');
   
   const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
   const displayEmail = authenticatedRestaurant?.email || authenticatedStaff?.email || '';
@@ -37,6 +43,33 @@ export default function ReportsPage() {
     logout();
     router.push('/business/login');
   };
+
+  // Feature kontrolü - erişim yok sayfası göster
+  if (!hasBasicReports && !hasAdvancedAnalytics) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <BusinessSidebar 
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          onLogout={handleLogout}
+        />
+        <div className="ml-0 lg:ml-64 flex items-center justify-center min-h-screen">
+          <div className="text-center p-8">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Erişim Yok</h1>
+            <p className="text-gray-600 mb-6">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+            <p className="text-sm text-gray-500 mb-6">Raporlama özelliğine erişmek için lütfen yöneticinizle iletişime geçin.</p>
+            <button
+              onClick={() => router.push('/business/dashboard')}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Kontrol Paneline Dön
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // SheetJS yükleyici (UMD)
   const loadXLSX = () => {
@@ -271,82 +304,11 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-purple-900 to-purple-800 text-white transform transition-transform duration-300 ease-in-out z-50 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}>
-        <div className="p-4 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Restoran Yönetim Sistemi</p>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-2 hover:bg-purple-700 rounded-lg transition-colors"
-            >
-              <FaTimes className="text-lg" />
-            </button>
-          </div>
-        </div>
-
-        <nav className="mt-4 sm:mt-6">
-          <Link href="/business/dashboard" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaChartLine className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Kontrol Paneli</span>
-          </Link>
-          <Link href="/business/menu" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaUtensils className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Menü Yönetimi</span>
-          </Link>
-          <Link href="/business/staff" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaUsers className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Personel</span>
-          </Link>
-          <Link href="/business/qr-codes" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaQrcode className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">QR Kodlar</span>
-          </Link>
-          <Link href="/business/reports" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 bg-purple-700 bg-opacity-50 border-l-4 border-white rounded-r-lg mx-2 sm:mx-0">
-            <FaChartBar className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Raporlar</span>
-          </Link>
-          <Link href="/business/support" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaHeadset className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Destek</span>
-          </Link>
-          <Link href="/business/settings" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaCog className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Ayarlar</span>
-          </Link>
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <div className="border-t border-purple-700 pt-4">
-          <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">{displayName}</p>
-                <p className="text-xs text-purple-300">{displayEmail}</p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 hover:bg-purple-700 rounded-lg transition-colors"
-                title="Çıkış Yap"
-              >
-                <FaSignOutAlt />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <BusinessSidebar 
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <div className="ml-0 lg:ml-64">
