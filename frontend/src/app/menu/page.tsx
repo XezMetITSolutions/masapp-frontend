@@ -177,17 +177,15 @@ export function MenuPageContent() {
   // Business menu sayfasındaki mantığı kullan
   let currentRestaurantId = activeRestaurant?.id;
   
-  // Fallback: Eğer restaurant bulunamazsa, subdomain mapping ile ID oluştur
+  // Fallback: Eğer restaurant bulunamazsa, store'dan subdomain'e göre bul
   if (!currentRestaurantId && restaurantSlug) {
-    // Subdomain'e göre sabit ID'ler (business menu sayfasındaki verilerle eşleşmeli)
-    const subdomainToId: { [key: string]: string } = {
-      'lezzet': 'lezzet-restaurant-id',
-      'kardesler': 'kardesler-restaurant-id',
-      'pizza': 'pizza-restaurant-id',
-      'cafe': 'cafe-restaurant-id'
-    };
-    currentRestaurantId = subdomainToId[restaurantSlug];
-    console.log('🔄 Using fallback restaurant ID:', currentRestaurantId);
+    const restaurant = restaurants.find(r => 
+      r.username === restaurantSlug || 
+      r.name.toLowerCase().replace(/\s+/g, '-') === restaurantSlug ||
+      r.name.toLowerCase().includes(restaurantSlug)
+    );
+    currentRestaurantId = restaurant?.id;
+    console.log('🔄 Using restaurant from store:', currentRestaurantId);
   }
   
   // Sadece bu restoranın kategorilerini ve ürünlerini filtrele

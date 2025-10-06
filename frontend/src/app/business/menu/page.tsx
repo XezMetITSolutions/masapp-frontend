@@ -49,6 +49,7 @@ export default function MenuManagement() {
   const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const { 
     currentRestaurant, 
+    restaurants,
     categories: allCategories, 
     menuItems: allMenuItems,
     addCategory,
@@ -70,14 +71,13 @@ export default function MenuManagement() {
       const mainDomains = ['localhost', 'www', 'guzellestir'];
       
       if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
-        // Subdomain'e göre restaurant ID mapping
-        const subdomainToId: { [key: string]: string } = {
-          'lezzet': 'lezzet-restaurant-id',
-          'kardesler': 'kardesler-restaurant-id',
-          'pizza': 'pizza-restaurant-id',
-          'cafe': 'cafe-restaurant-id'
-        };
-        return subdomainToId[subdomain];
+        // Store'dan subdomain'e göre restaurant bul
+        const restaurant = restaurants.find(r => 
+          r.username === subdomain || 
+          r.name.toLowerCase().replace(/\s+/g, '-') === subdomain ||
+          r.name.toLowerCase().includes(subdomain)
+        );
+        return restaurant?.id;
       }
     }
     return null;
