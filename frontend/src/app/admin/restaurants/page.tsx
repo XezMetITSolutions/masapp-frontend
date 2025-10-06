@@ -352,7 +352,7 @@ export default function RestaurantsManagement() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Toplam Sipariş</p>
-                <p className="text-2xl font-bold text-gray-900">{restaurants.reduce((sum, r) => sum + r.totalOrders, 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">{restaurants.reduce((sum, r) => sum + (r.totalOrders || 0), 0).toLocaleString()}</p>
               </div>
             </div>
           </div>

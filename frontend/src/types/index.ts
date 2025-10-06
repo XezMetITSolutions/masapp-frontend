@@ -45,8 +45,10 @@ export interface Restaurant {
   qrCodes: QRCode[];
   settings: RestaurantSettings;
   subscription: Subscription;
+  features?: string[]; // Aktif özellikler listesi
   createdAt: Date;
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'active' | 'inactive' | 'suspended' | 'pending';
+  totalOrders?: number;
 }
 
 export interface RestaurantSettings {
