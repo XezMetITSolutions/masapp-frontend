@@ -16,7 +16,10 @@ import { menuData, MenuItem } from '@/data/menu-data';
 
 export default function CashierDashboard() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, logout, authenticatedRestaurant, authenticatedStaff } = useAuthStore();
+  
+  // Restoran adını al
+  const restaurantName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp';
   const { orders: oldOrders, updateOrderStatus } = useOrderStore();
   const { clearCart } = useCartStore();
   const { 
@@ -38,13 +41,7 @@ export default function CashierDashboard() {
     initializeDemoData
   } = useCentralOrderStore();
   
-  // Demo verilerini başlat (sadece bir kez)
-  useEffect(() => {
-    initializeDemoData();
-  }, []);
-  
-  const orders = getActiveOrders();
-  console.log('💰 Kasa paneli sipariş sayısı:', orders.length);
+  // Demo veriler kaldırıldı - gerçek veriler API'den gelecek
   
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
@@ -89,82 +86,13 @@ export default function CashierDashboard() {
     const un = subscribe((evt) => {
       if (evt.type === 'waiter_request' && evt.payload?.type === 'bill') {
         setIncomingBillBlink({ table: evt.payload.tableNumber });
-        setTimeout(()=>setIncomingBillBlink(null), 5000);
       }
     });
     return un;
   }, []);
 
-  // MasApp siparişler - store formatına uygun
-  const [demoOrders, setDemoOrders] = useState<Order[]>([
-    {
-      id: 'order-1',
-      tableNumber: 5,
-      items: [
-        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 85, quantity: 2, notes: '' },
-        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 8, quantity: 2, notes: '' },
-        { id: '3', itemId: '3', name: { en: 'Baklava', tr: 'Baklava' }, price: 25, quantity: 1, notes: '' }
-      ],
-      total: 211,
-      subtotal: 211,
-      tipAmount: 0,
-      supportAmount: 0,
-      discount: 0,
-      status: 'ready',
-      timestamp: Date.now() - 15 * 60 * 1000,
-      couponCode: null
-    },
-    {
-      id: 'order-2',
-      tableNumber: 12,
-      items: [
-        { id: '4', itemId: '4', name: { en: 'Lahmacun', tr: 'Lahmacun' }, price: 15, quantity: 3, notes: '' },
-        { id: '5', itemId: '5', name: { en: 'Tea', tr: 'Çay' }, price: 5, quantity: 3, notes: '' }
-      ],
-      total: 60,
-      subtotal: 60,
-      tipAmount: 0,
-      supportAmount: 0,
-      discount: 0,
-      status: 'delivered',
-      timestamp: Date.now() - 25 * 60 * 1000,
-      couponCode: null
-    },
-    {
-      id: 'order-3',
-      tableNumber: 8,
-      items: [
-        { id: '6', itemId: '6', name: { en: 'Doner', tr: 'Döner' }, price: 45, quantity: 1, notes: '' },
-        { id: '7', itemId: '7', name: { en: 'Cola', tr: 'Kola' }, price: 12, quantity: 1, notes: '' },
-        { id: '8', itemId: '8', name: { en: 'Kunefe', tr: 'Künefe' }, price: 30, quantity: 1, notes: '' }
-      ],
-      total: 87,
-      subtotal: 87,
-      tipAmount: 0,
-      supportAmount: 0,
-      discount: 0,
-      status: 'pending',
-      timestamp: Date.now() - 5 * 60 * 1000,
-      couponCode: null
-    },
-    {
-      id: 'order-4',
-      tableNumber: 15,
-      items: [
-        { id: '1', itemId: '1', name: { en: 'Adana Kebab', tr: 'Adana Kebap' }, price: 65, quantity: 2, notes: '' },
-        { id: '2', itemId: '2', name: { en: 'Ayran', tr: 'Ayran' }, price: 8, quantity: 2, notes: '' }
-      ],
-      total: 146,
-      subtotal: 146,
-      tipAmount: 0,
-      supportAmount: 0,
-      discount: 0,
-      status: 'paid',
-      timestamp: Date.now() - 45 * 60 * 1000,
-      couponCode: null,
-      paymentMethod: 'card'
-    }
-  ]);
+  // Siparişler - gerçek veriler API'den gelecek
+  const [demoOrders, setDemoOrders] = useState<Order[]>([]);
 
   const filteredOrders = demoOrders.filter(order => {
     const matchesSearch = order.tableNumber.toString().includes(searchTerm) ||    
@@ -386,7 +314,7 @@ export default function CashierDashboard() {
   const handlePrintReceipt = (order: Order) => {
     const printContent = `
       <div style="font-family: monospace; max-width: 300px; margin: 0 auto; padding: 20px;">
-        <h2 style="text-align: center; margin-bottom: 20px;">${user?.name || 'MasApp'} Restoran</h2>
+        <h2 style="text-align: center; margin-bottom: 20px;">${restaurantName}</h2>
         <hr>
         <p><strong>Masa:</strong> ${order.tableNumber}</p>
         <p><strong>Tarih:</strong> ${new Date(order.timestamp).toLocaleString('tr-TR')}</p>
@@ -815,7 +743,7 @@ export default function CashierDashboard() {
           <div className="flex justify-between items-center py-3 sm:py-4">
             <div className="flex items-center gap-2 sm:gap-4">
               <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Kasa Paneli</h1>
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">{restaurantName} - Kasa Paneli</h1>
                 <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Ödemeleri yönet ve kasa işlemlerini takip et</p>
               </div>
             </div>
