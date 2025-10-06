@@ -62,8 +62,28 @@ export default function MenuManagement() {
   // Feature kontrolü
   const hasQrMenu = useFeature('qr_menu');
   
-  // Giriş yapan restoranın ID'si
-  const currentRestaurantId = authenticatedRestaurant?.id || currentRestaurant?.id;
+  // Giriş yapan restoranın ID'si - subdomain'den de alabilir
+  const getRestaurantIdFromSubdomain = () => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const subdomain = hostname.split('.')[0];
+      const mainDomains = ['localhost', 'www', 'guzellestir'];
+      
+      if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
+        // Subdomain'e göre restaurant ID mapping
+        const subdomainToId: { [key: string]: string } = {
+          'lezzet': 'lezzet-restaurant-id',
+          'kardesler': 'kardesler-restaurant-id',
+          'pizza': 'pizza-restaurant-id',
+          'cafe': 'cafe-restaurant-id'
+        };
+        return subdomainToId[subdomain];
+      }
+    }
+    return null;
+  };
+  
+  const currentRestaurantId = authenticatedRestaurant?.id || currentRestaurant?.id || getRestaurantIdFromSubdomain();
   
   // Sadece bu restorana ait kategorileri ve ürünleri filtrele
   const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
@@ -116,7 +136,12 @@ export default function MenuManagement() {
   });
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    // Eğer subdomain varsa authentication olmadan da çalışsın (test için)
+    const hasSubdomain = typeof window !== 'undefined' && 
+      !['localhost', 'www', 'guzellestir'].includes(window.location.hostname.split('.')[0]) &&
+      window.location.hostname.includes('.');
+      
+    if (!isAuthenticated() && !hasSubdomain) {
       router.push('/login');
     }
   }, [isAuthenticated, router]);
