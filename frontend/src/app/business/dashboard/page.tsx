@@ -29,6 +29,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useState } from 'react';
 import BusinessPaymentModal from '@/components/BusinessPaymentModal';
+import { useFeature } from '@/hooks/useFeature';
 
 export default function BusinessDashboard() {
   const router = useRouter();
@@ -230,6 +231,14 @@ export default function BusinessDashboard() {
     setSelectedFeatures([]);
   };
 
+  // Feature kontrolü
+  const hasQrMenu = useFeature('qr_menu');
+  const hasTableManagement = useFeature('table_management');
+  const hasOrderTaking = useFeature('order_taking');
+  const hasBasicReports = useFeature('basic_reports');
+  const hasStockManagement = useFeature('stock_management');
+  const hasAdvancedAnalytics = useFeature('advanced_analytics');
+
   // Gerçek verileri (veya şimdilik varsayılanları) kullan
   const stats = {
     todayOrders: 0, // Bu veriler daha sonra sipariş sisteminden gelecek
@@ -281,22 +290,28 @@ export default function BusinessDashboard() {
             <FaChartLine className="mr-2 sm:mr-3 text-sm sm:text-base" />
             <span className="text-sm sm:text-base font-medium">Kontrol Paneli</span>
           </Link>
-          <Link href="/business/menu" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaUtensils className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Menü Yönetimi</span>
-          </Link>
+          {hasQrMenu && (
+            <Link href="/business/menu" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
+              <FaUtensils className="mr-2 sm:mr-3 text-sm sm:text-base" />
+              <span className="text-sm sm:text-base font-medium">Menü Yönetimi</span>
+            </Link>
+          )}
           <Link href="/business/staff" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
             <FaUsers className="mr-2 sm:mr-3 text-sm sm:text-base" />
             <span className="text-sm sm:text-base font-medium">Personel</span>
           </Link>
-          <Link href="/business/qr-codes" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaQrcode className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">QR Kodlar</span>
-          </Link>
-          <Link href="/business/reports" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaChartBar className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Raporlar</span>
-          </Link>
+          {(hasQrMenu || hasTableManagement) && (
+            <Link href="/business/qr-codes" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
+              <FaQrcode className="mr-2 sm:mr-3 text-sm sm:text-base" />
+              <span className="text-sm sm:text-base font-medium">QR Kodlar</span>
+            </Link>
+          )}
+          {(hasBasicReports || hasAdvancedAnalytics) && (
+            <Link href="/business/reports" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
+              <FaChartBar className="mr-2 sm:mr-3 text-sm sm:text-base" />
+              <span className="text-sm sm:text-base font-medium">Raporlar</span>
+            </Link>
+          )}
           <Link href="/business/settings" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
             <FaCog className="mr-2 sm:mr-3 text-sm sm:text-base" />
             <span className="text-sm sm:text-base font-medium">Ayarlar</span>
