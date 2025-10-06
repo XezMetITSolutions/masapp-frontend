@@ -14,6 +14,7 @@ export function middleware(request: NextRequest) {
   // Query parameter'dan subdomain bilgisi al (geçici çözüm)
   const querySubdomain = searchParams.get('subdomain');
   
+  
   // Eğer subdomain varsa ve ana domain değilse VEYA query parameter varsa
   if ((!mainDomains.includes(subdomain) && hostname.includes('.')) || querySubdomain) {
     // Subdomain-based routing
@@ -32,7 +33,7 @@ export function middleware(request: NextRequest) {
       const tableNumber = pathname.split('/')[3];
       const url = new URL('/menu', request.url);
       url.searchParams.set('restaurant', subdomain || querySubdomain || 'demo');
-      url.searchParams.set('table', tableNumber || '1');
+      url.searchParams.set('table', tableNumber !== undefined ? tableNumber : '1');
       
       // Mevcut token'ı koru
       const token = searchParams.get('token');
