@@ -126,9 +126,14 @@ export function MenuPageContent() {
     }
   }, [setTableNumber]);
   
-  // Restaurant store
+  // Restaurant store - direkt store'dan al
   const { authenticatedRestaurant } = useAuthStore();
-  const restaurants = useRestaurantStore(state => state.restaurants);
+  const { 
+    restaurants, 
+    categories: allCategories, 
+    menuItems: allMenuItems 
+  } = useRestaurantStore();
+  
   // URL'de restaurant parametresi varsa onu kullan, yoksa authenticated restaurant
   const activeRestaurant = restaurantSlug 
     ? restaurants.find(r => 
@@ -146,9 +151,7 @@ export function MenuPageContent() {
     }
   }, [activeRestaurant?.id, setRestaurantId]);
   
-  // Menü verilerini restoran bazlı al
-  const allCategories = useRestaurantStore(state => state.categories);
-  const allMenuItems = useRestaurantStore(state => state.menuItems);
+  // Menü verileri yukarıda useRestaurantStore'dan alındı
   
   // Debug: Restaurant bilgilerini kontrol et
   console.log('🔍 MENU DEBUG START 🔍');
@@ -159,6 +162,7 @@ export function MenuPageContent() {
   console.log('Total Categories:', allCategories.length);
   console.log('Total Menu Items:', allMenuItems.length);
   console.log('All Restaurants:', restaurants.map(r => ({ name: r.name, id: r.id, username: r.username })));
+  console.log('All Menu Items with Restaurant IDs:', allMenuItems.map(item => ({ name: item.name, restaurantId: item.restaurantId })));
   
   // Restaurant store boşsa uyarı ver
   if (restaurants.length === 0) {
@@ -169,9 +173,26 @@ export function MenuPageContent() {
     console.log('⚠️ Restaurant not found in store for slug:', restaurantSlug);
   }
   
+  // Eğer activeRestaurant bulunamazsa, subdomain'e göre direkt filtrele
+  // Business menu sayfasındaki mantığı kullan
+  let currentRestaurantId = activeRestaurant?.id;
+  
+  // Fallback: Eğer restaurant bulunamazsa, subdomain mapping ile ID oluştur
+  if (!currentRestaurantId && restaurantSlug) {
+    // Subdomain'e göre sabit ID'ler (business menu sayfasındaki verilerle eşleşmeli)
+    const subdomainToId: { [key: string]: string } = {
+      'lezzet': 'lezzet-restaurant-id',
+      'kardesler': 'kardesler-restaurant-id',
+      'pizza': 'pizza-restaurant-id',
+      'cafe': 'cafe-restaurant-id'
+    };
+    currentRestaurantId = subdomainToId[restaurantSlug];
+    console.log('🔄 Using fallback restaurant ID:', currentRestaurantId);
+  }
+  
   // Sadece bu restoranın kategorilerini ve ürünlerini filtrele
-  const categories = allCategories.filter(c => c.restaurantId === activeRestaurant?.id);
-  const items = allMenuItems.filter(i => i.restaurantId === activeRestaurant?.id);
+  const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
+  const items = allMenuItems.filter(i => i.restaurantId === currentRestaurantId);
   
   console.log('Filtered Categories:', categories.length);
   console.log('Filtered Items:', items.length);
