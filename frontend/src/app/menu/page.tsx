@@ -633,8 +633,24 @@ export function MenuPageContent() {
 
         {/* Menu Items */}
         <div className="container mx-auto px-3 py-2">
-          <div className="grid grid-cols-1 gap-3">
-            {filteredItems.map((item) => (
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-12">
+              <FaUtensils className="mx-auto text-6xl text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <TranslatedText>Henüz menü eklenmemiş</TranslatedText>
+              </h3>
+              <p className="text-gray-600 mb-4">
+                <TranslatedText>Restoran sahibi henüz menü ürünlerini eklememiş. Lütfen daha sonra tekrar deneyin.</TranslatedText>
+              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+                <p className="text-sm text-blue-800">
+                  <TranslatedText>Restoran sahibiyseniz, işletme panelinizden menü ürünlerinizi ekleyebilirsiniz.</TranslatedText>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {filteredItems.map((item) => (
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-3 flex">
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image
@@ -691,7 +707,8 @@ export function MenuPageContent() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Sabit Duyurular */}
