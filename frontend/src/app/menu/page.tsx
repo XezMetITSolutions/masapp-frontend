@@ -41,22 +41,66 @@ export function MenuPageContent() {
   const [showWaiterModal, setShowWaiterModal] = useState(false);
   const [customNote, setCustomNote] = useState<string>('');
   
-  // URL parametrelerinden restaurant slug'ını ve masa numarasını al
+  // URL parametrelerinden veya subdomain'den restaurant bilgisini al
   const [restaurantSlug, setRestaurantSlug] = useState<string | null>(null);
+  const [restaurantName, setRestaurantName] = useState<string>('Menü');
   const setTableNumber = useCartStore(state => state.setTableNumber);
+  
+  // Subdomain'e göre restoran adını belirle
+  const getRestaurantDisplayName = (slug: string | null) => {
+    if (!slug) return 'Menü';
+    
+    switch (slug) {
+      case 'lezzet':
+        return 'Lezzet Restaurant';
+      case 'kardesler':
+        return 'Kardeşler Lokantası';
+      case 'pizza':
+        return 'Pizza Palace';
+      case 'cafe':
+        return 'Cafe Central';
+      default:
+        return slug.charAt(0).toUpperCase() + slug.slice(1) + ' Restaurant';
+    }
+  };
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Önce subdomain'den restaurant bilgisini almaya çalış
+      const hostname = window.location.hostname;
+      const subdomain = hostname.split('.')[0];
+      const mainDomains = ['localhost', 'www', 'guzellestir'];
+      
+      let restaurantFromUrl = null;
+      let tableFromUrl = null;
+      
+      // Eğer subdomain varsa ve ana domain değilse, subdomain'i restaurant olarak kullan
+      if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
+        restaurantFromUrl = subdomain;
+        
+        // URL path'inden masa numarasını al (/menu/masa/5 formatında)
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts.includes('masa') && pathParts.length > pathParts.indexOf('masa') + 1) {
+          tableFromUrl = pathParts[pathParts.indexOf('masa') + 1];
+        }
+      }
+      
+      // Fallback: URL parametrelerinden al
       const params = new URLSearchParams(window.location.search);
       const restaurant = params.get('restaurant');
       const tableParam = params.get('table') || params.get('masa');
       const urlToken = params.get('token');
       
-      setRestaurantSlug(restaurant);
+      // Subdomain'den gelen bilgileri öncelikle kullan
+      const finalRestaurant = restaurantFromUrl || restaurant;
+      const finalTable = tableFromUrl || tableParam;
+      
+      setRestaurantSlug(finalRestaurant);
+      setRestaurantName(getRestaurantDisplayName(finalRestaurant));
       
       // Masa numarasını URL'den al ve store'a kaydet
-      if (tableParam) {
-        const tableNum = parseInt(tableParam, 10);
+      if (finalTable) {
+        const tableNum = parseInt(finalTable, 10);
         if (!isNaN(tableNum)) {
           setTableNumber(tableNum);
           
@@ -73,13 +117,13 @@ export function MenuPageContent() {
             }
           } else {
             // URL'de token yoksa yeni oluştur (ilk QR tarama)
-            if (restaurant) {
-              const newToken = createSessionToken(restaurant, tableNum);
+            if (finalRestaurant) {
+              const newToken = createSessionToken(finalRestaurant, tableNum);
               setSessionToken(newToken.token);
               setTokenValid(true);
               
               // URL'i token ile güncelle
-              const newUrl = `${window.location.pathname}?restaurant=${restaurant}&table=${tableNum}&token=${newToken.token}`;
+              const newUrl = `${window.location.pathname}?restaurant=${finalRestaurant}&table=${tableNum}&token=${newToken.token}`;
               window.history.replaceState({}, '', newUrl);
             }
           }
@@ -495,7 +539,7 @@ export function MenuPageContent() {
                 <FaArrowLeft size={16} />
               </Link>
               <h1 className="text-dynamic-lg font-bold text-primary">
-                <TranslatedText>Menü</TranslatedText>
+                {restaurantName}
               </h1>
               {tableNumber && (
                 <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
