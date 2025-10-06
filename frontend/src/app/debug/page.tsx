@@ -160,17 +160,35 @@ export default function DebugPage() {
     alert(`Demo data yüklendi!\n- ${demoRestaurants.length} restaurant\n- ${demoCategories.length} kategori\n- ${demoMenuItems.length} menü item`);
   };
 
+  // Tüm verileri temizleme fonksiyonu
+  const clearAllData = () => {
+    if (confirm('TÜM VERİLER SİLİNECEK! Emin misiniz?')) {
+      setRestaurants([]);
+      setCategories([]);
+      setMenuItems([]);
+      alert('Tüm veriler temizlendi!');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">🔍 Restaurant Store Debug</h1>
-          <button
-            onClick={loadDemoData}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
-          >
-            📊 Demo Data Yükle
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={clearAllData}
+              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium"
+            >
+              🗑️ Tüm Verileri Sil
+            </button>
+            <button
+              onClick={loadDemoData}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
+            >
+              📊 Demo Data Yükle
+            </button>
+          </div>
         </div>
         
         {/* URL Info */}
