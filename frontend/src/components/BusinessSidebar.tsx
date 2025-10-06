@@ -14,6 +14,7 @@ import {
   FaBars
 } from 'react-icons/fa';
 import { useFeature } from '@/hooks/useFeature';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface BusinessSidebarProps {
   sidebarOpen: boolean;
@@ -23,12 +24,17 @@ interface BusinessSidebarProps {
 
 export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout }: BusinessSidebarProps) {
   const pathname = usePathname();
+  const { authenticatedRestaurant, authenticatedStaff } = useAuthStore();
   
   // Feature kontrolü
   const hasQrMenu = useFeature('qr_menu');
   const hasTableManagement = useFeature('table_management');
   const hasBasicReports = useFeature('basic_reports');
   const hasAdvancedAnalytics = useFeature('advanced_analytics');
+
+  // Restoran bilgileri
+  const restaurantName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp';
+  const restaurantEmail = authenticatedRestaurant?.email || authenticatedStaff?.email || 'toto@Ayantar.com';
 
   const allMenuItems = [
     {
@@ -102,8 +108,8 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">MasApp</h1>
-              <p className="text-purple-200 text-xs sm:text-sm mt-1">Restoran Yönetim Sistemi</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{restaurantName}</h1>
+              <p className="text-purple-200 text-xs sm:text-sm mt-1">Yönetim Paneli</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -132,17 +138,19 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
               );
             })}
           </nav>
+        </div>
 
-          {/* Bottom Section */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 border-t border-purple-700">
+        {/* Bottom Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+          <div className="border-t border-purple-700 pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold">M</span>
+                  <span className="text-sm font-bold">{restaurantName.charAt(0).toUpperCase()}</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">MasApp</p>
-                  <p className="text-xs text-purple-200">toto@Ayantar.com</p>
+                  <p className="text-sm font-medium">{restaurantName}</p>
+                  <p className="text-xs text-purple-300">{restaurantEmail}</p>
                 </div>
               </div>
               <button
