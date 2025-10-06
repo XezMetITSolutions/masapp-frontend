@@ -26,10 +26,9 @@ export function MenuPageContent() {
   const tableNumber = useCartStore(state => state.tableNumber);
   const setRestaurantId = useCartStore(state => state.setRestaurantId);
   
-  // Session token state
+  // Session token state (basitleştirildi)
   const [sessionToken, setSessionToken] = useState<string | null>(null);
-  const [tokenValid, setTokenValid] = useState<boolean>(true);
-  const [tokenError, setTokenError] = useState<string>('');
+  const [tokenValid, setTokenValid] = useState<boolean>(true); // Her zaman true
   
   // Notification store
   const createWaiterCallNotification = useNotificationStore(state => state.createWaiterCallNotification);
@@ -98,61 +97,27 @@ export function MenuPageContent() {
       setRestaurantSlug(finalRestaurant);
       setRestaurantName(getRestaurantDisplayName(finalRestaurant));
       
-      // Masa numarasını URL'den al ve store'a kaydet
+      // Masa numarasını URL'den al ve store'a kaydet (opsiyonel)
       if (finalTable) {
         const tableNum = parseInt(finalTable, 10);
         if (!isNaN(tableNum)) {
           setTableNumber(tableNum);
-          
-          // Token kontrolü ve oluşturma
-          if (urlToken) {
-            // URL'de token varsa validate et
-            const validation = validateToken(urlToken);
-            if (validation.valid) {
-              setSessionToken(urlToken);
-              setTokenValid(true);
-            } else {
-              // Token geçersiz - yeni token oluştur
-              handleTokenError(validation.reason || 'invalid');
-            }
-          } else {
-            // URL'de token yoksa yeni oluştur (ilk QR tarama)
-            if (finalRestaurant) {
-              const newToken = createSessionToken(finalRestaurant, tableNum);
-              setSessionToken(newToken.token);
-              setTokenValid(true);
-              
-              // URL'i token ile güncelle
-              const newUrl = `${window.location.pathname}?restaurant=${finalRestaurant}&table=${tableNum}&token=${newToken.token}`;
-              window.history.replaceState({}, '', newUrl);
-            }
-          }
         }
       }
+      
+      // Token'ı basitçe kabul et (validation yok)
+      if (urlToken) {
+        setSessionToken(urlToken);
+      }
+      
+      // Her durumda token'ı geçerli kabul et
+      setTokenValid(true);
     }
   }, [setTableNumber]);
-  
-  // Token hatası yönetimi
-  const handleTokenError = (reason: string) => {
-    setTokenValid(false);
-    switch (reason) {
-      case 'token_used':
-        setTokenError('Bu oturum kullanılmış. Lütfen QR kodu tekrar tarayın.');
-        break;
-      case 'token_expired':
-        setTokenError('Oturum süresi dolmuş. Lütfen QR kodu tekrar tarayın.');
-        break;
-      case 'no_token':
-      case 'invalid_token':
-      default:
-        setTokenError('Geçersiz oturum. Lütfen QR kodu tarayın.');
-    }
-  };
   
   // Restaurant store
   const { authenticatedRestaurant } = useAuthStore();
   const restaurants = useRestaurantStore(state => state.restaurants);
-  
   // URL'de restaurant parametresi varsa onu kullan, yoksa authenticated restaurant
   const activeRestaurant = restaurantSlug 
     ? restaurants.find(r => 
@@ -353,8 +318,8 @@ export function MenuPageContent() {
     }
   };
 
-  // Token geçersizse QR taratma ekranı göster
-  if (!tokenValid) {
+  // Token validation kaldırıldı - menü her zaman açık
+  if (false) { // Bu blok artık çalışmaz
     return (
       <>
         <SetBrandColor />
@@ -365,7 +330,7 @@ export function MenuPageContent() {
                 <FaQrcode className="text-red-600 text-4xl" />
               </div>
               <h2 className="text-2xl font-bold text-gray-800 mb-2">Oturum Geçersiz</h2>
-              <p className="text-gray-600">{tokenError}</p>
+              <p className="text-gray-600">Menü yüklenemiyor</p>
             </div>
             
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
