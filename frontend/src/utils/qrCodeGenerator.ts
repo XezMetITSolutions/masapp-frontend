@@ -22,8 +22,9 @@ export const generateToken = (): string => {
          Math.random().toString(36).substring(2, 15);
 };
 
-// Subdomain'den restaurant slug'ını al
-export const getRestaurantSlug = (): string => {
+// Restaurant slug'ını al - önce subdomain'den, sonra authenticated restaurant'dan
+export const getRestaurantSlug = (authenticatedRestaurant?: any): string => {
+  // Önce subdomain'den almaya çalış
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     const subdomain = hostname.split('.')[0];
@@ -33,7 +34,43 @@ export const getRestaurantSlug = (): string => {
       return subdomain;
     }
   }
-  return 'demo';
+  
+  // Subdomain yoksa authenticated restaurant'dan al
+  if (authenticatedRestaurant) {
+    // Restaurant name'den slug oluştur
+    if (authenticatedRestaurant.name) {
+      const slug = authenticatedRestaurant.name.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .substring(0, 20); // Max 20 karakter
+      
+      // Bilinen restaurant name'leri için özel mapping
+      const nameMapping: { [key: string]: string } = {
+        'lezzet-restaurant': 'lezzet',
+        'kardesler-lokantasi': 'kardesler',
+        'pizza-palace': 'pizza',
+        'cafe-central': 'cafe'
+      };
+      
+      return nameMapping[slug] || slug;
+    }
+    
+    // Username varsa onu kullan
+    if (authenticatedRestaurant.username) {
+      return authenticatedRestaurant.username;
+    }
+  }
+  
+  // Son çare olarak current URL'den tahmin et
+  if (typeof window !== 'undefined') {
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('lezzet')) return 'lezzet';
+    if (currentPath.includes('kardesler')) return 'kardesler';
+    if (currentPath.includes('pizza')) return 'pizza';
+    if (currentPath.includes('cafe')) return 'cafe';
+  }
+  
+  return 'lezzet'; // Default olarak lezzet kullan (demo yerine)
 };
 
 // QR kod URL'i oluştur
@@ -71,9 +108,10 @@ export const createQRCodeImageURL = (dataUrl: string, theme: string = 'default')
 export const createTableQRCode = (
   tableNumber: number, 
   restaurantId: string,
-  theme: string = 'default'
+  theme: string = 'default',
+  authenticatedRestaurant?: any
 ): QRCodeData => {
-  const restaurantSlug = getRestaurantSlug();
+  const restaurantSlug = getRestaurantSlug(authenticatedRestaurant);
   const token = generateToken();
   const url = createQRCodeURL(restaurantSlug, tableNumber, token);
   const qrCodeImage = createQRCodeImageURL(url, theme);
@@ -99,9 +137,10 @@ export const createTableQRCode = (
 export const createGeneralQRCode = (
   name: string,
   restaurantId: string,
-  theme: string = 'default'
+  theme: string = 'default',
+  authenticatedRestaurant?: any
 ): QRCodeData => {
-  const restaurantSlug = getRestaurantSlug();
+  const restaurantSlug = getRestaurantSlug(authenticatedRestaurant);
   const token = generateToken();
   const url = createQRCodeURL(restaurantSlug, undefined, token);
   const qrCodeImage = createQRCodeImageURL(url, theme);
@@ -127,13 +166,14 @@ export const createBulkTableQRCodes = (
   startTable: number,
   count: number,
   restaurantId: string,
-  theme: string = 'default'
+  theme: string = 'default',
+  authenticatedRestaurant?: any
 ): QRCodeData[] => {
   const qrCodes: QRCodeData[] = [];
   
   for (let i = 0; i < count; i++) {
     const tableNumber = startTable + i;
-    qrCodes.push(createTableQRCode(tableNumber, restaurantId, theme));
+    qrCodes.push(createTableQRCode(tableNumber, restaurantId, theme, authenticatedRestaurant));
   }
   
   return qrCodes;

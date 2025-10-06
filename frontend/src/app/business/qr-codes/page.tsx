@@ -86,7 +86,8 @@ export default function QRCodesPage() {
       1, // Masa 1'den başla
       bulkCount,
       authenticatedRestaurant.id,
-      selectedTheme
+      selectedTheme,
+      authenticatedRestaurant
     );
 
     setQrCodes(prev => [...prev, ...newQRCodes]);
@@ -104,7 +105,8 @@ export default function QRCodesPage() {
     const newQRCode = createTableQRCode(
       tableNumber,
       authenticatedRestaurant.id,
-      selectedTheme
+      selectedTheme,
+      authenticatedRestaurant
     );
 
     setQrCodes(prev => [...prev, newQRCode]);
