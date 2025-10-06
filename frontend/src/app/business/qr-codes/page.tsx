@@ -249,11 +249,28 @@ export default function QRCodesPage() {
 
     const restaurantSlug = authenticatedRestaurant.username || authenticatedRestaurant.name.toLowerCase().replace(/\s+/g, '-');
 
+    // Plan limitleri
+    const planLimits: {[key: string]: number} = {
+      'basic': 10,
+      'premium': 25,
+      'enterprise': 999
+    };
+    
+    const currentPlan = authenticatedRestaurant.subscription?.plan || 'basic';
+    const maxTables = planLimits[currentPlan] || 10;
+    const currentTableCount = qrCodes.filter(qr => qr.type === 'table').length;
+
     // Toplu oluşturma modu
     if (bulkCreateMode) {
       const count = parseInt(bulkTableCount);
       if (!count || count < 1 || count > 100) {
         alert('Lütfen 1-100 arası geçerli bir masa sayısı girin!');
+        return;
+      }
+
+      // Plan limiti kontrolü
+      if (currentTableCount + count > maxTables) {
+        alert(`${currentPlan.toUpperCase()} planınızda maksimum ${maxTables} masa oluşturabilirsiniz!\n\nMevcut masa sayısı: ${currentTableCount}\nEklemek istediğiniz: ${count}\nKalan kapasite: ${maxTables - currentTableCount}\n\nDaha fazla masa için planınızı yükseltin.`);
         return;
       }
 

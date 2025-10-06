@@ -15,7 +15,8 @@ import {
   FaShieldAlt,
   FaTimes,
   FaBars,
-  FaGlobe
+  FaGlobe,
+  FaBox
 } from 'react-icons/fa';
 
 interface AdminLayoutProps {
@@ -89,6 +90,17 @@ export default function AdminLayout({
                   >
                     <FaBuilding className="mr-3" />
                     Restoran Yönetimi
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    href="/admin/plans" 
+                    className={`flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white ${
+                      title === 'Plan Yönetimi' ? 'bg-blue-600 text-white' : ''
+                    }`}
+                  >
+                    <FaBox className="mr-3" />
+                    Plan Yönetimi
                   </Link>
                 </li>
                 <li>
