@@ -14,6 +14,7 @@ import {
   FaSignOutAlt,
   FaBars
 } from 'react-icons/fa';
+import { useFeature } from '@/hooks/useFeature';
 
 interface BusinessSidebarProps {
   sidebarOpen: boolean;
@@ -23,57 +24,74 @@ interface BusinessSidebarProps {
 
 export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout }: BusinessSidebarProps) {
   const pathname = usePathname();
+  
+  // Feature kontrolü
+  const hasQrMenu = useFeature('qr_menu');
+  const hasTableManagement = useFeature('table_management');
+  const hasBasicReports = useFeature('basic_reports');
+  const hasAdvancedAnalytics = useFeature('advanced_analytics');
 
-  const menuItems = [
+  const allMenuItems = [
     {
       href: '/business/dashboard',
       icon: FaChartLine,
       label: 'Kontrol Paneli',
-      active: pathname === '/business/dashboard'
+      active: pathname === '/business/dashboard',
+      visible: true // Her zaman görünür
     },
     {
       href: '/admin/payment',
       icon: FaCreditCard,
       label: 'Ödeme & Abonelik',
-      active: pathname === '/admin/payment'
+      active: pathname === '/admin/payment',
+      visible: true // Her zaman görünür
     },
     {
       href: '/business/menu',
       icon: FaUtensils,
       label: 'Menü Yönetimi',
-      active: pathname === '/business/menu'
+      active: pathname === '/business/menu',
+      visible: hasQrMenu // Sadece qr_menu varsa
     },
     {
       href: '/business/staff',
       icon: FaUsers,
       label: 'Personel',
-      active: pathname === '/business/staff'
+      active: pathname === '/business/staff',
+      visible: true // Her zaman görünür
     },
     {
       href: '/business/qr-codes',
       icon: FaQrcode,
       label: 'QR Kodlar',
-      active: pathname === '/business/qr-codes'
+      active: pathname === '/business/qr-codes',
+      visible: hasQrMenu || hasTableManagement // qr_menu veya table_management varsa
     },
     {
       href: '/business/reports',
       icon: FaChartBar,
       label: 'Raporlar',
-      active: pathname === '/business/reports'
+      active: pathname === '/business/reports',
+      visible: hasBasicReports || hasAdvancedAnalytics // basic_reports veya advanced_analytics varsa
     },
     {
       href: '/business/settings',
       icon: FaCog,
       label: 'Ayarlar',
-      active: pathname === '/business/settings'
+      active: pathname === '/business/settings',
+      visible: true // Her zaman görünür
     },
     {
       href: '/business/support',
       icon: FaHeadset,
       label: 'Destek',
-      active: pathname === '/business/support'
+      active: pathname === '/business/support',
+      visible: true // Her zaman görünür
     }
   ];
+
+  // Sadece görünür menüleri filtrele
+  const menuItems = allMenuItems.filter(item => item.visible);
 
   return (
     <>
