@@ -16,7 +16,10 @@ export default function DebugPage() {
     restaurants, 
     categories: allCategories, 
     menuItems: allMenuItems,
-    currentRestaurant
+    currentRestaurant,
+    setRestaurants,
+    setCategories,
+    setMenuItems
   } = useRestaurantStore();
 
   useEffect(() => {
@@ -50,10 +53,125 @@ export default function DebugPage() {
 
   const filteredData = getFilteredData(activeRestaurant?.id);
 
+  // Demo data yükleme fonksiyonu
+  const loadDemoData = () => {
+    const demoRestaurants = [
+      {
+        id: 'lezzet-restaurant-id',
+        name: 'Lezzet Restaurant',
+        username: 'lezzet',
+        email: 'info@lezzetrestaurant.com',
+        phone: '+90 555 123 4567',
+        address: 'İstanbul, Türkiye',
+        primaryColor: '#8B4513',
+        secondaryColor: '#D2691E',
+        isActive: true,
+        subscription: { plan: 'premium', expiresAt: '2024-12-31' },
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'kardesler-restaurant-id',
+        name: 'Kardeşler Lokantası',
+        username: 'kardesler',
+        email: 'iletisim@kardeslerlokantasi.com',
+        phone: '+90 555 987 6543',
+        address: 'Ankara, Türkiye',
+        primaryColor: '#2E8B57',
+        secondaryColor: '#90EE90',
+        isActive: true,
+        subscription: { plan: 'premium', expiresAt: '2024-12-31' },
+        createdAt: new Date().toISOString()
+      }
+    ];
+
+    const demoCategories = [
+      {
+        id: 'cat-lezzet-ana',
+        restaurantId: 'lezzet-restaurant-id',
+        name: { tr: 'Ana Yemekler', en: 'Main Dishes' },
+        description: { tr: 'Lezzetli ana yemekler', en: 'Delicious main dishes' },
+        displayOrder: 1,
+        isActive: true
+      },
+      {
+        id: 'cat-kardesler-ana',
+        restaurantId: 'kardesler-restaurant-id',
+        name: { tr: 'Ana Yemekler', en: 'Main Dishes' },
+        description: { tr: 'Kardeşler ana yemekleri', en: 'Kardesler main dishes' },
+        displayOrder: 1,
+        isActive: true
+      },
+      {
+        id: 'cat-kardesler-icecek',
+        restaurantId: 'kardesler-restaurant-id',
+        name: { tr: 'İçecekler', en: 'Beverages' },
+        description: { tr: 'Soğuk ve sıcak içecekler', en: 'Cold and hot beverages' },
+        displayOrder: 2,
+        isActive: true
+      }
+    ];
+
+    const demoMenuItems = [
+      // Lezzet Restaurant items
+      {
+        id: 'item-lezzet-1',
+        restaurantId: 'lezzet-restaurant-id',
+        categoryId: 'cat-lezzet-ana',
+        name: { tr: 'Lezzet Kebap', en: 'Lezzet Kebab' },
+        description: { tr: 'Özel baharatlarla marine edilmiş', en: 'Marinated with special spices' },
+        price: 75,
+        image: '/placeholder-food.jpg',
+        isActive: true,
+        isPopular: true,
+        allergens: [],
+        nutritionalInfo: {},
+        preparationTime: 15,
+        displayOrder: 1
+      },
+      // Kardeşler Lokantası items (20 items)
+      ...Array.from({ length: 20 }, (_, i) => ({
+        id: `item-kardesler-${i + 1}`,
+        restaurantId: 'kardesler-restaurant-id',
+        categoryId: i < 15 ? 'cat-kardesler-ana' : 'cat-kardesler-icecek',
+        name: { 
+          tr: i < 15 ? `Kardeşler Yemeği ${i + 1}` : `İçecek ${i - 14}`, 
+          en: i < 15 ? `Kardesler Dish ${i + 1}` : `Beverage ${i - 14}` 
+        },
+        description: { 
+          tr: i < 15 ? `Özel ${i + 1}. yemek` : `Soğuk içecek ${i - 14}`, 
+          en: i < 15 ? `Special dish ${i + 1}` : `Cold beverage ${i - 14}` 
+        },
+        price: i < 15 ? 25 + (i * 5) : 10 + (i * 2),
+        image: '/placeholder-food.jpg',
+        isActive: true,
+        isPopular: i < 3,
+        allergens: [],
+        nutritionalInfo: {},
+        preparationTime: i < 15 ? 10 + i : 2,
+        displayOrder: i + 1
+      }))
+    ];
+
+    // Store'a yükle (TypeScript hatalarını ignore et)
+    setRestaurants(demoRestaurants as any);
+    setCategories(demoCategories as any);
+    setMenuItems(demoMenuItems as any);
+
+    alert(`Demo data yüklendi!\n- ${demoRestaurants.length} restaurant\n- ${demoCategories.length} kategori\n- ${demoMenuItems.length} menü item`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">🔍 Restaurant Store Debug</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">🔍 Restaurant Store Debug</h1>
+          <button
+            onClick={loadDemoData}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
+          >
+            📊 Demo Data Yükle
+          </button>
+        </div>
         
         {/* URL Info */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
