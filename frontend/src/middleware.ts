@@ -8,12 +8,23 @@ export function middleware(request: NextRequest) {
   // Subdomain routing kontrolü
   const subdomain = hostname.split('.')[0];
   
-  // Ana domain'ler (subdomain routing yapılmayacak)
+  // Ana domain'ler (subdomain routing yapılmayacak)  
   const mainDomains = ['localhost', 'www'];
   
   // Query parameter'dan subdomain bilgisi al (geçici çözüm)
   const querySubdomain = searchParams.get('subdomain');
   
+  // Debug - geçici
+  if (pathname.startsWith('/menu/masa/')) {
+    console.log('Menu Debug:', { 
+      pathname, 
+      hostname, 
+      subdomain, 
+      mainDomainsCheck: mainDomains.includes(subdomain),
+      hasSubdomain: !mainDomains.includes(subdomain) && hostname.includes('.'),
+      querySubdomain 
+    });
+  }
   
   // Eğer subdomain varsa ve ana domain değilse VEYA query parameter varsa
   if ((!mainDomains.includes(subdomain) && hostname.includes('.')) || querySubdomain) {
