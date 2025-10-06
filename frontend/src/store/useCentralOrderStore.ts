@@ -197,8 +197,143 @@ const useCentralOrderStore = create<CentralOrderState>()(
       },
       
       initializeDemoData: () => {
-        // Demo verileri temizlendi - boş başlangıç
-        console.log('🔄 Demo verileri temizleniyor...');
+        // Subdomain'e göre farklı test verileri
+        const subdomain = typeof window !== 'undefined' ? 
+          window.location.hostname.split('.')[0] : 'default';
+        
+        let testOrders: CentralOrder[] = [];
+        
+        if (subdomain === 'lezzet') {
+          testOrders = [
+            {
+              id: 'lezzet-order-1',
+              tableNumber: 5,
+              customerName: 'Ahmet Bey',
+              orderTime: '20:15',
+              estimatedTime: 10,
+              priority: 'medium',
+              totalAmount: 174,
+              guests: 2,
+              items: [
+                { 
+                  id: 'l1',
+                  name: 'Lezzet Kebap', 
+                  quantity: 2, 
+                  price: 75,
+                  notes: 'Orta pişmiş', 
+                  status: 'ready',
+                  category: 'food',
+                  prepTime: 15
+                },
+                { 
+                  id: 'l2',
+                  name: 'Ayran', 
+                  quantity: 2, 
+                  price: 12,
+                  notes: 'Soğuk', 
+                  status: 'ready',
+                  category: 'drink',
+                  prepTime: 2
+                }
+              ],
+              status: 'ready',
+              createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+              paymentStatus: 'pending'
+            },
+            {
+              id: 'lezzet-order-2',
+              tableNumber: 8,
+              customerName: 'Fatma Hanım',
+              orderTime: '20:25',
+              estimatedTime: 8,
+              priority: 'high',
+              totalAmount: 45,
+              guests: 1,
+              items: [
+                { 
+                  id: 'l3',
+                  name: 'Lezzet Pide', 
+                  quantity: 1, 
+                  price: 45,
+                  notes: 'Kaşarlı', 
+                  status: 'preparing',
+                  category: 'food',
+                  prepTime: 12
+                }
+              ],
+              status: 'preparing',
+              createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+              paymentStatus: 'pending'
+            }
+          ];
+        } else if (subdomain === 'kardesler') {
+          testOrders = [
+            {
+              id: 'kardesler-order-1',
+              tableNumber: 3,
+              customerName: 'Mehmet Abi',
+              orderTime: '20:10',
+              estimatedTime: 5,
+              priority: 'medium',
+              totalAmount: 45,
+              guests: 1,
+              items: [
+                { 
+                  id: 'k1',
+                  name: 'Kardeşler Döner', 
+                  quantity: 1, 
+                  price: 35,
+                  notes: 'Ekstra sos', 
+                  status: 'ready',
+                  category: 'food',
+                  prepTime: 10
+                },
+                { 
+                  id: 'k2',
+                  name: 'Kola', 
+                  quantity: 1, 
+                  price: 10,
+                  notes: '', 
+                  status: 'ready',
+                  category: 'drink',
+                  prepTime: 1
+                }
+              ],
+              status: 'ready',
+              createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+              paymentStatus: 'pending'
+            },
+            {
+              id: 'kardesler-order-2',
+              tableNumber: 7,
+              customerName: 'Zeynep Abla',
+              orderTime: '20:20',
+              estimatedTime: 12,
+              priority: 'high',
+              totalAmount: 60,
+              guests: 2,
+              items: [
+                { 
+                  id: 'k3',
+                  name: 'Kardeşler Lahmacun', 
+                  quantity: 3, 
+                  price: 20,
+                  notes: 'İnce hamur', 
+                  status: 'preparing',
+                  category: 'food',
+                  prepTime: 8
+                }
+              ],
+              status: 'preparing',
+              createdAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+              paymentStatus: 'pending'
+            }
+          ];
+        }
+        
+        set({ orders: testOrders });
+        console.log(`✅ ${subdomain} restoranı için test siparişleri oluşturuldu:`, testOrders);
+        
         const demoOrders: CentralOrder[] = [
           // 1. Hazırlanıyor - Yüksek Öncelik
           {
@@ -713,8 +848,8 @@ const useCentralOrderStore = create<CentralOrderState>()(
           }
         ];
         
-        set({ orders: [] });
-        console.log('✅ Merkezi store temizlendi - demo veriler kaldırıldı');
+        // Test verilerini kullanmıyoruz, sadece subdomain test verilerini kullan
+        // set({ orders: demoOrders });
       }
     }),
     {

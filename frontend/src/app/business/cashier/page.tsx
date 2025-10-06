@@ -43,6 +43,11 @@ export default function CashierDashboard() {
   
   // Demo veriler kaldırıldı - gerçek veriler API'den gelecek
   
+  // Test için demo data initialize et
+  useEffect(() => {
+    initializeDemoData();
+  }, [initializeDemoData]);
+  
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
   const [tipAmount, setTipAmount] = useState(0);
