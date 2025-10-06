@@ -32,9 +32,45 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
   const hasBasicReports = useFeature('basic_reports');
   const hasAdvancedAnalytics = useFeature('advanced_analytics');
 
-  // Restoran bilgileri
-  const restaurantName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp';
-  const restaurantEmail = authenticatedRestaurant?.email || authenticatedStaff?.email || 'toto@Ayantar.com';
+  // Restoran bilgileri - subdomain'e göre kişiselleştir
+  const getRestaurantInfo = () => {
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      switch (subdomain) {
+        case 'lezzet':
+          return {
+            name: 'Lezzet Restaurant',
+            email: 'info@lezzetrestaurant.com'
+          };
+        case 'kardesler':
+          return {
+            name: 'Kardeşler Lokantası', 
+            email: 'iletisim@kardeslerlokantasi.com'
+          };
+        case 'pizza':
+          return {
+            name: 'Pizza Palace',
+            email: 'orders@pizzapalace.com'
+          };
+        case 'cafe':
+          return {
+            name: 'Cafe Central',
+            email: 'hello@cafecentral.com'
+          };
+        default:
+          return {
+            name: authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp',
+            email: authenticatedRestaurant?.email || authenticatedStaff?.email || 'info@masapp.com'
+          };
+      }
+    }
+    return {
+      name: authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp',
+      email: authenticatedRestaurant?.email || authenticatedStaff?.email || 'info@masapp.com'
+    };
+  };
+  
+  const { name: restaurantName, email: restaurantEmail } = getRestaurantInfo();
 
   const allMenuItems = [
     {

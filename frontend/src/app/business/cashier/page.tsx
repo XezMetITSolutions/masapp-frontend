@@ -18,8 +18,27 @@ export default function CashierDashboard() {
   const router = useRouter();
   const { user, logout, authenticatedRestaurant, authenticatedStaff } = useAuthStore();
   
-  // Restoran adını al
-  const restaurantName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp';
+  // Restoran adını al - subdomain'e göre kişiselleştir
+  const getRestaurantName = () => {
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      switch (subdomain) {
+        case 'lezzet':
+          return 'Lezzet Restaurant';
+        case 'kardesler':
+          return 'Kardeşler Lokantası';
+        case 'pizza':
+          return 'Pizza Palace';
+        case 'cafe':
+          return 'Cafe Central';
+        default:
+          return authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp';
+      }
+    }
+    return authenticatedRestaurant?.name || authenticatedStaff?.name || 'MasApp';
+  };
+  
+  const restaurantName = getRestaurantName();
   const { orders: oldOrders, updateOrderStatus } = useOrderStore();
   const { clearCart } = useCartStore();
   const { 
