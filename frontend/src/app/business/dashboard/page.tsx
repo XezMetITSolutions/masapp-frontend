@@ -236,6 +236,9 @@ export default function BusinessDashboard() {
     activeOrders: 0,
     todayRevenue: 0,
     monthlyRevenue: 0,
+    monthlyOrders: 0, // Aylık toplam sipariş
+    averageRating: 0, // Ortalama puan
+    customerSatisfaction: 0, // Müşteri memnuniyeti
     totalMenuItems: 0, // Bu veriler menü sisteminden gelecek
     activeCategories: 0,
     totalWaiters: 0, // Bu veriler personel sisteminden gelecek
@@ -294,13 +297,13 @@ export default function BusinessDashboard() {
             <FaChartBar className="mr-2 sm:mr-3 text-sm sm:text-base" />
             <span className="text-sm sm:text-base font-medium">Raporlar</span>
           </Link>
-          <Link href="/business/support" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
-            <FaHeadset className="mr-2 sm:mr-3 text-sm sm:text-base" />
-            <span className="text-sm sm:text-base font-medium">Destek</span>
-          </Link>
           <Link href="/business/settings" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
             <FaCog className="mr-2 sm:mr-3 text-sm sm:text-base" />
             <span className="text-sm sm:text-base font-medium">Ayarlar</span>
+          </Link>
+          <Link href="/business/support" className="flex items-center justify-center sm:justify-start px-4 sm:px-6 py-3 sm:py-3 hover:bg-purple-700 hover:bg-opacity-50 transition-colors rounded-r-lg mx-2 sm:mx-0">
+            <FaHeadset className="mr-2 sm:mr-3 text-sm sm:text-base" />
+            <span className="text-sm sm:text-base font-medium">Destek</span>
           </Link>
         </nav>
 
@@ -390,7 +393,6 @@ export default function BusinessDashboard() {
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.todayOrders}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
@@ -401,7 +403,6 @@ export default function BusinessDashboard() {
                 <span className="text-xs sm:text-sm text-green-600 font-medium">+8%</span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{stats.todayRevenue.toLocaleString('tr-TR')}</h3>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
             </div>
 
@@ -414,7 +415,6 @@ export default function BusinessDashboard() {
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.totalMenuItems}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1">Menü Ürünleri</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
@@ -424,7 +424,7 @@ export default function BusinessDashboard() {
                 </div>
                 <span className="text-xs sm:text-sm text-orange-600 font-medium">{stats.activeTables} aktif</span>
               </div>
-              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{authenticatedRestaurant?.tableCount || 15}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{authenticatedRestaurant?.tableCount || 0}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Toplam Masa</p>
             </div>
           </div>
@@ -504,22 +504,24 @@ export default function BusinessDashboard() {
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-xl font-semibold mb-2">Aylık Performans</h3>
-                <p className="text-purple-200 mb-4">Bu ay harika gidiyorsunuz!</p>
+                <p className="text-purple-200 mb-4">
+                  {stats.monthlyOrders > 0 ? 'Bu ay harika gidiyorsunuz!' : 'Henüz veri bulunmuyor'}
+                </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
                     <p className="text-3xl font-bold">₺{stats.monthlyRevenue.toLocaleString('tr-TR')}</p>
                     <p className="text-purple-200 text-sm">Aylık Ciro</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">486</p>
+                    <p className="text-3xl font-bold">{stats.monthlyOrders}</p>
                     <p className="text-purple-200 text-sm">Toplam Sipariş</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">4.8</p>
+                    <p className="text-3xl font-bold">{stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '-'}</p>
                     <p className="text-purple-200 text-sm">Ortalama Puan</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold">92%</p>
+                    <p className="text-3xl font-bold">{stats.customerSatisfaction > 0 ? `${stats.customerSatisfaction}%` : '-'}</p>
                     <p className="text-purple-200 text-sm">Müşteri Memnuniyeti</p>
                   </div>
                 </div>

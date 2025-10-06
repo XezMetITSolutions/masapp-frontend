@@ -62,16 +62,16 @@ export default function BusinessSidebar({ sidebarOpen, setSidebarOpen, onLogout 
       active: pathname === '/business/reports'
     },
     {
-      href: '/business/support',
-      icon: FaHeadset,
-      label: 'Destek',
-      active: pathname === '/business/support'
-    },
-    {
       href: '/business/settings',
       icon: FaCog,
       label: 'Ayarlar',
       active: pathname === '/business/settings'
+    },
+    {
+      href: '/business/support',
+      icon: FaHeadset,
+      label: 'Destek',
+      active: pathname === '/business/support'
     }
   ];
 
