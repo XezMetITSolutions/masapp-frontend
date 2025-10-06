@@ -389,7 +389,6 @@ export default function BusinessDashboard() {
                 <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
                   <FaShoppingCart className="text-lg sm:text-xl text-blue-600" />
                 </div>
-                <span className="text-xs sm:text-sm text-green-600 font-medium">+12%</span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">{stats.todayOrders}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Siparişler</p>
@@ -400,7 +399,6 @@ export default function BusinessDashboard() {
                 <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
                   <FaChartLine className="text-lg sm:text-xl text-green-600" />
                 </div>
-                <span className="text-xs sm:text-sm text-green-600 font-medium">+8%</span>
               </div>
               <h3 className="text-lg sm:text-2xl font-bold text-gray-800">₺{stats.todayRevenue.toLocaleString('tr-TR')}</h3>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">Bugünkü Ciro</p>
