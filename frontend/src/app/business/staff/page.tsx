@@ -403,11 +403,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">URL:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
-                        {typeof window !== 'undefined' ? `${window.location.origin}/mutfak` : 'guzellestir.com/mutfak'}
+                        {settings.basicInfo.subdomain}.masapp.com/mutfak
                       </span>
                       <button
                         onClick={() => {
-                          const url = typeof window !== 'undefined' ? `${window.location.origin}/mutfak` : 'https://guzellestir.com/mutfak';
+                          const url = `https://${settings.basicInfo.subdomain}.masapp.com/mutfak`;
                           navigator.clipboard.writeText(url);
                           alert('URL kopyalandı!');
                         }}
@@ -494,11 +494,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">URL:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
-                        {typeof window !== 'undefined' ? `${window.location.origin}/garson` : 'guzellestir.com/garson'}
+                        {settings.basicInfo.subdomain}.masapp.com/garson
                       </span>
                       <button
                         onClick={() => {
-                          const url = typeof window !== 'undefined' ? `${window.location.origin}/garson` : 'https://guzellestir.com/garson';
+                          const url = `https://${settings.basicInfo.subdomain}.masapp.com/garson`;
                           navigator.clipboard.writeText(url);
                           alert('URL kopyalandı!');
                         }}
@@ -585,11 +585,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">URL:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
-                        {typeof window !== 'undefined' ? `${window.location.origin}/kasa` : 'guzellestir.com/kasa'}
+                        {settings.basicInfo.subdomain}.masapp.com/kasa
                       </span>
                       <button
                         onClick={() => {
-                          const url = typeof window !== 'undefined' ? `${window.location.origin}/kasa` : 'https://guzellestir.com/kasa';
+                          const url = `https://${settings.basicInfo.subdomain}.masapp.com/kasa`;
                           navigator.clipboard.writeText(url);
                           alert('URL kopyalandı!');
                         }}
