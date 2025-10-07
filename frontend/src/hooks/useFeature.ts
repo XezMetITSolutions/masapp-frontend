@@ -3,59 +3,49 @@ import useRestaurantStore from '@/store/useRestaurantStore';
 import { useEffect, useState, useMemo } from 'react';
 
 /**
- * Restaurant'a özel özellik kontrolü için hook
+ * Restaurant'a özel özellik kontrolü için hook - REAL-TIME
+ * Backend'den canlı veri çeker, localStorage kullanmaz
  * 
  * @param featureId - Kontrol edilecek özellik ID'si
  * @returns boolean - Özellik aktif mi?
- * 
- * @example
- * const hasGoogleReviews = useFeature('google_reviews');
- * 
- * return (
- *   <>
- *     {hasGoogleReviews && <GoogleReviewsWidget />}
- *   </>
- * );
  */
 export function useFeature(featureId: string): boolean {
   const { authenticatedRestaurant } = useAuthStore();
-  const { restaurants } = useRestaurantStore();
+  const { restaurants, fetchRestaurantByUsername } = useRestaurantStore();
+  const [loading, setLoading] = useState(false);
   const [remoteFeatures, setRemoteFeatures] = useState<string[] | null>(null);
-
-  const localHas = useMemo(() => {
-    if (authenticatedRestaurant) {
-      return authenticatedRestaurant.features?.includes(featureId) ?? false;
-    }
+  
+  // Real-time data fetch için subdomain'i al ve backend'den çek
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const subdomain = window.location.hostname.split('.')[0];
-      const restaurant = restaurants.find(r => r.username === subdomain);
-      if (restaurant) return restaurant.features?.includes(featureId) ?? false;
+      if (subdomain && subdomain !== 'localhost' && subdomain !== 'www' && !authenticatedRestaurant) {
+        setLoading(true);
+        fetchRestaurantByUsername(subdomain).finally(() => setLoading(false));
+      }
     }
-    return false;
-  }, [authenticatedRestaurant?.id, authenticatedRestaurant?.features, restaurants, featureId]);
-
-  useEffect(() => {
-    if (localHas) return; // local true ise uzak çağrıya gerek yok
-    if (authenticatedRestaurant) return; // loginli ise localdan okunur
-    if (typeof window === 'undefined') return;
+  }, [fetchRestaurantByUsername, authenticatedRestaurant]);
+  
+  // Önce authenticated restaurant'ı kontrol et
+  if (authenticatedRestaurant) {
+    return authenticatedRestaurant.features?.includes(featureId) ?? false;
+  }
+  
+  // Authenticated yoksa subdomain'e göre restaurant bul (backend'den çekilmiş)
+  if (typeof window !== 'undefined') {
     const subdomain = window.location.hostname.split('.')[0];
-    if (!subdomain) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`/api/restaurants/${encodeURIComponent(subdomain)}/features`, { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (cancelled) return;
-        setRemoteFeatures(Array.isArray(data?.features) ? data.features : []);
-      } catch {}
-    })();
-    return () => { cancelled = true; };
-  }, [localHas, authenticatedRestaurant?.id]);
-
-  if (localHas) return true;
-  if (remoteFeatures) return remoteFeatures.includes(featureId);
+    const restaurant = restaurants.find(r => r.username === subdomain);
+    
+    if (restaurant) {
+      return restaurant.features?.includes(featureId) ?? false;
+    }
+  }
+  
+  // Remote features varsa onu kontrol et
+  if (remoteFeatures) {
+    return remoteFeatures.includes(featureId);
+  }
+  
   return false;
 }
 
