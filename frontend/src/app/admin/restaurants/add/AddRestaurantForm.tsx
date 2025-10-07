@@ -14,73 +14,22 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    subdomain: '',
+    city: '',
     address: '',
-    phone: '',
-    email: '',
-    website: '',
-    ownerName: '',
-    ownerEmail: '',
-    ownerPhone: '',
     username: '',
     password: '',
-    confirmPassword: '',
-    category: 'Restoran',
-    tableCount: 10,
-    workingHours: {
-      monday: { open: '09:00', close: '22:00', closed: false },
-      tuesday: { open: '09:00', close: '22:00', closed: false },
-      wednesday: { open: '09:00', close: '22:00', closed: false },
-      thursday: { open: '09:00', close: '22:00', closed: false },
-      friday: { open: '09:00', close: '22:00', closed: false },
-      saturday: { open: '09:00', close: '22:00', closed: false },
-      sunday: { open: '09:00', close: '22:00', closed: false }
-    },
-    features: ['qr-menu', 'online-ordering', 'table-management'],
-    settings: {
-      allowOnlineOrders: true,
-      requirePhoneVerification: false,
-      autoAcceptOrders: false,
-      showPrices: true,
-      showImages: true
-    }
+    confirmPassword: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent as keyof typeof prev],
-          [child]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'number' ? parseInt(value) || 0 : value
-      }));
-    }
-  };
-
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: checked
+      [name]: value
     }));
   };
 
-  const handleFeatureToggle = (feature: string) => {
-    setFormData(prev => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,41 +39,22 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
       return;
     }
 
-    if (!formData.username || !formData.password) {
-      alert('Kullanıcı adı ve şifre gereklidir!');
+    if (!formData.name || !formData.subdomain || !formData.city || !formData.address || !formData.username || !formData.password) {
+      alert('Tüm alanlar gereklidir!');
       return;
     }
 
     setIsLoading(true);
     
     try {
-      const newRestaurant: Partial<Restaurant> = {
+      // Backend'in beklediği format
+      const newRestaurant = {
         name: formData.name,
-        address: formData.address,
-        phone: formData.phone,
-        email: formData.email,
-        website: formData.website,
         username: formData.username,
-        ownerName: formData.ownerName,
-        ownerEmail: formData.ownerEmail,
-        ownerPhone: formData.ownerPhone,
-        category: formData.category,
-        tableCount: formData.tableCount,
-        workingHours: formData.workingHours,
-        features: formData.features,
-        settings: formData.settings,
-        status: 'active',
-        subscription: {
-          plan: 'Basic',
-          status: 'active',
-          startDate: new Date().toISOString(),
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        totalOrders: 0,
-        monthlyRevenue: 0,
-        rating: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        password: formData.password,
+        email: `${formData.username}@${formData.subdomain}.com`, // Otomatik email oluştur
+        phone: `+90555${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`, // Otomatik telefon
+        address: `${formData.address}, ${formData.city}` // Şehir ile birleştir
       };
 
       await createRestaurant(newRestaurant);
@@ -161,42 +91,39 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="Restoran">Restoran</option>
-                <option value="İtalyan">İtalyan</option>
-                <option value="Fast Food">Fast Food</option>
-                <option value="Japon">Japon</option>
-                <option value="Kahve">Kahve</option>
-                <option value="Et Restoranı">Et Restoranı</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Masa Sayısı</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Subdomain *</label>
               <input
-                type="number"
-                name="tableCount"
-                value={formData.tableCount}
+                type="text"
+                name="subdomain"
+                value={formData.subdomain}
                 onChange={handleInputChange}
-                min="1"
+                required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="restoran-adi (sadece küçük harf, tire ve rakam)"
               />
             </div>
-          </div>
-        </div>
-
-        {/* İletişim Bilgileri */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <FaMapMarkerAlt className="mr-2" />
-            İletişim Bilgileri
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Şehir *</label>
+              <select
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Şehir seçin</option>
+                <option value="İstanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="İzmir">İzmir</option>
+                <option value="Bursa">Bursa</option>
+                <option value="Antalya">Antalya</option>
+                <option value="Adana">Adana</option>
+                <option value="Konya">Konya</option>
+                <option value="Gaziantep">Gaziantep</option>
+                <option value="Mersin">Mersin</option>
+                <option value="Diyarbakır">Diyarbakır</option>
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Adres *</label>
               <textarea
@@ -209,84 +136,9 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
                 placeholder="Tam adres bilgisi"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="+90 555 123 45 67"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="info@restoran.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
-              <input
-                type="url"
-                name="website"
-                value={formData.website}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="https://www.restoran.com"
-              />
-            </div>
           </div>
         </div>
 
-        {/* Sahip Bilgileri */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <FaUser className="mr-2" />
-            Sahip Bilgileri
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Adı</label>
-              <input
-                type="text"
-                name="ownerName"
-                value={formData.ownerName}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Sahip adı soyadı"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sahip E-posta</label>
-              <input
-                type="email"
-                name="ownerEmail"
-                value={formData.ownerEmail}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="sahip@restoran.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Telefon</label>
-              <input
-                type="tel"
-                name="ownerPhone"
-                value={formData.ownerPhone}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="+90 555 123 45 67"
-              />
-            </div>
-          </div>
-        </div>
 
         {/* Admin Hesabı */}
         <div className="bg-gray-50 p-6 rounded-lg">
@@ -303,6 +155,7 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
                 value={formData.username}
                 onChange={handleInputChange}
                 required
+                autoComplete="username"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="admin_username"
               />
@@ -315,6 +168,7 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
+                autoComplete="new-password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Güçlü şifre girin"
               />
@@ -327,6 +181,7 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required
+                autoComplete="new-password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Şifreyi tekrar girin"
               />
@@ -334,33 +189,6 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
           </div>
         </div>
 
-        {/* Özellikler */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <FaGlobe className="mr-2" />
-            Özellikler
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { key: 'qr-menu', label: 'QR Menü' },
-              { key: 'online-ordering', label: 'Online Sipariş' },
-              { key: 'table-management', label: 'Masa Yönetimi' },
-              { key: 'payment-integration', label: 'Ödeme Entegrasyonu' },
-              { key: 'analytics', label: 'Analitik' },
-              { key: 'multi-language', label: 'Çoklu Dil' }
-            ].map(feature => (
-              <label key={feature.key} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.features.includes(feature.key)}
-                  onChange={() => handleFeatureToggle(feature.key)}
-                  className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700">{feature.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
 
         {/* Butonlar */}
         <div className="flex justify-end space-x-4 pt-6">
