@@ -88,7 +88,7 @@ export default function RestaurantsManagement() {
           </div>
           <div>
             <div className="text-sm font-medium text-gray-900">{value}</div>
-            <div className="text-xs text-gray-500">{row.subscription.plan}</div>
+            <div className="text-xs text-gray-500">{row.subscription?.plan || 'Basic'}</div>
           </div>
         </div>
       )
@@ -121,9 +121,9 @@ export default function RestaurantsManagement() {
       render: (value: any) => (
         <div className="flex items-center">
           <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-            value.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+            value?.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
           }`}>
-            {value.plan}
+            {value?.plan || 'Basic'}
           </span>
         </div>
       )
