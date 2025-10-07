@@ -1,51 +1,91 @@
 import { useState, useEffect } from 'react';
+import { apiService } from '@/services/api';
 
 export interface Announcement {
   id: string;
   title: string;
   description: string;
-  ticker?: boolean; // kayan çubukta göster
-  durationSec?: number; // çubukta gösterim süresi
-  icon?: 'sale' | 'flash' | 'info' | 'star' | 'wifi' | 'google' | 'clock' | 'instagram' | 'coffee' | 'loyalty' | 'birthday';
-  action?: string; // buton metni
-  color?: 'orange' | 'pink' | 'blue' | 'green';
+  icon: string;
+  type?: 'info' | 'warning' | 'success' | 'error';
+  priority?: 'low' | 'medium' | 'high';
+  isActive?: boolean;
+  createdAt?: Date;
 }
 
-export function useAnnouncementStore() {
-  // Demo: localStorage, replace with backend in production
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+// Default announcements for fallback
+const defaultAnnouncements: Announcement[] = [
+  { id: 'wifi', title: 'WiFi Şifresi', description: 'restoran2024', icon: 'wifi' },
+  { id: 'promo', title: 'Günün Menüsü', description: 'Bugün özel indirim!', icon: 'star' },
+  { id: 'info', title: 'Bilgilendirme', description: 'Mutfak 22:00\'da kapanır', icon: 'info' },
+  { id: 'event', title: 'Etkinlik', description: 'Canlı müzik 20:00\'da başlıyor', icon: 'music' },
+  { id: 'special', title: 'Özel Menü', description: 'Şef\'in önerisi: Izgara Somon', icon: 'chef' },
+  { id: 'payment', title: 'Ödeme', description: 'Kredi kartı ve nakit kabul edilir', icon: 'payment' },
+  { id: 'service', title: 'Servis', description: '7/24 servis hizmeti', icon: 'service' },
+  { id: 'delivery', title: 'Paket Servis', description: 'Ücretsiz teslimat (min 50₺)', icon: 'delivery' }
+];
 
+export function useAnnouncementStore() {
+  const [announcements, setAnnouncements] = useState<Announcement[]>(defaultAnnouncements);
+  const [loading, setLoading] = useState(false);
+
+  // Backend'den announcements çek (gelecekte implement edilecek)
   useEffect(() => {
-    const data = localStorage.getItem('announcements');
-    if (data) setAnnouncements(JSON.parse(data));
-    else setAnnouncements([
-      { id: 'wifi', title: 'WiFi Şifresi', description: 'restoran2024', icon: 'wifi' },
-      { id: 'google', title: 'Google\'da Değerlendirin', description: 'Bir çay ikram edelim!', icon: 'google', action: 'Yorum Yap' },
-      { id: 'clock', title: 'Çalışma Saatleri', description: '09:00 - 23:00', icon: 'clock' },
-      { id: 'instagram', title: 'Instagram\'da Takip Edin', description: 'Fırsatları kaçırmayın!', icon: 'instagram', action: '@restoranadi' },
-      { id: 'coffee', title: 'Çay İkramı', description: 'Google yorumu yapın, çay ikram edelim!', icon: 'coffee', action: 'Detay' },
-      { id: 'loyalty', title: 'Sadakat Programı', description: 'Her 10. siparişinizde %20 indirim!', icon: 'sale', action: 'Katıl' },
-      { id: 'birthday', title: 'Doğum Günü Özel', description: 'Doğum gününüzde ücretsiz tatlı!', icon: 'info', action: 'Kayıt Ol' },
-      { id: 'campaign-sep', title: 'Eylül Ayı Kampanyası', description: 'Tüm salatalarda %20 indirim. Sadece bu ay geçerli!', ticker: true, durationSec: 10 },
-      { id: 'fresh', title: 'Bugüne Özel', description: 'Bugüne özel taze çorba servisimiz başlamıştır!', ticker: true, durationSec: 8 }
-    ]);
+    const fetchAnnouncements = async () => {
+      try {
+        setLoading(true);
+        // TODO: Backend API endpoint eklendiğinde aktif et
+        // const response = await apiService.getAnnouncements();
+        // if (response.success) {
+        //   setAnnouncements(response.data);
+        // }
+      } catch (error) {
+        console.log('Announcements API not implemented yet, using defaults');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
   }, []);
 
-  const addAnnouncement = (a: Announcement) => {
-    const updated = [...announcements, a];
-    setAnnouncements(updated);
-    localStorage.setItem('announcements', JSON.stringify(updated));
-  };
-  const updateAnnouncement = (id: string, patch: Partial<Announcement>) => {
-    const updated = announcements.map(a => a.id === id ? { ...a, ...patch } : a);
-    setAnnouncements(updated);
-    localStorage.setItem('announcements', JSON.stringify(updated));
-  };
-  const removeAnnouncement = (id: string) => {
-    const updated = announcements.filter(a => a.id !== id);
-    setAnnouncements(updated);
-    localStorage.setItem('announcements', JSON.stringify(updated));
+  const addAnnouncement = async (a: Announcement) => {
+    try {
+      // TODO: Backend API call
+      // await apiService.createAnnouncement(a);
+      
+      // Local update for now
+      const updated = [...announcements, a];
+      setAnnouncements(updated);
+    } catch (error) {
+      console.error('Failed to add announcement:', error);
+    }
   };
 
-  return { announcements, addAnnouncement, updateAnnouncement, removeAnnouncement };
+  const updateAnnouncement = async (id: string, patch: Partial<Announcement>) => {
+    try {
+      // TODO: Backend API call
+      // await apiService.updateAnnouncement(id, patch);
+      
+      // Local update for now
+      const updated = announcements.map(a => a.id === id ? { ...a, ...patch } : a);
+      setAnnouncements(updated);
+    } catch (error) {
+      console.error('Failed to update announcement:', error);
+    }
+  };
+
+  const removeAnnouncement = async (id: string) => {
+    try {
+      // TODO: Backend API call
+      // await apiService.deleteAnnouncement(id);
+      
+      // Local update for now
+      const updated = announcements.filter(a => a.id !== id);
+      setAnnouncements(updated);
+    } catch (error) {
+      console.error('Failed to remove announcement:', error);
+    }
+  };
+
+  return { announcements, addAnnouncement, updateAnnouncement, removeAnnouncement, loading };
 }
