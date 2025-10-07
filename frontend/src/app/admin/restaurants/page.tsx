@@ -389,7 +389,10 @@ export default function RestaurantsManagement() {
       </div>
       
       <Modal isOpen={isAddModalOpen} onClose={() => setAddModalOpen(false)} title="Yeni Restoran Ekle">
-        <AddRestaurantForm onClose={() => setAddModalOpen(false)} />
+        <AddRestaurantForm onClose={() => {
+          setAddModalOpen(false);
+          fetchRestaurants(); // Listeyi yenile
+        }} />
       </Modal>
 
       {selectedRestaurant && (
