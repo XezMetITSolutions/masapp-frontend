@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
+import { useEffect, useMemo, useState } from 'react';
 
 /**
  * Restaurant'a özel özellik kontrolü için hook
@@ -19,22 +20,42 @@ import useRestaurantStore from '@/store/useRestaurantStore';
 export function useFeature(featureId: string): boolean {
   const { authenticatedRestaurant } = useAuthStore();
   const { restaurants } = useRestaurantStore();
-  
-  // Önce authenticated restaurant'ı kontrol et
-  if (authenticatedRestaurant) {
-    return authenticatedRestaurant.features?.includes(featureId) ?? false;
-  }
-  
-  // Authenticated yoksa subdomain'e göre restaurant bul
-  if (typeof window !== 'undefined') {
-    const subdomain = window.location.hostname.split('.')[0];
-    const restaurant = restaurants.find(r => r.username === subdomain);
-    
-    if (restaurant) {
-      return restaurant.features?.includes(featureId) ?? false;
+  const [remoteFeatures, setRemoteFeatures] = useState<string[] | null>(null);
+
+  const localHas = useMemo(() => {
+    if (authenticatedRestaurant) {
+      return authenticatedRestaurant.features?.includes(featureId) ?? false;
     }
-  }
-  
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      const restaurant = restaurants.find(r => r.username === subdomain);
+      if (restaurant) return restaurant.features?.includes(featureId) ?? false;
+    }
+    return false;
+  }, [authenticatedRestaurant?.id, authenticatedRestaurant?.features, restaurants, featureId]);
+
+  useEffect(() => {
+    if (localHas) return; // local true ise uzak çağrıya gerek yok
+    if (authenticatedRestaurant) return; // loginli ise localdan okunur
+    if (typeof window === 'undefined') return;
+    const subdomain = window.location.hostname.split('.')[0];
+    if (!subdomain) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/restaurants/${encodeURIComponent(subdomain)}/features`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setRemoteFeatures(Array.isArray(data?.features) ? data.features : []);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [localHas, authenticatedRestaurant?.id]);
+
+  if (localHas) return true;
+  if (remoteFeatures) return remoteFeatures.includes(featureId);
   return false;
 }
 
@@ -58,29 +79,52 @@ export function useFeature(featureId: string): boolean {
 export function useFeatures(featureIds: string[]): Record<string, boolean> {
   const { authenticatedRestaurant } = useAuthStore();
   const { restaurants } = useRestaurantStore();
-  
-  // Önce authenticated restaurant'ı kontrol et
-  if (authenticatedRestaurant) {
-    return featureIds.reduce((acc, id) => ({
-      ...acc,
-      [id]: authenticatedRestaurant.features?.includes(id) ?? false
-    }), {});
-  }
-  
-  // Authenticated yoksa subdomain'e göre restaurant bul
-  if (typeof window !== 'undefined') {
-    const subdomain = window.location.hostname.split('.')[0];
-    const restaurant = restaurants.find(r => r.username === subdomain);
-    
-    if (restaurant) {
+  const [remoteFeatures, setRemoteFeatures] = useState<string[] | null>(null);
+
+  const local = useMemo(() => {
+    if (authenticatedRestaurant) {
       return featureIds.reduce((acc, id) => ({
         ...acc,
-        [id]: restaurant.features?.includes(id) ?? false
-      }), {});
+        [id]: authenticatedRestaurant.features?.includes(id) ?? false
+      }), {} as Record<string, boolean>);
     }
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      const restaurant = restaurants.find(r => r.username === subdomain);
+      if (restaurant) {
+        return featureIds.reduce((acc, id) => ({
+          ...acc,
+          [id]: restaurant.features?.includes(id) ?? false
+        }), {} as Record<string, boolean>);
+      }
+    }
+    return null;
+  }, [authenticatedRestaurant?.id, authenticatedRestaurant?.features, restaurants, featureIds.join('|')]);
+
+  useEffect(() => {
+    if (local) return;
+    if (authenticatedRestaurant) return;
+    if (typeof window === 'undefined') return;
+    const subdomain = window.location.hostname.split('.')[0];
+    if (!subdomain) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/restaurants/${encodeURIComponent(subdomain)}/features`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setRemoteFeatures(Array.isArray(data?.features) ? data.features : []);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [local, authenticatedRestaurant?.id, featureIds.join('|')]);
+
+  if (local) return local;
+  if (remoteFeatures) {
+    return featureIds.reduce((acc, id) => ({ ...acc, [id]: remoteFeatures.includes(id) }), {} as Record<string, boolean>);
   }
-  
-  return featureIds.reduce((acc, id) => ({ ...acc, [id]: false }), {});
+  return featureIds.reduce((acc, id) => ({ ...acc, [id]: false }), {} as Record<string, boolean>);
 }
 
 /**
@@ -95,23 +139,38 @@ export function useFeatures(featureIds: string[]): Record<string, boolean> {
 export function useActiveFeatures(): string[] {
   const { authenticatedRestaurant } = useAuthStore();
   const { restaurants } = useRestaurantStore();
-  
-  // Önce authenticated restaurant'ı kontrol et
-  if (authenticatedRestaurant) {
-    return authenticatedRestaurant.features ?? [];
-  }
-  
-  // Authenticated yoksa subdomain'e göre restaurant bul
-  if (typeof window !== 'undefined') {
-    const subdomain = window.location.hostname.split('.')[0];
-    const restaurant = restaurants.find(r => r.username === subdomain);
-    
-    if (restaurant) {
-      return restaurant.features ?? [];
+  const [remoteFeatures, setRemoteFeatures] = useState<string[] | null>(null);
+
+  const local = useMemo(() => {
+    if (authenticatedRestaurant) return authenticatedRestaurant.features ?? [];
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      const restaurant = restaurants.find(r => r.username === subdomain);
+      if (restaurant) return restaurant.features ?? [];
     }
-  }
-  
-  return [];
+    return null;
+  }, [authenticatedRestaurant?.id, authenticatedRestaurant?.features, restaurants]);
+
+  useEffect(() => {
+    if (local) return;
+    if (authenticatedRestaurant) return;
+    if (typeof window === 'undefined') return;
+    const subdomain = window.location.hostname.split('.')[0];
+    if (!subdomain) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/restaurants/${encodeURIComponent(subdomain)}/features`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setRemoteFeatures(Array.isArray(data?.features) ? data.features : []);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [local, authenticatedRestaurant?.id]);
+
+  return local ?? remoteFeatures ?? [];
 }
 
 /**
@@ -120,23 +179,6 @@ export function useActiveFeatures(): string[] {
  * @returns number - Aktif özellik sayısı
  */
 export function useFeatureCount(): number {
-  const { authenticatedRestaurant } = useAuthStore();
-  const { restaurants } = useRestaurantStore();
-  
-  // Önce authenticated restaurant'ı kontrol et
-  if (authenticatedRestaurant) {
-    return authenticatedRestaurant.features?.length ?? 0;
-  }
-  
-  // Authenticated yoksa subdomain'e göre restaurant bul
-  if (typeof window !== 'undefined') {
-    const subdomain = window.location.hostname.split('.')[0];
-    const restaurant = restaurants.find(r => r.username === subdomain);
-    
-    if (restaurant) {
-      return restaurant.features?.length ?? 0;
-    }
-  }
-  
-  return 0;
+  const local = useActiveFeatures();
+  return local.length;
 }

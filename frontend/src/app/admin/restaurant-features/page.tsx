@@ -77,11 +77,24 @@ export default function RestaurantFeaturesManagement() {
     setHasChanges(true);
   };
 
-  const handleSave = () => {
-    if (selectedRestaurant) {
+  const handleSave = async () => {
+    if (!selectedRestaurant) return;
+    try {
+      const res = await fetch('/api/admin/restaurants/features', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ restaurantId: selectedRestaurant.id, features: selectedFeatures })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || 'Kaydetme başarısız');
+      }
       updateRestaurant(selectedRestaurant.id, { features: selectedFeatures });
       setHasChanges(false);
       alert(`✅ ${selectedRestaurant.name} için özellikler kaydedildi!\n\nAktif özellikler: ${selectedFeatures.length}`);
+    } catch (e: any) {
+      alert(`❌ Kaydetme hatası: ${e?.message || 'Bilinmeyen hata'}`);
     }
   };
 
