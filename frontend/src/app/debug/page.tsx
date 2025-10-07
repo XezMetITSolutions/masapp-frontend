@@ -178,6 +178,7 @@ export default function DebugPage() {
       id: `rest_${timestamp}`,
       name: 'Lezzet Restaurant',
       username: 'lezzet',
+      password: '123456',
       email: 'info@lezzet.com',
       phone: '+90 555 987 6543',
       address: 'İstanbul, Türkiye',
@@ -219,6 +220,7 @@ export default function DebugPage() {
       id: `rest_${timestamp + 1}`,
       name: 'Kardeşler Lokantası',
       username: 'kardesler',
+      password: '123456',
       email: 'info@kardesler.com',
       phone: '+90 555 123 4567',
       address: 'Ankara, Türkiye',
@@ -355,7 +357,7 @@ export default function DebugPage() {
     setCategories([...lezzetCategories, ...kardeslerCategories] as any);
     setMenuItems([...lezzetItems, ...kardeslerItems] as any);
 
-    alert(`Başarıyla oluşturuldu!\n\nLezzet Restaurant:\n- 1 kategori\n- 1 ürün\n\nKardeşler Lokantası:\n- 2 kategori\n- 20 ürün`);
+    alert(`Başarıyla oluşturuldu!\n\nLezzet Restaurant:\n- Username: lezzet\n- Password: 123456\n- 1 kategori\n- 1 ürün\n\nKardeşler Lokantası:\n- Username: kardesler\n- Password: 123456\n- 2 kategori\n- 20 ürün`);
   };
 
   return (
