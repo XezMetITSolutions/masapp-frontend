@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaChevronDown, FaChevronUp, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaEye, FaEdit, FaTrash, FaLock } from 'react-icons/fa';
 
 interface Column {
   key: string;
@@ -142,6 +142,17 @@ export default function ResponsiveTable({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      onAction?.('changePassword', row);
+                    }}
+                    disabled={isLoading}
+                    className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded hover:bg-purple-50 transition-colors"
+                    title="Şifre Değiştir"
+                  >
+                    <FaLock className="text-sm" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
                       onAction?.('delete', row);
                     }}
                     disabled={isLoading}
@@ -211,6 +222,17 @@ export default function ResponsiveTable({
                       title="Düzenle"
                     >
                       <FaEdit className="text-sm" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAction?.('changePassword', row);
+                      }}
+                      disabled={isLoading}
+                      className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded hover:bg-purple-50 transition-colors"
+                      title="Şifre Değiştir"
+                    >
+                      <FaLock className="text-sm" />
                     </button>
                     <button
                       onClick={(e) => {

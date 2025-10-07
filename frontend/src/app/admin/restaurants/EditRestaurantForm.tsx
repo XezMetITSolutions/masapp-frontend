@@ -6,7 +6,11 @@ import {
   FaSave,
   FaStore,
   FaPalette,
-  FaCog
+  FaCog,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaCheck
 } from 'react-icons/fa';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { Restaurant } from '@/types';
@@ -18,7 +22,7 @@ interface EditRestaurantFormProps {
 
 export default function EditRestaurantForm({ restaurantId, onClose }: EditRestaurantFormProps) {
   const router = useRouter();
-  const { restaurants, updateRestaurant } = useRestaurantStore();
+  const { restaurants, updateRestaurant, updateRestaurantPassword } = useRestaurantStore();
 
   const restaurant = useMemo(
     () => restaurants.find((r) => r.id === restaurantId) || null,
@@ -38,6 +42,15 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
     plan: 'basic' as 'basic' | 'premium' | 'enterprise',
   });
 
+  // Şifre değiştirme için ayrı state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+
   useEffect(() => {
     if (restaurant) {
       setFormData({
@@ -53,6 +66,58 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
       });
     }
   }, [restaurant]);
+
+  // Şifre validasyonu
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    if (password.length < 6) {
+      errors.push('Şifre en az 6 karakter olmalıdır');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Şifre en az bir büyük harf içermelidir');
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push('Şifre en az bir rakam içermelidir');
+    }
+    return errors;
+  };
+
+  const handlePasswordChange = async () => {
+    setPasswordErrors([]);
+    
+    // Validasyon kontrolleri
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordErrors(['Yeni şifreler eşleşmiyor']);
+      return;
+    }
+
+    const validationErrors = validatePassword(passwordData.newPassword);
+    if (validationErrors.length > 0) {
+      setPasswordErrors(validationErrors);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Şifreyi güncelle
+      updateRestaurantPassword(restaurant.id, passwordData.newPassword);
+      
+      // Formu temizle
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setShowPasswordChange(false);
+      setPasswordErrors([]);
+      
+      alert('Şifre başarıyla değiştirildi!');
+    } catch (error) {
+      setPasswordErrors(['Şifre değiştirilirken bir hata oluştu']);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -240,6 +305,92 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
           </div>
         </div>
       </div>
+
+      {/* Şifre Değiştirme Bölümü */}
+      <div className="mt-8 bg-white rounded-xl p-6 border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <FaLock className="mr-2 text-red-600" />
+            Şifre Yönetimi
+          </h3>
+          <button
+            type="button"
+            data-password-toggle
+            onClick={() => setShowPasswordChange(!showPasswordChange)}
+            className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+          >
+            {showPasswordChange ? 'İptal' : 'Şifre Değiştir'}
+          </button>
+        </div>
+
+        {showPasswordChange && (
+          <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+            {passwordErrors.length > 0 && (
+              <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
+                <ul className="list-disc list-inside space-y-1">
+                  {passwordErrors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Yeni Şifre *
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Yeni şifre girin"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Şifre Tekrar *
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Şifreyi tekrar girin"
+                />
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Şifre Gereksinimleri:</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• En az 6 karakter uzunluğunda</li>
+                <li>• En az bir büyük harf içermeli</li>
+                <li>• En az bir rakam içermeli</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handlePasswordChange}
+                disabled={isLoading || !passwordData.newPassword || !passwordData.confirmPassword}
+                className={`px-6 py-2 rounded-lg text-white flex items-center ${
+                  isLoading || !passwordData.newPassword || !passwordData.confirmPassword
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                <FaCheck className="mr-2" />
+                {isLoading ? 'Değiştiriliyor...' : 'Şifreyi Değiştir'}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="mt-8 flex justify-end space-x-4">
         <button
           type="button"

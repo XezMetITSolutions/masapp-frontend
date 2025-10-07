@@ -25,6 +25,7 @@ interface RestaurantState {
   setRestaurants: (restaurants: Restaurant[]) => void;
   addRestaurant: (restaurant: Restaurant) => void;
   updateRestaurant: (id: string, updates: Partial<Restaurant>) => void;
+  updateRestaurantPassword: (id: string, newPassword: string) => void;
   deleteRestaurant: (id: string) => void;
   
   // Menü Actions
@@ -77,6 +78,15 @@ const useRestaurantStore = create<RestaurantState>()(
         ),
         currentRestaurant: state.currentRestaurant?.id === id 
           ? { ...state.currentRestaurant, ...updates }
+          : state.currentRestaurant
+      })),
+
+      updateRestaurantPassword: (id, newPassword) => set((state) => ({
+        restaurants: state.restaurants.map(r => 
+          r.id === id ? { ...r, password: newPassword } : r
+        ),
+        currentRestaurant: state.currentRestaurant?.id === id 
+          ? { ...state.currentRestaurant, password: newPassword }
           : state.currentRestaurant
       })),
       

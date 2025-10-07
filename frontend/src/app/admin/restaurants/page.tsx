@@ -25,7 +25,8 @@ import {
   FaClock,
   FaStar,
   FaUsers,
-  FaQrcode
+  FaQrcode,
+  FaLock
 } from 'react-icons/fa';
 
 export default function RestaurantsManagement() {
@@ -162,6 +163,18 @@ export default function RestaurantsManagement() {
         case 'edit':
           setSelectedRestaurant(restaurant);
           setEditModalOpen(true);
+          break;
+        case 'changePassword':
+          // Şifre değiştirme için restoran düzenleme modalını aç
+          setSelectedRestaurant(restaurant);
+          setEditModalOpen(true);
+          // Modal açıldıktan sonra şifre değiştirme bölümünü otomatik aç
+          setTimeout(() => {
+            const passwordButton = document.querySelector('[data-password-toggle]') as HTMLButtonElement;
+            if (passwordButton) {
+              passwordButton.click();
+            }
+          }, 100);
           break;
         case 'delete':
           // Restoranı kalıcı olarak kaldır (Zustand store + persist)
