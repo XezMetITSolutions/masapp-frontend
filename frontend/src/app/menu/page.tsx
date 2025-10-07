@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -121,9 +121,6 @@ export function MenuPageContent() {
       
       // Her durumda token'ı geçerli kabul et
       setTokenValid(true);
-      
-      // Debug alert - basit
-      // Debug alert kaldırıldı - artık gerekli değil
     }
   }, [setTableNumber]);
   
