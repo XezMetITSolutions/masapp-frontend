@@ -1190,7 +1190,7 @@ export default function MenuManagement() {
                       İptal
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         // Gerçek güncelleme işlemi
                         if (editingItem) {
                           // Ürün güncelleme
@@ -1213,7 +1213,7 @@ export default function MenuManagement() {
                             alert('Lütfen ürün adı, fiyat ve kategori alanlarını doldurun!');
                             return;
                           }
-                          addMenuItem({
+                          await addMenuItem({
                             id: `item_${Date.now()}`,
                             restaurantId: currentRestaurantId!,
                             categoryId: formData.category,

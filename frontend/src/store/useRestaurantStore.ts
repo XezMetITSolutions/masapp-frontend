@@ -181,9 +181,30 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   
   setMenuItems: (items: MenuItem[]) => set({ menuItems: items }),
   
-  addMenuItem: (item: MenuItem) => set((state) => ({
-    menuItems: [...state.menuItems, item]
-  })),
+  addMenuItem: async (item: MenuItem) => {
+    try {
+      // Backend API'ye kaydet
+      const response = await apiService.createMenuItem(item.restaurantId, item);
+      if (response.success) {
+        // Başarılı olursa local state'e ekle
+        set((state) => ({
+          menuItems: [...state.menuItems, response.data || item]
+        }));
+      } else {
+        console.error('Menü ürünü backend\'e kaydedilemedi:', response.message);
+        // Hata durumunda sadece local state'e ekle
+        set((state) => ({
+          menuItems: [...state.menuItems, item]
+        }));
+      }
+    } catch (error) {
+      console.error('Menü ürünü ekleme hatası:', error);
+      // Hata durumunda sadece local state'e ekle
+      set((state) => ({
+        menuItems: [...state.menuItems, item]
+      }));
+    }
+  },
   
   updateMenuItem: (id: string, updates: Partial<MenuItem>) => set((state) => ({
     menuItems: state.menuItems.map(item => 
