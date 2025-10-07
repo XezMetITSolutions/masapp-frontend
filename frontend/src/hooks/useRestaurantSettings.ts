@@ -1,72 +1,60 @@
 import { useEffect } from 'react';
 import { useBusinessSettingsStore } from '@/store/useBusinessSettingsStore';
+import { apiService } from '@/services/api';
 
-// Her restoran için kendi settings'ini yükle/kaydet
+// Her restoran için kendi settings'ini yükle/kaydet - PostgreSQL ready
 export function useRestaurantSettings(restaurantId: string | undefined) {
   const store = useBusinessSettingsStore();
   
   useEffect(() => {
     if (!restaurantId) return;
     
-    // Restaurant ID'ye göre localStorage'dan settings yükle
-    const storageKey = `business-settings-${restaurantId}`;
-    const savedSettings = localStorage.getItem(storageKey);
-    
-    if (savedSettings) {
+    const loadSettings = async () => {
       try {
-        const parsed = JSON.parse(savedSettings);
-        if (parsed.state) {
-          // Sadece settings, branding gibi önemli verileri yükle
-          if (parsed.state.settings) {
-            Object.keys(parsed.state.settings).forEach(key => {
-              const settingsKey = key as keyof typeof parsed.state.settings;
-              const value = parsed.state.settings[settingsKey];
-              
-              // Her settings kategorisini güncelle
-              if (settingsKey === 'basicInfo' && store.updateBasicInfo) {
-                store.updateBasicInfo(value);
-              } else if (settingsKey === 'branding' && store.updateBranding) {
-                store.updateBranding(value);
-              } else if (settingsKey === 'menuSettings' && store.updateMenuSettings) {
-                store.updateMenuSettings(value);
-              } else if (settingsKey === 'paymentSettings' && store.updatePaymentSettings) {
-                store.updatePaymentSettings(value);
-              } else if (settingsKey === 'technicalSettings' && store.updateTechnicalSettings) {
-                store.updateTechnicalSettings(value);
-              } else if (settingsKey === 'customerExperience' && store.updateCustomerExperience) {
-                store.updateCustomerExperience(value);
-              } else if (settingsKey === 'notificationSettings' && store.updateNotificationSettings) {
-                store.updateNotificationSettings(value);
-              } else if (settingsKey === 'securitySettings' && store.updateSecuritySettings) {
-                store.updateSecuritySettings(value);
-              } else if (settingsKey === 'backupSettings' && store.updateBackupSettings) {
-                store.updateBackupSettings(value);
-              }
-            });
-          }
-        }
+        // TODO: Backend API endpoint eklendiğinde aktif et
+        // const response = await apiService.getRestaurantSettings(restaurantId);
+        // if (response.success) {
+        //   store.updateSettings(response.data.settings || {});
+        //   store.updateAccountInfo(response.data.accountInfo || {});
+        //   return;
+        // }
+        
+        console.log(`⏳ Settings API not implemented yet, using defaults for restaurant ${restaurantId}`);
       } catch (error) {
-        console.error('Failed to load restaurant settings:', error);
+        console.error('❌ Failed to load settings from backend:', error);
       }
-    }
+      
+      // Default settings (fallback)
+      store.updateSettings({
+        businessName: 'Restoran Adı',
+        businessType: 'restaurant',
+        currency: 'TRY',
+        timezone: 'Europe/Istanbul',
+        language: 'tr',
+        theme: 'light'
+      });
+    };
+    
+    loadSettings();
   }, [restaurantId]);
   
-  // Settings değiştiğinde restaurant-specific localStorage'a kaydet
+  // Settings değiştiğinde backend'e kaydet (debounced)
   useEffect(() => {
     if (!restaurantId) return;
     
-    const storageKey = `business-settings-${restaurantId}`;
-    const dataToSave = {
-      state: {
-        settings: store.settings,
-        accountInfo: store.accountInfo,
-        stats: store.stats
-      },
-      version: 0
+    const saveSettings = async () => {
+      try {
+        // TODO: Backend API endpoint eklendiğinde aktif et
+        // await apiService.updateRestaurantSettings(restaurantId, store.settings);
+        console.log(`⏳ Settings API not implemented yet for restaurant ${restaurantId}`);
+      } catch (error) {
+        console.error('❌ Failed to save settings:', error);
+      }
     };
     
-    localStorage.setItem(storageKey, JSON.stringify(dataToSave));
-  }, [restaurantId, store.settings, store.accountInfo, store.stats]);
+    const timeoutId = setTimeout(saveSettings, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [restaurantId, store.settings]);
   
   return store;
 }

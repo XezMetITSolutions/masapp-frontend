@@ -28,37 +28,44 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     setIsClient(true);
   }, []);
 
-  // Detect user's location and set initial language
   useEffect(() => {
     if (!isClient) return; // Only run on client side
 
     const detectUserLanguage = async () => {
       try {
-        // Check if user has a saved language preference first
+        // TODO: Backend'den user preferences çek
+        // const userPrefs = await apiService.getUserPreferences();
+        // if (userPrefs.success && userPrefs.data.language) {
+        //   setCurrentLanguage(userPrefs.data.language);
+        //   return;
+        // }
+
+        // Geçici: localStorage fallback (TODO: remove when backend ready)
         const savedLanguage = localStorage.getItem('masapp-language');
         if (savedLanguage && Object.keys(supportedLanguages).includes(savedLanguage)) {
           setCurrentLanguage(savedLanguage);
           return;
         }
 
-        // Try to get user's country from IP
+        // If no saved preference, detect from IP location
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
         const detectedLanguage = await detectLanguageFromLocation(data.country_code);
         
         setCurrentLanguage(detectedLanguage);
-        localStorage.setItem('masapp-language', detectedLanguage);
+        // TODO: Backend'e kaydet
+        // await apiService.updateUserPreferences({ language: detectedLanguage });
+        localStorage.setItem('masapp-language', detectedLanguage); // Geçici fallback
       } catch (error) {
         console.error('Language detection failed:', error);
         // Fallback to Turkish
         setCurrentLanguage('Turkish');
-        localStorage.setItem('masapp-language', 'Turkish');
+        localStorage.setItem('masapp-language', 'Turkish'); // Geçici fallback
       }
     };
 
     detectUserLanguage();
   }, [isClient]);
-
   const setLanguage = (language: string) => {
     setCurrentLanguage(language);
     localStorage.setItem('masapp-language', language);
