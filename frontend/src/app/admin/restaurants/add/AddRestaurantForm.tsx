@@ -20,7 +20,7 @@ interface AddRestaurantFormProps {
 
 export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
   const router = useRouter();
-  const { addRestaurant, addCategory, addMenuItem } = useRestaurantStore();
+  const { addRestaurant, addCategory, addMenuItem, createRestaurant } = useRestaurantStore();
   const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -92,7 +92,29 @@ export default function AddRestaurantForm({ onClose }: AddRestaurantFormProps) {
       status: 'active'
     };
 
-    addRestaurant(newRestaurant);
+    // Backend API ile restaurant oluştur
+    try {
+      await createRestaurant({
+        name: formData.name,
+        username: formData.username,
+        password: formData.password,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        features: ['qr_menu', 'basic_reports']
+      });
+      
+      console.log('✅ Restaurant created in PostgreSQL');
+      alert(`✅ ${formData.name} başarıyla oluşturuldu!`);
+      onClose();
+      setIsLoading(false);
+      return;
+    } catch (error) {
+      console.error('❌ Failed to create restaurant:', error);
+      alert('❌ Restaurant oluşturulurken hata oluştu');
+      setIsLoading(false);
+      return;
+    }
     
     const restaurantNameLower = formData.name.toLowerCase();
     
