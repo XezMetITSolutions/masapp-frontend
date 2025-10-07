@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { apiService } from '@/services/api';
 
 // Demo staff verileri - gerçek uygulamada bunlar veritabanından gelecek
 const demoStaff = [
@@ -21,10 +22,28 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
-    // Önce restoran olarak giriş kontrolü
+    try {
+      // Backend API ile login dene
+      const response = await apiService.login({ username, password });
+      
+      if (response.success && response.data) {
+        const restaurant = response.data;
+        loginRestaurant(restaurant);
+        
+        // Cookie set et (middleware için)
+        document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
+        router.push('/business/dashboard');
+        return;
+      }
+    } catch (error) {
+      console.log('Backend login failed, trying localStorage fallback...');
+    }
+    
+    // Fallback: localStorage'dan kontrol et (geçici)
     const restaurant = restaurants.find(
       (r) => r.username === username && r.password === password
     );
@@ -37,7 +56,7 @@ export default function LoginPage() {
       return;
     }
 
-    // Restoran değilse, personel olarak giriş kontrolü
+    // Personel kontrolü (demo)
     const staff = demoStaff.find(
       (s) => s.username === username && s.password === password
     );
