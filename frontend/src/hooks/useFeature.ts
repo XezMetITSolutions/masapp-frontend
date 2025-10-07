@@ -13,21 +13,40 @@ export function useFeature(featureId: string): boolean {
   const { authenticatedRestaurant } = useAuthStore();
   const { restaurants, fetchRestaurantByUsername } = useRestaurantStore();
   const [loading, setLoading] = useState(false);
-  const [remoteFeatures, setRemoteFeatures] = useState<string[] | null>(null);
   
   // Real-time data fetch için subdomain'i al ve backend'den çek
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const subdomain = window.location.hostname.split('.')[0];
-      if (subdomain && subdomain !== 'localhost' && subdomain !== 'www' && !authenticatedRestaurant) {
+      if (subdomain && subdomain !== 'localhost' && subdomain !== 'www') {
+        console.log('🔍 useFeature: Fetching data for subdomain:', subdomain);
         setLoading(true);
-        fetchRestaurantByUsername(subdomain).finally(() => setLoading(false));
+        fetchRestaurantByUsername(subdomain).finally(() => {
+          setLoading(false);
+          console.log('✅ useFeature: Fetch completed for subdomain:', subdomain);
+        });
       }
     }
-  }, [fetchRestaurantByUsername, authenticatedRestaurant]);
+  }, [fetchRestaurantByUsername]);
+  
+  // Debug logging
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      const restaurant = restaurants.find(r => r.username === subdomain);
+      console.log('🎯 useFeature Debug:', {
+        featureId,
+        subdomain,
+        authenticatedRestaurant: authenticatedRestaurant?.features,
+        restaurantFromStore: restaurant?.features,
+        totalRestaurants: restaurants.length
+      });
+    }
+  }, [featureId, authenticatedRestaurant, restaurants]);
   
   // Önce authenticated restaurant'ı kontrol et
   if (authenticatedRestaurant) {
+    console.log('🔐 useFeature: Using authenticated restaurant features:', authenticatedRestaurant.features);
     return authenticatedRestaurant.features?.includes(featureId) ?? false;
   }
   
@@ -37,15 +56,12 @@ export function useFeature(featureId: string): boolean {
     const restaurant = restaurants.find(r => r.username === subdomain);
     
     if (restaurant) {
+      console.log('🏪 useFeature: Using restaurant from store:', restaurant.features);
       return restaurant.features?.includes(featureId) ?? false;
     }
   }
   
-  // Remote features varsa onu kontrol et
-  if (remoteFeatures) {
-    return remoteFeatures.includes(featureId);
-  }
-  
+  console.log('❌ useFeature: No features found, returning false');
   return false;
 }
 
