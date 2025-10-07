@@ -50,10 +50,15 @@ const availableFeatures: Feature[] = [
 ];
 
 export default function RestaurantFeaturesManagement() {
-  const { restaurants, updateRestaurant } = useRestaurantStore();
+  const { restaurants, updateRestaurant, fetchRestaurants, updateRestaurantFeatures } = useRestaurantStore();
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
+
+  // Backend'den restaurant verilerini çek
+  useEffect(() => {
+    fetchRestaurants();
+  }, [fetchRestaurants]);
 
   const selectedRestaurant = restaurants.find(r => r.id === selectedRestaurantId);
 
@@ -80,19 +85,13 @@ export default function RestaurantFeaturesManagement() {
   const handleSave = async () => {
     if (!selectedRestaurant) return;
     try {
-      const res = await fetch('/api/admin/restaurants/features', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ restaurantId: selectedRestaurant.id, features: selectedFeatures })
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || 'Kaydetme başarısız');
-      }
-      updateRestaurant(selectedRestaurant.id, { features: selectedFeatures });
+      // Backend API kullan
+      await updateRestaurantFeatures(selectedRestaurant.id, selectedFeatures);
       setHasChanges(false);
       alert(`✅ ${selectedRestaurant.name} için özellikler kaydedildi!\n\nAktif özellikler: ${selectedFeatures.length}`);
+      
+      // Verileri yenile
+      fetchRestaurants();
     } catch (e: any) {
       alert(`❌ Kaydetme hatası: ${e?.message || 'Bilinmeyen hata'}`);
     }

@@ -31,7 +31,7 @@ import {
 
 export default function RestaurantsManagement() {
   const router = useRouter();
-  const { restaurants, deleteRestaurant } = useRestaurantStore();
+  const { restaurants, deleteRestaurant, fetchRestaurants, loading } = useRestaurantStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -39,6 +39,11 @@ export default function RestaurantsManagement() {
   const [isAddModalOpen, setAddModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+
+  // Backend'den restaurant verilerini çek
+  useEffect(() => {
+    fetchRestaurants();
+  }, [fetchRestaurants]);
 
   const getStatusClass = (status: string) => {
     switch(status) {
