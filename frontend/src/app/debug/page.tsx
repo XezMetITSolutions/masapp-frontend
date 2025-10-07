@@ -18,8 +18,11 @@ export default function DebugPage() {
     menuItems: allMenuItems,
     currentRestaurant,
     setRestaurants,
+    addRestaurant,
     setCategories,
-    setMenuItems
+    addCategory,
+    setMenuItems,
+    addMenuItem
   } = useRestaurantStore();
 
   useEffect(() => {
@@ -172,6 +175,15 @@ export default function DebugPage() {
 
   // Lezzet ve Kardeşler restaurant'larını oluştur
   const createLezzetAndKardesler = () => {
+    // Mevcut restoranları kontrol et
+    const existingLezzet = restaurants.find(r => r.username === 'lezzet');
+    const existingKardesler = restaurants.find(r => r.username === 'kardesler');
+    
+    if (existingLezzet && existingKardesler) {
+      alert('⚠️ Lezzet ve Kardeşler restoranları zaten mevcut!');
+      return;
+    }
+    
     const timestamp = Date.now();
     
     const lezzetRestaurant = {
@@ -352,12 +364,28 @@ export default function DebugPage() {
       }
     ];
 
-    // Store'a ekle
-    setRestaurants([lezzetRestaurant, kardeslerRestaurant] as any);
-    setCategories([...lezzetCategories, ...kardeslerCategories] as any);
-    setMenuItems([...lezzetItems, ...kardeslerItems] as any);
+    // Store'a ekle - Mevcut verileri koruyarak ekle
+    if (!existingLezzet) {
+      addRestaurant(lezzetRestaurant as any);
+      lezzetCategories.forEach(cat => addCategory(cat as any));
+      lezzetItems.forEach(item => addMenuItem(item as any));
+    }
+    
+    if (!existingKardesler) {
+      addRestaurant(kardeslerRestaurant as any);
+      kardeslerCategories.forEach(cat => addCategory(cat as any));
+      kardeslerItems.forEach(item => addMenuItem(item as any));
+    }
 
-    alert(`Başarıyla oluşturuldu!\n\nLezzet Restaurant:\n- Username: lezzet\n- Password: 123456\n- 1 kategori\n- 1 ürün\n\nKardeşler Lokantası:\n- Username: kardesler\n- Password: 123456\n- 2 kategori\n- 20 ürün`);
+    const message = `✅ Başarıyla oluşturuldu!
+
+${!existingLezzet ? '🏢 Lezzet Restaurant:\n- Username: lezzet\n- Password: 123456\n- 1 kategori, 1 ürün\n' : ''}
+${!existingKardesler ? '🏢 Kardeşler Lokantası:\n- Username: kardesler\n- Password: 123456\n- 2 kategori, 20 ürün\n' : ''}
+
+⚠️ ÖNEMLİ: Admin panelinde görmek için aynı domainden erişin!
+📍 Şu URL'den deneyin: ${window.location.origin.replace(/^https?:\/\/[^.]+\./, 'https://')}/admin/restaurants`;
+
+    alert(message);
   };
 
   return (
@@ -384,6 +412,32 @@ export default function DebugPage() {
             >
               📊 Demo Data Yükle
             </button>
+          </div>
+        </div>
+
+        {/* Cross-Domain LocalStorage Uyarısı */}
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">⚠️ Cross-Domain localStorage Uyarısı</h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p className="mb-2">Bu sayfada oluşturduğunuz restoranlar <strong>sadece bu domainde</strong> (localStorage) kaydedilir.</p>
+                <p className="mb-2">
+                  <strong>Şu anki domain:</strong> <code className="bg-yellow-100 px-2 py-1 rounded">{hostname}</code>
+                </p>
+                <p className="mb-2">
+                  <strong>Admin paneli:</strong> <code className="bg-yellow-100 px-2 py-1 rounded">guzellestir.com/admin/restaurants</code>
+                </p>
+                <p className="font-medium">
+                  ✅ Çözüm: Admin panelinde görmek için aynı domain'den (guzellestir.com) debug sayfasına erişin veya admin panelinden restoran oluşturun.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         
