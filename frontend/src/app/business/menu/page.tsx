@@ -57,7 +57,9 @@ export default function MenuManagement() {
     deleteCategory,
     addMenuItem,
     updateMenuItem,
-    deleteMenuItem
+    deleteMenuItem,
+    createMenuCategory,
+    createMenuItem
   } = useRestaurantStore();
   
   // Feature kontrolü
@@ -1213,22 +1215,42 @@ export default function MenuManagement() {
                             alert('Lütfen ürün adı, fiyat ve kategori alanlarını doldurun!');
                             return;
                           }
-                          await addMenuItem({
-                            id: `item_${Date.now()}`,
-                            restaurantId: currentRestaurantId!,
-                            categoryId: formData.category,
-                            name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
-                            description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
-                            price: Number(formData.price),
-                            image: capturedImage || '/placeholder-food.jpg',
-                            order: items.length + 1,
-                            isAvailable: formData.isAvailable,
-                            isPopular: formData.isPopular,
-                            preparationTime: Number(formData.preparationTime) || 0,
-                            calories: Number(formData.calories) || 0,
-                            allergens: { tr: [], en: [] }
-                          });
-                          console.log('Yeni ürün eklendi:', formData);
+                          
+                          // Backend API'sine kaydet
+                          if (currentRestaurantId) {
+                            await createMenuItem(currentRestaurantId, {
+                              categoryId: formData.category,
+                              name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
+                              description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                              price: Number(formData.price),
+                              image: capturedImage || '/placeholder-food.jpg',
+                              order: items.length + 1,
+                              isAvailable: formData.isAvailable,
+                              isPopular: formData.isPopular,
+                              preparationTime: Number(formData.preparationTime) || 0,
+                              calories: Number(formData.calories) || 0,
+                              allergens: { tr: [], en: [] }
+                            });
+                            console.log('Yeni ürün backend\'e kaydedildi:', formData);
+                          } else {
+                            // Fallback: local storage
+                            addMenuItem({
+                              id: `item_${Date.now()}`,
+                              restaurantId: currentRestaurantId!,
+                              categoryId: formData.category,
+                              name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
+                              description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                              price: Number(formData.price),
+                              image: capturedImage || '/placeholder-food.jpg',
+                              order: items.length + 1,
+                              isAvailable: formData.isAvailable,
+                              isPopular: formData.isPopular,
+                              preparationTime: Number(formData.preparationTime) || 0,
+                              calories: Number(formData.calories) || 0,
+                              allergens: { tr: [], en: [] }
+                            });
+                            console.log('Yeni ürün local storage\'a kaydedildi:', formData);
+                          }
                         }
                         setShowItemForm(false);
                         setEditingItem(null);
@@ -1397,7 +1419,7 @@ export default function MenuManagement() {
                       İptal
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         // Gerçek kategori güncelleme işlemi
                         if (!categoryFormData.nameTr) {
                           alert('Lütfen kategori adını girin!');
@@ -1414,15 +1436,27 @@ export default function MenuManagement() {
                           });
                           console.log('Kategori güncellendi:', editingCategory);
                         } else {
-                          addCategory({
-                            id: `cat_${Date.now()}`,
-                            restaurantId: currentRestaurantId!,
-                            name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
-                            description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
-                            order: categories.length,
-                            isActive: categoryFormData.isActive
-                          });
-                          console.log('Yeni kategori eklendi');
+                          // Backend API'sine kaydet
+                          if (currentRestaurantId) {
+                            await createMenuCategory(currentRestaurantId, {
+                              name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
+                              description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                              order: categories.length,
+                              isActive: categoryFormData.isActive
+                            });
+                            console.log('Yeni kategori backend\'e kaydedildi');
+                          } else {
+                            // Fallback: local storage
+                            addCategory({
+                              id: `cat_${Date.now()}`,
+                              restaurantId: currentRestaurantId!,
+                              name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
+                              description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                              order: categories.length,
+                              isActive: categoryFormData.isActive
+                            });
+                            console.log('Yeni kategori local storage\'a kaydedildi');
+                          }
                         }
                         setShowCategoryForm(false);
                         setEditingCategory(null);

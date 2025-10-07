@@ -148,6 +148,37 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
     }
   },
   
+  // Menu API Actions
+  createMenuCategory: async (restaurantId: string, data: any) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.createMenuCategory(restaurantId, data);
+      if (response.success) {
+        set((state) => ({
+          categories: [...state.categories, response.data],
+          loading: false
+        }));
+      }
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to create category', loading: false });
+    }
+  },
+
+  createMenuItem: async (restaurantId: string, data: any) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.createMenuItem(restaurantId, data);
+      if (response.success) {
+        set((state) => ({
+          menuItems: [...state.menuItems, response.data],
+          loading: false
+        }));
+      }
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to create menu item', loading: false });
+    }
+  },
+
   // Local Actions (for backward compatibility)
   setCurrentRestaurant: (restaurant: Restaurant) => set({ currentRestaurant: restaurant }),
   
@@ -181,30 +212,9 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   
   setMenuItems: (items: MenuItem[]) => set({ menuItems: items }),
   
-  addMenuItem: async (item: MenuItem) => {
-    try {
-      // Backend API'ye kaydet
-      const response = await apiService.createMenuItem(item.restaurantId, item);
-      if (response.success) {
-        // Başarılı olursa local state'e ekle
-        set((state) => ({
-          menuItems: [...state.menuItems, response.data || item]
-        }));
-      } else {
-        console.error('Menü ürünü backend\'e kaydedilemedi:', response.message);
-        // Hata durumunda sadece local state'e ekle
-        set((state) => ({
-          menuItems: [...state.menuItems, item]
-        }));
-      }
-    } catch (error) {
-      console.error('Menü ürünü ekleme hatası:', error);
-      // Hata durumunda sadece local state'e ekle
-      set((state) => ({
-        menuItems: [...state.menuItems, item]
-      }));
-    }
-  },
+  addMenuItem: (item: MenuItem) => set((state) => ({
+    menuItems: [...state.menuItems, item]
+  })),
   
   updateMenuItem: (id: string, updates: Partial<MenuItem>) => set((state) => ({
     menuItems: state.menuItems.map(item => 
