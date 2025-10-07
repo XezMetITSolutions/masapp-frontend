@@ -1,19 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { 
-  FaSave,
-  FaStore,
-  FaPalette,
-  FaCog,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-  FaCheck
-} from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 import useRestaurantStore from '@/store/useRestaurantStore';
 import { Restaurant } from '@/types';
+import { FaTimes, FaSave, FaBuilding, FaMapMarkerAlt, FaPhone, FaEnvelope, FaUser, FaLock, FaGlobe } from 'react-icons/fa';
 
 interface EditRestaurantFormProps {
   restaurantId: string;
@@ -21,395 +11,357 @@ interface EditRestaurantFormProps {
 }
 
 export default function EditRestaurantForm({ restaurantId, onClose }: EditRestaurantFormProps) {
-  const router = useRouter();
-  const { restaurants, updateRestaurant, updateRestaurantPassword } = useRestaurantStore();
-
-  const restaurant = useMemo(
-    () => restaurants.find((r) => r.id === restaurantId) || null,
-    [restaurants, restaurantId]
-  );
-
+  const { restaurants, updateRestaurant } = useRestaurantStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    username: '',
-    email: '',
-    phone: '',
     address: '',
+    phone: '',
+    email: '',
+    website: '',
+    ownerName: '',
+    ownerEmail: '',
+    ownerPhone: '',
+    category: 'Restoran',
     tableCount: 10,
-    primaryColor: '#3B82F6',
-    secondaryColor: '#10B981',
-    plan: 'basic' as 'basic' | 'premium' | 'enterprise',
+    status: 'active',
+    workingHours: {
+      monday: { open: '09:00', close: '22:00', closed: false },
+      tuesday: { open: '09:00', close: '22:00', closed: false },
+      wednesday: { open: '09:00', close: '22:00', closed: false },
+      thursday: { open: '09:00', close: '22:00', closed: false },
+      friday: { open: '09:00', close: '22:00', closed: false },
+      saturday: { open: '09:00', close: '22:00', closed: false },
+      sunday: { open: '09:00', close: '22:00', closed: false }
+    },
+    features: [] as string[],
+    settings: {
+      allowOnlineOrders: true,
+      requirePhoneVerification: false,
+      autoAcceptOrders: false,
+      showPrices: true,
+      showImages: true
+    }
   });
-
-  // Şifre değiştirme için ayrı state
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   useEffect(() => {
-    if (restaurant) {
+    const foundRestaurant = restaurants.find(r => r.id === restaurantId);
+    if (foundRestaurant) {
+      setRestaurant(foundRestaurant);
       setFormData({
-        name: restaurant.name,
-        username: restaurant.username,
-        email: restaurant.email,
-        phone: restaurant.phone,
-        address: restaurant.address,
-        tableCount: restaurant.tableCount,
-        primaryColor: restaurant.primaryColor,
-        secondaryColor: restaurant.secondaryColor,
-        plan: restaurant.subscription?.plan || 'basic',
+        name: foundRestaurant.name || '',
+        address: foundRestaurant.address || '',
+        phone: foundRestaurant.phone || '',
+        email: foundRestaurant.email || '',
+        website: foundRestaurant.website || '',
+        ownerName: foundRestaurant.ownerName || '',
+        ownerEmail: foundRestaurant.ownerEmail || '',
+        ownerPhone: foundRestaurant.ownerPhone || '',
+        category: foundRestaurant.category || 'Restoran',
+        tableCount: foundRestaurant.tableCount || 10,
+        status: foundRestaurant.status || 'active',
+        workingHours: foundRestaurant.workingHours || formData.workingHours,
+        features: foundRestaurant.features || [],
+        settings: foundRestaurant.settings || formData.settings
       });
     }
-  }, [restaurant]);
+  }, [restaurantId, restaurants]);
 
-  // Şifre validasyonu
-  const validatePassword = (password: string): string[] => {
-    const errors: string[] = [];
-    if (password.length < 6) {
-      errors.push('Şifre en az 6 karakter olmalıdır');
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent as keyof typeof prev],
+          [child]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'number' ? parseInt(value) || 0 : value
+      }));
     }
-    if (!/[A-Z]/.test(password)) {
-      errors.push('Şifre en az bir büyük harf içermelidir');
-    }
-    if (!/[0-9]/.test(password)) {
-      errors.push('Şifre en az bir rakam içermelidir');
-    }
-    return errors;
   };
 
-  const handlePasswordChange = async () => {
-    setPasswordErrors([]);
-    
-    // Validasyon kontrolleri
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordErrors(['Yeni şifreler eşleşmiyor']);
-      return;
-    }
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
+    }));
+  };
 
-    const validationErrors = validatePassword(passwordData.newPassword);
-    if (validationErrors.length > 0) {
-      setPasswordErrors(validationErrors);
-      return;
-    }
+  const handleFeatureToggle = (feature: string) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature]
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!restaurant) return;
 
     setIsLoading(true);
+    
     try {
-      // Şifreyi güncelle
-      updateRestaurantPassword(restaurant.id, passwordData.newPassword);
-      
-      // Formu temizle
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
-      setShowPasswordChange(false);
-      setPasswordErrors([]);
-      
-      alert('Şifre başarıyla değiştirildi!');
+      const updatedData: Partial<Restaurant> = {
+        name: formData.name,
+        address: formData.address,
+        phone: formData.phone,
+        email: formData.email,
+        website: formData.website,
+        ownerName: formData.ownerName,
+        ownerEmail: formData.ownerEmail,
+        ownerPhone: formData.ownerPhone,
+        category: formData.category,
+        tableCount: formData.tableCount,
+        status: formData.status,
+        workingHours: formData.workingHours,
+        features: formData.features,
+        settings: formData.settings,
+        updatedAt: new Date().toISOString()
+      };
+
+      await updateRestaurant(restaurantId, updatedData);
+      alert('Restoran başarıyla güncellendi!');
+      onClose();
     } catch (error) {
-      setPasswordErrors(['Şifre değiştirilirken bir hata oluştu']);
+      console.error('Restaurant update error:', error);
+      alert('Restoran güncellenirken hata oluştu!');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!restaurant) return;
-    setIsLoading(true);
-
-    const updates: Partial<Restaurant> = {
-      name: formData.name,
-      username: formData.username,
-      email: formData.email,
-      phone: formData.phone,
-      address: formData.address,
-      tableCount: formData.tableCount,
-      primaryColor: formData.primaryColor,
-      secondaryColor: formData.secondaryColor,
-      subscription: {
-        ...(restaurant.subscription || {}),
-        plan: formData.plan,
-      },
-    };
-
-    updateRestaurant(restaurant.id, updates);
-    onClose();
-    router.refresh();
-  };
-
   if (!restaurant) {
-    return <div>Restoran bilgileri yükleniyor...</div>;
+    return (
+      <div className="p-6 text-center">
+        <p className="text-gray-500">Restoran bulunamadı.</p>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <FaStore className="mr-2 text-blue-600" />
-              Restoran Bilgileri
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Restoran Adı *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı Adı *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-posta *</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon *</label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Adres *</label>
-                <textarea
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  rows={2}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Masa Sayısı *</label>
-                <input
-                  type="number"
-                  required
-                  min={1}
-                  value={formData.tableCount}
-                  onChange={(e) => setFormData({ ...formData, tableCount: parseInt(e.target.value || '0', 10) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <FaPalette className="mr-2 text-purple-600" />
-              Görünüm Ayarları
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ana Renk</label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={formData.primaryColor}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    className="h-10 w-20"
-                  />
-                  <input
-                    type="text"
-                    value={formData.primaryColor}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">İkincil Renk</label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={formData.secondaryColor}
-                    onChange={(e) => setFormData({ ...formData, secondaryColor: e.target.value })}
-                    className="h-10 w-20"
-                  />
-                  <input
-                    type="text"
-                    value={formData.secondaryColor}
-                    onChange={(e) => setFormData({ ...formData, secondaryColor: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <FaCog className="mr-2 text-orange-600" />
-              Abonelik Planı
-            </h3>
-            <div className="space-y-3">
-              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="plan"
-                  value="basic"
-                  checked={formData.plan === 'basic'}
-                  onChange={(e) => setFormData({ ...formData, plan: e.target.value as any })}
-                  className="mr-3"
-                />
-                <div className="flex-1">
-                  <div className="font-medium">Basic Plan</div>
-                  <div className="text-sm text-gray-500">10 masa, temel özellikler</div>
-                </div>
-                <div className="text-lg font-bold">₺299/ay</div>
-              </label>
-              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="plan"
-                  value="premium"
-                  checked={formData.plan === 'premium'}
-                  onChange={(e) => setFormData({ ...formData, plan: e.target.value as any })}
-                  className="mr-3"
-                />
-                <div className="flex-1">
-                  <div className="font-medium">Premium Plan</div>
-                  <div className="text-sm text-gray-500">25 masa, gelişmiş özellikler</div>
-                </div>
-                <div className="text-lg font-bold">₺599/ay</div>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Şifre Değiştirme Bölümü */}
-      <div className="mt-8 bg-white rounded-xl p-6 border border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-            <FaLock className="mr-2 text-red-600" />
-            Şifre Yönetimi
+    <div className="max-w-4xl mx-auto p-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Temel Bilgiler */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <FaBuilding className="mr-2" />
+            Temel Bilgiler
           </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Restoran Adı *</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Restoran adını girin"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="Restoran">Restoran</option>
+                <option value="İtalyan">İtalyan</option>
+                <option value="Fast Food">Fast Food</option>
+                <option value="Japon">Japon</option>
+                <option value="Kahve">Kahve</option>
+                <option value="Et Restoranı">Et Restoranı</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Masa Sayısı</label>
+              <input
+                type="number"
+                name="tableCount"
+                value={formData.tableCount}
+                onChange={handleInputChange}
+                min="1"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
+                <option value="pending">Beklemede</option>
+                <option value="suspended">Askıya Alındı</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* İletişim Bilgileri */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <FaMapMarkerAlt className="mr-2" />
+            İletişim Bilgileri
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Adres *</label>
+              <textarea
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                required
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Tam adres bilgisi"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="+90 555 123 45 67"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="info@restoran.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
+              <input
+                type="url"
+                name="website"
+                value={formData.website}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="https://www.restoran.com"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Sahip Bilgileri */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <FaUser className="mr-2" />
+            Sahip Bilgileri
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Adı</label>
+              <input
+                type="text"
+                name="ownerName"
+                value={formData.ownerName}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Sahip adı soyadı"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Sahip E-posta</label>
+              <input
+                type="email"
+                name="ownerEmail"
+                value={formData.ownerEmail}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="sahip@restoran.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Telefon</label>
+              <input
+                type="tel"
+                name="ownerPhone"
+                value={formData.ownerPhone}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="+90 555 123 45 67"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Özellikler */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <FaGlobe className="mr-2" />
+            Özellikler
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { key: 'qr-menu', label: 'QR Menü' },
+              { key: 'online-ordering', label: 'Online Sipariş' },
+              { key: 'table-management', label: 'Masa Yönetimi' },
+              { key: 'payment-integration', label: 'Ödeme Entegrasyonu' },
+              { key: 'analytics', label: 'Analitik' },
+              { key: 'multi-language', label: 'Çoklu Dil' }
+            ].map(feature => (
+              <label key={feature.key} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.features.includes(feature.key)}
+                  onChange={() => handleFeatureToggle(feature.key)}
+                  className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">{feature.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Butonlar */}
+        <div className="flex justify-end space-x-4 pt-6">
           <button
             type="button"
-            data-password-toggle
-            onClick={() => setShowPasswordChange(!showPasswordChange)}
-            className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+            onClick={onClose}
+            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
           >
-            {showPasswordChange ? 'İptal' : 'Şifre Değiştir'}
+            <FaTimes className="inline mr-2" />
+            İptal
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <FaSave className="inline mr-2" />
+            {isLoading ? 'Güncelleniyor...' : 'Güncelle'}
           </button>
         </div>
-
-        {showPasswordChange && (
-          <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-            {passwordErrors.length > 0 && (
-              <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
-                <ul className="list-disc list-inside space-y-1">
-                  {passwordErrors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Yeni Şifre *
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Yeni şifre girin"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Şifre Tekrar *
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Şifreyi tekrar girin"
-                />
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-blue-800 mb-2">Şifre Gereksinimleri:</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• En az 6 karakter uzunluğunda</li>
-                <li>• En az bir büyük harf içermeli</li>
-                <li>• En az bir rakam içermeli</li>
-              </ul>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handlePasswordChange}
-                disabled={isLoading || !passwordData.newPassword || !passwordData.confirmPassword}
-                className={`px-6 py-2 rounded-lg text-white flex items-center ${
-                  isLoading || !passwordData.newPassword || !passwordData.confirmPassword
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-red-600 hover:bg-red-700'
-                }`}
-              >
-                <FaCheck className="mr-2" />
-                {isLoading ? 'Değiştiriliyor...' : 'Şifreyi Değiştir'}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-8 flex justify-end space-x-4">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-        >
-          İptal
-        </button>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className={`px-6 py-2 rounded-lg text-white flex items-center ${
-            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          <FaSave className="mr-2" />
-          {isLoading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
