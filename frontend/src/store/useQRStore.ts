@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { QRCode } from '@/types';
+import { createPersistOptions } from './storageConfig';
 
 interface QRState {
   qrCodes: QRCode[];
@@ -77,8 +78,6 @@ export const useQRStore = create<QRState>()(
       
       endTableSession: () => set({ activeTableSession: null }),
     }),
-    {
-      name: 'qr-storage',
-    }
+    createPersistOptions('masapp-qr-storage')
   )
 );

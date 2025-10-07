@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getStorageKey } from '@/utils/subdomain';
+import { createPersistOptions } from './storageConfig';
 // Simple ID generator
 const generateId = () => Math.random().toString(36).substring(2, 15);
 import { CartItem } from './useCartStore';
@@ -84,15 +84,13 @@ const useOrderStore = create<OrderState>()(
         );
       },
       
-      getRecentOrders: (limit = 5) => {
+      getRecentOrders: (limit = 10) => {
         return [...get().orders]
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, limit);
       },
     }),
-    {
-      name: getStorageKey('masapp-order-storage'),
-    }
+    createPersistOptions('order-storage')
   )
 );
 

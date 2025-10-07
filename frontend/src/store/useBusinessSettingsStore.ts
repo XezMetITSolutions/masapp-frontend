@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { BusinessSettings, AccountInfo, BusinessStats } from '@/types';
+import { createPersistOptions } from './storageConfig';
 
 interface BusinessSettingsState {
   // Ayarlar
@@ -537,9 +538,7 @@ export const useBusinessSettingsStore = create<BusinessSettingsState>()(
         return isValid && isAvailable;
       }
     }),
-    {
-      name: 'business-settings-storage',
-    }
+    createPersistOptions('business-settings-storage')
   )
 );
 

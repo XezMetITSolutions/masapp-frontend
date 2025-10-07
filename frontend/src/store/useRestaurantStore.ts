@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Restaurant, MenuCategory, MenuItem, Order, ServiceCall } from '@/types';
+import { createPersistOptions } from './storageConfig';
 
 interface RestaurantState {
   // Mevcut restoran bilgisi
@@ -191,9 +192,7 @@ const useRestaurantStore = create<RestaurantState>()(
         serviceCalls: state.serviceCalls.filter(call => call.status !== 'completed')
       })),
     }),
-    {
-      name: 'restaurant-storage',
-    }
+    createPersistOptions('restaurant-storage')
   )
 );
 

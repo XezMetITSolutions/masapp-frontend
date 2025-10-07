@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { aiTranslationService } from '@/lib/aiTranslation';
+import { createPersistOptions } from './storageConfig';
 
 type Language = 'en' | 'tr';
 
@@ -219,9 +220,7 @@ const useLanguageStore = create<LanguageState>()(
         }
       },
     }),
-    {
-      name: 'masapp-language-storage',
-    }
+    createPersistOptions('language-storage')
   )
 );
 

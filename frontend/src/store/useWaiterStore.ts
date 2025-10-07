@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { createPersistOptions } from './storageConfig';
 // Simple ID generator
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
@@ -77,9 +78,7 @@ const useWaiterStore = create<WaiterState>()(
         );
       },
     }),
-    {
-      name: 'masapp-waiter-storage',
-    }
+    createPersistOptions('masapp-waiter-storage')
   )
 );
 

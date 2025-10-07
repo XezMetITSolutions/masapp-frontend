@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { createPersistOptions } from './storageConfig';
 // Simple ID generator
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
@@ -205,9 +206,7 @@ const useCartStore = create<CartState>()(
         return subtotal - discount + tipAmount;
       },
     }),
-    {
-      name: 'masapp-cart-storage',
-    }
+    createPersistOptions('masapp-cart-storage')
   )
 );
 
