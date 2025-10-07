@@ -32,6 +32,9 @@ export default function LoginPage() {
       await login(demoUser, 'demo-access-token', 'demo-refresh-token');
       console.log('Login successful');
       
+      // Cookie set et (middleware için)
+      document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
+      
       if (role === 'waiter') {
         console.log('Redirecting to waiter panel');
         router.push('/business/waiter');

@@ -31,6 +31,8 @@ export default function LoginPage() {
 
     if (restaurant) {
       loginRestaurant(restaurant);
+      // Cookie set et (middleware için)
+      document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
       router.push('/business/dashboard');
       return;
     }
@@ -42,6 +44,8 @@ export default function LoginPage() {
 
     if (staff) {
       loginStaff(staff);
+      // Cookie set et (middleware için)
+      document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
       // Role göre yönlendirme
       switch (staff.role) {
         case 'waiter':
