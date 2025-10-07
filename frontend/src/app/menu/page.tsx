@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -17,6 +17,7 @@ import TranslatedText from '@/components/TranslatedText';
 import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 import SetBrandColor from '@/components/SetBrandColor';
 import { createSessionToken, validateToken, getSessionToken, markTokenAsUsed, getRemainingTime } from '@/utils/sessionToken';
+import { saveKardeslerDataToLocalStorage } from '@/utils/saveKardeslerData';
 
 export function MenuPageContent() {
   // Store states
@@ -122,7 +123,7 @@ export function MenuPageContent() {
       setTokenValid(true);
       
       // Debug alert - basit
-      alert(`Menu yüklendi!\nRestaurant: ${finalRestaurant}\nHostname: ${hostname}`);
+      // Debug alert kaldırıldı - artık gerekli değil
     }
   }, [setTableNumber]);
   
