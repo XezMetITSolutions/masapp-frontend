@@ -79,6 +79,7 @@ interface MenuState {
   createMenuItem: (restaurantId: string, itemData: any) => Promise<any>;
   updateMenuItem: (restaurantId: string, itemId: string, itemData: any) => Promise<any>;
   deleteMenuItem: (restaurantId: string, itemId: string) => Promise<boolean>;
+  deleteCategory: (restaurantId: string, categoryId: string) => Promise<boolean>;
 }
 
 // Sample menu data
@@ -663,6 +664,40 @@ const useMenuStore = create<MenuState>()((set, get) => ({
     });
 
     set({ items: updatedItems });
+  },
+
+  // Delete category via PostgreSQL API
+  deleteCategory: async (restaurantId: string, categoryId: string) => {
+    try {
+      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Remove from local state
+        set((state) => ({
+          categories: state.categories.filter(cat => cat.id !== categoryId),
+          items: state.items.filter(item => item.categoryId !== categoryId) // Also remove items in this category
+        }));
+        console.log('Category deleted successfully:', categoryId);
+        return true;
+      } else {
+        throw new Error(result.message || 'Failed to delete category');
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      set({ error: error instanceof Error ? error.message : 'Failed to delete category' });
+      return false;
+    }
   }
 }));
 

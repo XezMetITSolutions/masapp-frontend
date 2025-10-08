@@ -61,12 +61,17 @@ export default function MenuManagement() {
     createRestaurant
   } = useRestaurantStore();
   
-  const { createCategory, createMenuItem, fetchMenu } = useMenuStore();
+  // Menu store'dan PostgreSQL API fonksiyonları
+  const { 
+    createCategory: createCategoryAPI, 
+    createMenuItem: createMenuItemAPI, 
+    fetchMenu,
+    deleteMenuItem: deleteMenuItemAPI,
+    deleteCategory: deleteCategoryAPI 
+  } = useMenuStore();
   
   // Feature kontrolü
   const hasQrMenu = useFeature('qr_menu');
-  
-  // Restaurant ID'sini al - authenticated restaurant'tan veya subdomain'den
   const getRestaurantId = useCallback(() => {
     // Önce authenticated restaurant'tan al
     if (authenticatedRestaurant?.id) {
@@ -240,11 +245,22 @@ export default function MenuManagement() {
     setShowItemForm(true);
   };
 
-  const handleDeleteItem = (itemId: string) => {
+  const handleDeleteItem = async (itemId: string) => {
     if (confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
-      // Store'dan ürünü sil
-      deleteMenuItem(itemId);
-      console.log('Ürün silindi:', itemId);
+      const restaurantId = getRestaurantId();
+      if (restaurantId) {
+        // PostgreSQL API'den sil
+        const success = await deleteMenuItemAPI(restaurantId, itemId);
+        if (success) {
+          console.log('Ürün PostgreSQL\'den silindi:', itemId);
+        } else {
+          console.error('Ürün silinemedi:', itemId);
+        }
+      } else {
+        // Fallback: local store'dan sil
+        deleteMenuItem(itemId);
+        console.log('Ürün local store\'dan silindi:', itemId);
+      }
     }
   };
 
@@ -267,11 +283,22 @@ export default function MenuManagement() {
     setShowCategoryForm(true);
   };
 
-  const handleDeleteCategory = (categoryId: string) => {
+  const handleDeleteCategory = async (categoryId: string) => {
     if (confirm('Bu kategoriyi silmek istediğinizden emin misiniz? Bu kategoriye ait tüm ürünler de silinecektir.')) {
-      // Store'dan kategoriyi sil
-      deleteCategory(categoryId);
-      console.log('Kategori silindi:', categoryId);
+      const restaurantId = getRestaurantId();
+      if (restaurantId) {
+        // PostgreSQL API'den sil
+        const success = await deleteCategoryAPI(restaurantId, categoryId);
+        if (success) {
+          console.log('Kategori PostgreSQL\'den silindi:', categoryId);
+        } else {
+          console.error('Kategori silinemedi:', categoryId);
+        }
+      } else {
+        // Fallback: local store'dan sil
+        deleteCategory(categoryId);
+        console.log('Kategori local store\'dan silindi:', categoryId);
+      }
     }
   };
 
@@ -1241,7 +1268,7 @@ export default function MenuManagement() {
                           
                           // Backend API'sine kaydet
                           if (currentRestaurantId) {
-                            await createMenuItem(currentRestaurantId, {
+                            await createMenuItemAPI(currentRestaurantId, {
                               categoryId: formData.category,
                               name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
                               description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
@@ -1461,7 +1488,7 @@ export default function MenuManagement() {
                         } else {
                           // Backend API'sine kaydet
                           if (currentRestaurantId) {
-                            await createCategory(currentRestaurantId, {
+                            await createCategoryAPI(currentRestaurantId, {
                               name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
                               description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
                               order: categories.length,
