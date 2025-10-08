@@ -42,9 +42,7 @@ interface ReportsState {
   clearReports: () => void;
 }
 
-const useReportsStore = create<ReportsState>()(
-  persist(
-    (set, get) => ({
+const useReportsStore = create<ReportsState>()((set, get) => ({
       salesReports: [],
       productReports: [],
       tableReports: [],
@@ -216,9 +214,6 @@ const useReportsStore = create<ReportsState>()(
       clearReports: () => {
         set({ salesReports: [], productReports: [], tableReports: [] });
       }
-    }),
-    createPersistOptions('reports-storage')
-  )
-);
+}));
 
 export default useReportsStore;

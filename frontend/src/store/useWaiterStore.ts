@@ -29,9 +29,7 @@ interface WaiterState {
   getActiveRequests: () => WaiterRequest[];
 }
 
-const useWaiterStore = create<WaiterState>()(
-  persist(
-    (set, get) => ({
+const useWaiterStore = create<WaiterState>()((set, get) => ({
       requests: [],
       tableNumber: 5, // Default table number
       
@@ -77,9 +75,6 @@ const useWaiterStore = create<WaiterState>()(
           request.status === 'pending' || request.status === 'acknowledged'
         );
       },
-    }),
-    createPersistOptions('masapp-waiter-storage')
-  )
-);
+}));
 
 export default useWaiterStore;

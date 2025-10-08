@@ -19,9 +19,7 @@ interface LanguageState {
   isTranslating: boolean;
 }
 
-const useLanguageStore = create<LanguageState>()(
-  persist(
-    (set, get) => ({
+const useLanguageStore = create<LanguageState>()((set, get) => ({
       language: 'en', // Default language
       isTranslating: false,
       
@@ -219,9 +217,6 @@ const useLanguageStore = create<LanguageState>()(
           return text; // Hata durumunda orijinal metni döndür
         }
       },
-    }),
-    createPersistOptions('language-storage')
-  )
-);
+}));
 
 export default useLanguageStore;

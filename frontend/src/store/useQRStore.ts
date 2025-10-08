@@ -22,9 +22,7 @@ interface QRState {
   endTableSession: () => void;
 }
 
-export const useQRStore = create<QRState>()(
-  persist(
-    (set, get) => ({
+export const useQRStore = create<QRState>()((set, get) => ({
       qrCodes: [],
       activeTableSession: null,
       
@@ -71,13 +69,10 @@ export const useQRStore = create<QRState>()(
           activeTableSession: {
             restaurantId,
             tableNumber,
-            sessionId
+            sessionId,
           }
         });
       },
       
-      endTableSession: () => set({ activeTableSession: null }),
-    }),
-    createPersistOptions('masapp-qr-storage')
-  )
-);
+      endTableSession: () => set({ activeTableSession: null })
+}));
