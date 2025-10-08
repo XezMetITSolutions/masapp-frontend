@@ -763,7 +763,7 @@ export default function MenuManagement() {
               {categories.map(category => (
               <div key={category.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-lg">{category.name.tr}</h3>
+                  <h3 className="font-semibold text-lg">{typeof category.name === 'string' ? category.name : category.name.tr}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     (category as any).isActive !== false
                       ? 'bg-green-100 text-green-800'
@@ -1709,7 +1709,7 @@ export default function MenuManagement() {
                       <option value="all">Tüm Kategoriler</option>
                       {categories.map(category => (
                         <option key={category.id} value={category.id}>
-                          {category.name.tr}
+                          {typeof category.name === 'string' ? category.name : category.name.tr}
                         </option>
                       ))}
                     </select>
