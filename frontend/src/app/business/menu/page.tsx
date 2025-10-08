@@ -221,7 +221,8 @@ export default function MenuManagement() {
 
   const handleDeleteItem = (itemId: string) => {
     if (confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
-      // Demo için ürünü listeden kaldır
+      // Store'dan ürünü sil
+      deleteMenuItem(itemId);
       console.log('Ürün silindi:', itemId);
     }
   };
@@ -246,8 +247,9 @@ export default function MenuManagement() {
   };
 
   const handleDeleteCategory = (categoryId: string) => {
-    if (confirm('Bu kategoriyi silmek istediğinizden emin misiniz?')) {
-      // Demo için kategoriyi listeden kaldır
+    if (confirm('Bu kategoriyi silmek istediğinizden emin misiniz? Bu kategoriye ait tüm ürünler de silinecektir.')) {
+      // Store'dan kategoriyi sil
+      deleteCategory(categoryId);
       console.log('Kategori silindi:', categoryId);
     }
   };
