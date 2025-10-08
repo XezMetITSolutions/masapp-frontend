@@ -149,12 +149,12 @@ export default function MenuStats({ items, categories, getItemsByCategory }: Men
                   {category.image && (
                     <img
                       src={category.image}
-                      alt={category.name.tr}
+                      alt={category.name}
                       className="w-10 h-10 object-cover rounded"
                     />
                   )}
                   <div>
-                    <p className="font-medium">{category.name.tr}</p>
+                    <p className="font-medium">{category.name}</p>
                     <p className="text-sm text-gray-600">
                       {category.activeItems}/{category.totalItems} aktif
                     </p>
@@ -206,11 +206,11 @@ export default function MenuStats({ items, categories, getItemsByCategory }: Men
               <div key={item.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <img
                   src={item.image || '/placeholder-food.jpg'}
-                  alt={item.name.tr}
+                  alt={item.name}
                   className="w-12 h-12 object-cover rounded"
                 />
                 <div className="flex-1">
-                  <p className="font-medium text-sm">{item.name.tr}</p>
+                  <p className="font-medium text-sm">{item.name}</p>
                   <p className="text-sm text-gray-600">₺{item.price}</p>
                 </div>
                 <div className="text-red-500">

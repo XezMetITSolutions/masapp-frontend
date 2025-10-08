@@ -15,13 +15,13 @@ export default function CategoryForm({
   setFormData,
   isEditing = false
 }: CategoryFormProps) {
-  const [newSubcategory, setNewSubcategory] = useState({ en: '', tr: '' });
+  const [newSubcategory, setNewSubcategory] = useState('');
 
   const addSubcategory = () => {
-    if (newSubcategory.en.trim() && newSubcategory.tr.trim()) {
+    if (newSubcategory.trim()) {
       const subcategory = {
         id: `sub_${Date.now()}`,
-        name: { ...newSubcategory },
+        name: newSubcategory,
         parentId: formData.id || 'temp'
       };
       
@@ -29,7 +29,7 @@ export default function CategoryForm({
         ...formData,
         subcategories: [...(formData.subcategories || []), subcategory]
       });
-      setNewSubcategory({ en: '', tr: '' });
+      setNewSubcategory('');
     }
   };
 
@@ -45,17 +45,17 @@ export default function CategoryForm({
       {/* Temel Bilgiler */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Temel Bilgiler</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Kategori Adı (Türkçe) *
+              Kategori Adı *
             </label>
             <input
               type="text"
-              value={formData.name.tr}
+              value={formData.name || ''}
               onChange={(e) => setFormData({
                 ...formData,
-                name: { ...formData.name, tr: e.target.value }
+                name: e.target.value
               })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
@@ -64,50 +64,13 @@ export default function CategoryForm({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Kategori Adı (İngilizce) *
-            </label>
-            <input
-              type="text"
-              value={formData.name.en}
-              onChange={(e) => setFormData({
-                ...formData,
-                name: { ...formData.name, en: e.target.value }
-              })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Açıklama (Türkçe)
+              Açıklama
             </label>
             <textarea
-              value={formData.description?.tr || ''}
+              value={formData.description || ''}
               onChange={(e) => setFormData({
                 ...formData,
-                description: { 
-                  ...formData.description, 
-                  tr: e.target.value 
-                }
-              })}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Açıklama (İngilizce)
-            </label>
-            <textarea
-              value={formData.description?.en || ''}
-              onChange={(e) => setFormData({
-                ...formData,
-                description: { 
-                  ...formData.description, 
-                  en: e.target.value 
-                }
+                description: e.target.value
               })}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -138,42 +101,29 @@ export default function CategoryForm({
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Alt Kategoriler</h3>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div className="flex gap-2">
             <input
               type="text"
-              value={newSubcategory.tr}
-              onChange={(e) => setNewSubcategory({
-                ...newSubcategory,
-                tr: e.target.value
-              })}
-              placeholder="Alt kategori adı (Türkçe)"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              value={newSubcategory}
+              onChange={(e) => setNewSubcategory(e.target.value)}
+              placeholder="Alt kategori adı"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              onKeyPress={(e) => e.key === 'Enter' && addSubcategory()}
             />
-            <input
-              type="text"
-              value={newSubcategory.en}
-              onChange={(e) => setNewSubcategory({
-                ...newSubcategory,
-                en: e.target.value
-              })}
-              placeholder="Alt kategori adı (İngilizce)"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
+            <button
+              onClick={addSubcategory}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+            >
+              <FaPlus />
+              Alt Kategori Ekle
+            </button>
           </div>
-          <button
-            onClick={addSubcategory}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
-          >
-            <FaPlus />
-            Alt Kategori Ekle
-          </button>
 
           <div className="space-y-2">
             {formData.subcategories?.map((subcategory: any, index: number) => (
               <div key={index} className="flex items-center gap-2 p-3 bg-white rounded-lg border">
                 <div className="flex-1">
-                  <div className="font-medium">{subcategory.name.tr}</div>
-                  <div className="text-sm text-gray-500">{subcategory.name.en}</div>
+                  <div className="font-medium">{subcategory.name}</div>
                 </div>
                 <button
                   onClick={() => removeSubcategory(index)}

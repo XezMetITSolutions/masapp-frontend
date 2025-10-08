@@ -91,14 +91,8 @@ export interface QRCode {
 export interface MenuCategory {
   id: string;
   restaurantId: string;
-  name: {
-    tr: string;
-    en: string;
-  };
-  description?: {
-    tr: string;
-    en: string;
-  };
+  name: string; // Sadece Türkçe
+  description?: string; // Sadece Türkçe
   image?: string;
   order: number;
   isActive: boolean;
@@ -108,30 +102,15 @@ export interface MenuItem {
   id: string;
   restaurantId: string;
   categoryId: string;
-  name: {
-    tr: string;
-    en: string;
-  };
-  description: {
-    tr: string;
-    en: string;
-  };
+  name: string; // Sadece Türkçe
+  description: string; // Sadece Türkçe
   price: number;
   image?: string;
-  ingredients?: {
-    tr: string[];
-    en: string[];
-  };
-  allergens?: {
-    tr: string[];
-    en: string[];
-  };
+  ingredients?: string[]; // Sadece Türkçe
+  allergens?: string[]; // Sadece Türkçe
   calories?: number;
   preparationTime?: number;
-  servingInfo?: {
-    tr: string;
-    en: string;
-  };
+  servingInfo?: string; // Sadece Türkçe
   isAvailable: boolean;
   isPopular?: boolean;
   order: number;
@@ -159,10 +138,7 @@ export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'ser
 
 export interface OrderItem {
   menuItemId: string;
-  name: {
-    tr: string;
-    en: string;
-  };
+  name: string; // Sadece Türkçe
   quantity: number;
   price: number;
   notes?: string;

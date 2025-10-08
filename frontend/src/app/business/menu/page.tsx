@@ -119,12 +119,10 @@ export default function MenuManagement() {
   const [bulkPriceOperation, setBulkPriceOperation] = useState<'increase' | 'decrease'>('increase');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Form state'leri
+  // Form state'leri - Sadece Türkçe
   const [formData, setFormData] = useState({
-    nameTr: '',
-    nameEn: '',
-    descriptionTr: '',
-    descriptionEn: '',
+    name: '',
+    description: '',
     price: '',
     category: '',
     preparationTime: '',
@@ -134,10 +132,8 @@ export default function MenuManagement() {
   });
   
   const [categoryFormData, setCategoryFormData] = useState({
-    nameTr: '',
-    nameEn: '',
-    descriptionTr: '',
-    descriptionEn: '',
+    name: '',
+    description: '',
     order: 0,
     isActive: true
   });
@@ -196,10 +192,8 @@ export default function MenuManagement() {
     setEditingItem(null);
     setCapturedImage(null);
     setFormData({
-      nameTr: '',
-      nameEn: '',
-      descriptionTr: '',
-      descriptionEn: '',
+      name: '',
+      description: '',
       price: '',
       category: '',
       preparationTime: '',
@@ -213,10 +207,8 @@ export default function MenuManagement() {
   const handleEditItem = (item: any) => {
     setEditingItem(item);
     setFormData({
-      nameTr: item.name.tr || '',
-      nameEn: item.name.en || '',
-      descriptionTr: item.description.tr || '',
-      descriptionEn: item.description.en || '',
+      name: item.name || '',
+      description: item.description || '',
       price: item.price.toString(),
       category: item.categoryId || '',
       preparationTime: item.preparationTime?.toString() || '',
@@ -248,10 +240,8 @@ export default function MenuManagement() {
   const handleAddCategory = () => {
     setEditingCategory(null);
     setCategoryFormData({
-      nameTr: '',
-      nameEn: '',
-      descriptionTr: '',
-      descriptionEn: '',
+      name: '',
+      description: '',
       order: categories.length,
       isActive: true
     });
@@ -262,10 +252,8 @@ export default function MenuManagement() {
   const handleEditCategory = (category: any) => {
     setEditingCategory(category);
     setCategoryFormData({
-      nameTr: category.name.tr || '',
-      nameEn: category.name.en || '',
-      descriptionTr: category.description.tr || '',
-      descriptionEn: category.description.en || '',
+      name: category.name || '',
+      description: category.description || '',
       order: category.order || 0,
       isActive: category.isActive !== false
     });
@@ -289,11 +277,11 @@ export default function MenuManagement() {
   // Filtrelenmiş ürünler
   const filteredItems = items.filter(item => {
     // Güvenlik kontrolü - item.name ve item.description undefined olabilir
-    const nameTr = item.name?.tr || '';
-    const descriptionTr = item.description?.tr || '';
+    const itemName = item.name || '';
+    const itemDescription = item.description || '';
     
-    const matchesSearch = nameTr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         descriptionTr.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         itemDescription.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || 
                          (statusFilter === 'available' && item.isAvailable !== false) ||
@@ -483,12 +471,12 @@ export default function MenuManagement() {
                         <div className="flex items-center">
                           <img
                             src={item.image || '/placeholder-food.jpg'}
-                            alt={item.name.tr}
+                            alt={item.name}
                             className="h-12 w-12 rounded-lg object-cover mr-4"
                           />
                           <div>
                             <div className="text-sm font-medium text-gray-900">
-                              {item.name.tr}
+                              {item.name}
                               {item.isPopular && (
                                 <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200">
                                   <FaFire className="mr-1 text-yellow-600" />
@@ -497,13 +485,13 @@ export default function MenuManagement() {
                               )}
                             </div>
                             <div className="text-sm text-gray-500 line-clamp-1">
-                              {item.description.tr}
+                              {item.description}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {categories.find(c => c.id === item.categoryId)?.name.tr || 'Kategori Yok'}
+                        {categories.find(c => c.id === item.categoryId)?.name || 'Kategori Yok'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         ₺{item.price}
@@ -550,14 +538,14 @@ export default function MenuManagement() {
                 <div className="flex items-start gap-3">
                   <img
                     src={item.image || '/placeholder-food.jpg'}
-                    alt={item.name.tr}
+                    alt={item.name}
                     className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="text-sm font-medium text-gray-900 truncate">
-                          {item.name.tr}
+                          {item.name}
                         </h3>
                         {item.isPopular && (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200 mt-1">
@@ -566,7 +554,7 @@ export default function MenuManagement() {
                           </span>
                         )}
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                          {item.description.tr}
+                          {item.description}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2">
@@ -587,7 +575,7 @@ export default function MenuManagement() {
                     </div>
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-xs text-gray-500">
-                        {categories.find(c => c.id === item.categoryId)?.name.tr || 'Kategori Yok'}
+                        {categories.find(c => c.id === item.categoryId)?.name || 'Kategori Yok'}
                       </span>
                       <div className="flex gap-2">
                         <button 
@@ -647,7 +635,7 @@ export default function MenuManagement() {
               {categories.map(category => (
               <div key={category.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-lg">{category.name.tr}</h3>
+                  <h3 className="font-semibold text-lg">{category.name}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     category.isActive !== false
                       ? 'bg-green-100 text-green-800'
@@ -732,60 +720,32 @@ export default function MenuManagement() {
                 <div className="p-6 overflow-y-auto max-h-[70vh]">
                   <form className="space-y-6">
                     {/* Ürün Adı */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Ürün Adı (Türkçe) *
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.nameTr}
-                          onChange={(e) => setFormData({...formData, nameTr: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Örn: Bruschetta"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Ürün Adı (İngilizce)
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.nameEn}
-                          onChange={(e) => setFormData({...formData, nameEn: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Örn: Bruschetta"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Ürün Adı *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Örn: Bruschetta"
+                        required
+                      />
                     </div>
 
                     {/* Açıklama */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Açıklama (Türkçe)
-                        </label>
-                        <textarea
-                          value={formData.descriptionTr}
-                          onChange={(e) => setFormData({...formData, descriptionTr: e.target.value})}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Ürün açıklaması..."
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Açıklama (İngilizce)
-                        </label>
-                        <textarea
-                          value={formData.descriptionEn}
-                          onChange={(e) => setFormData({...formData, descriptionEn: e.target.value})}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Product description..."
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Açıklama
+                      </label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Ürün açıklaması..."
+                      />
                     </div>
 
                     {/* Fiyat ve Kategori */}
@@ -816,7 +776,7 @@ export default function MenuManagement() {
                           <option value="">Kategori Seçin</option>
                           {categories.length > 0 ? (
                             categories.map(cat => (
-                              <option key={cat.id} value={cat.id}>{cat.name.tr}</option>
+                              <option key={cat.id} value={cat.id}>{cat.name}</option>
                             ))
                           ) : (
                             <option disabled>Önce kategori ekleyin</option>
@@ -929,8 +889,8 @@ export default function MenuManagement() {
                           try {
                             if (currentRestaurantId) {
                               await updateMenuItem(currentRestaurantId, editingItem.id, {
-                                name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
-                                description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                                name: formData.name,
+                                description: formData.description,
                                 price: Number(formData.price),
                                 categoryId: formData.category,
                                 preparationTime: Number(formData.preparationTime) || 0,
@@ -947,7 +907,7 @@ export default function MenuManagement() {
                           }
                         } else {
                           // Yeni ürün ekleme
-                          if (!formData.nameTr || !formData.price || !formData.category) {
+                          if (!formData.name || !formData.price || !formData.category) {
                             alert('Lütfen ürün adı, fiyat ve kategori alanlarını doldurun!');
                             return;
                           }
@@ -956,16 +916,15 @@ export default function MenuManagement() {
                             if (currentRestaurantId) {
                               await createMenuItem(currentRestaurantId, {
                                 categoryId: formData.category,
-                                name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
-                                description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                                name: formData.name,
+                                description: formData.description,
                                 price: Number(formData.price),
                                 image: capturedImage || '/placeholder-food.jpg',
                                 order: items.length + 1,
                                 isAvailable: formData.isAvailable,
                                 isPopular: formData.isPopular,
                                 preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0,
-                                allergens: { tr: [], en: [] }
+                                calories: Number(formData.calories) || 0
                               });
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
                             }
@@ -979,10 +938,8 @@ export default function MenuManagement() {
                         setCapturedImage(null);
                         // Form resetle
                         setFormData({
-                          nameTr: '',
-                          nameEn: '',
-                          descriptionTr: '',
-                          descriptionEn: '',
+                          name: '',
+                          description: '',
                           price: '',
                           category: '',
                           preparationTime: '',
@@ -1024,8 +981,8 @@ export default function MenuManagement() {
                       </label>
                       <input
                         type="text"
-                        value={categoryFormData.nameTr}
-                        onChange={(e) => setCategoryFormData({...categoryFormData, nameTr: e.target.value})}
+                        value={categoryFormData.name}
+                        onChange={(e) => setCategoryFormData({...categoryFormData, name: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="Örn: Başlangıçlar, Ana Yemekler, Tatlılar"
                         required
@@ -1056,7 +1013,7 @@ export default function MenuManagement() {
                     <button
                       onClick={async () => {
                         // Gerçek kategori güncelleme işlemi
-                        if (!categoryFormData.nameTr) {
+                        if (!categoryFormData.name) {
                           alert('Lütfen kategori adını girin!');
                           return;
                         }
@@ -1065,8 +1022,8 @@ export default function MenuManagement() {
                           if (editingCategory) {
                             if (currentRestaurantId) {
                               await updateMenuCategory(currentRestaurantId, editingCategory.id, {
-                                name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
-                                description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                                name: categoryFormData.name,
+                                description: categoryFormData.description,
                                 order: categoryFormData.order,
                                 isActive: categoryFormData.isActive
                               });
@@ -1076,8 +1033,8 @@ export default function MenuManagement() {
                             // Backend API'sine kaydet
                             if (currentRestaurantId) {
                               await createMenuCategory(currentRestaurantId, {
-                                name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
-                                description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                                name: categoryFormData.name,
+                                description: categoryFormData.description,
                                 order: categories.length,
                                 isActive: categoryFormData.isActive
                               });
@@ -1092,10 +1049,8 @@ export default function MenuManagement() {
                         setEditingCategory(null);
                         setSubcategories([]); // Formu temizle
                         setCategoryFormData({
-                          nameTr: '',
-                          nameEn: '',
-                          descriptionTr: '',
-                          descriptionEn: '',
+                          name: '',
+                          description: '',
                           order: 0,
                           isActive: true
                         });

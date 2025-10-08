@@ -20,13 +20,13 @@ export default function MenuItemForm({
   getSubcategoriesByParent
 }: MenuItemFormProps) {
   const [newIngredient, setNewIngredient] = useState('');
-  const [newAllergen, setNewAllergen] = useState({ en: '', tr: '' });
+  const [newAllergen, setNewAllergen] = useState('');
 
   const addIngredient = () => {
     if (newIngredient.trim()) {
       setFormData({
         ...formData,
-        ingredients: [...formData.ingredients, newIngredient.trim()]
+        ingredients: [...(formData.ingredients || []), newIngredient.trim()]
       });
       setNewIngredient('');
     }
@@ -40,12 +40,12 @@ export default function MenuItemForm({
   };
 
   const addAllergen = () => {
-    if (newAllergen.en.trim() && newAllergen.tr.trim()) {
+    if (newAllergen.trim()) {
       setFormData({
         ...formData,
-        allergens: [...formData.allergens, { ...newAllergen }]
+        allergens: [...(formData.allergens || []), newAllergen.trim()]
       });
-      setNewAllergen({ en: '', tr: '' });
+      setNewAllergen('');
     }
   };
 
@@ -62,32 +62,16 @@ export default function MenuItemForm({
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Temel Bilgiler</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ürün Adı (Türkçe) *
+              Ürün Adı *
             </label>
             <input
               type="text"
-              value={formData.name.tr}
+              value={formData.name || ''}
               onChange={(e) => setFormData({
                 ...formData,
-                name: { ...formData.name, tr: e.target.value }
-              })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ürün Adı (İngilizce) *
-            </label>
-            <input
-              type="text"
-              value={formData.name.en}
-              onChange={(e) => setFormData({
-                ...formData,
-                name: { ...formData.name, en: e.target.value }
+                name: e.target.value
               })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
@@ -96,28 +80,13 @@ export default function MenuItemForm({
 
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Açıklama (Türkçe)
+              Açıklama
             </label>
             <textarea
-              value={formData.description.tr}
+              value={formData.description || ''}
               onChange={(e) => setFormData({
                 ...formData,
-                description: { ...formData.description, tr: e.target.value }
-              })}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Açıklama (İngilizce)
-            </label>
-            <textarea
-              value={formData.description.en}
-              onChange={(e) => setFormData({
-                ...formData,
-                description: { ...formData.description, en: e.target.value }
+                description: e.target.value
               })}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -158,7 +127,7 @@ export default function MenuItemForm({
               <option value="">Kategori Seçin</option>
               {categories.map(category => (
                 <option key={category.id} value={category.id}>
-                  {category.name.tr}
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -180,7 +149,7 @@ export default function MenuItemForm({
                 <option value="">Alt Kategori Seçin</option>
                 {getSubcategoriesByParent(formData.category).map(subcategory => (
                   <option key={subcategory.id} value={subcategory.id}>
-                    {subcategory.name.tr}
+                    {subcategory.name}
                   </option>
                 ))}
               </select>
@@ -332,43 +301,31 @@ export default function MenuItemForm({
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Alerjenler</h3>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div className="flex gap-2">
             <input
               type="text"
-              value={newAllergen.en}
-              onChange={(e) => setNewAllergen({
-                ...newAllergen,
-                en: e.target.value
-              })}
-              placeholder="Alerjen (İngilizce)"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              value={newAllergen}
+              onChange={(e) => setNewAllergen(e.target.value)}
+              placeholder="Alerjen adı girin"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              onKeyPress={(e) => e.key === 'Enter' && addAllergen()}
             />
-            <input
-              type="text"
-              value={newAllergen.tr}
-              onChange={(e) => setNewAllergen({
-                ...newAllergen,
-                tr: e.target.value
-              })}
-              placeholder="Alerjen (Türkçe)"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
+            <button
+              onClick={addAllergen}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
+            >
+              <FaPlus />
+              Ekle
+            </button>
           </div>
-          <button
-            onClick={addAllergen}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
-          >
-            <FaPlus />
-            Alerjen Ekle
-          </button>
 
           <div className="flex flex-wrap gap-2">
-            {formData.allergens?.map((allergen: any, index: number) => (
+            {formData.allergens?.map((allergen: string, index: number) => (
               <span
                 key={index}
                 className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm"
               >
-                {allergen.tr} ({allergen.en})
+                {allergen}
                 <button
                   onClick={() => removeAllergen(index)}
                   className="text-red-600 hover:text-red-800"
@@ -384,36 +341,20 @@ export default function MenuItemForm({
       {/* Servis Bilgileri */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Servis Bilgileri</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Servis Bilgisi (Türkçe)
-            </label>
-            <input
-              type="text"
-              value={formData.servingInfo.tr}
-              onChange={(e) => setFormData({
-                ...formData,
-                servingInfo: { ...formData.servingInfo, tr: e.target.value }
-              })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Servis Bilgisi (İngilizce)
-            </label>
-            <input
-              type="text"
-              value={formData.servingInfo.en}
-              onChange={(e) => setFormData({
-                ...formData,
-                servingInfo: { ...formData.servingInfo, en: e.target.value }
-              })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Servis Bilgisi
+          </label>
+          <input
+            type="text"
+            value={formData.servingInfo || ''}
+            onChange={(e) => setFormData({
+              ...formData,
+              servingInfo: e.target.value
+            })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="Örn: 1 kişilik, 250g"
+          />
         </div>
       </div>
 

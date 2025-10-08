@@ -44,8 +44,6 @@ interface RestaurantState {
   
   setMenuItems: (items: MenuItem[]) => void;
   addMenuItem: (item: MenuItem) => void;
-  updateMenuItem: (id: string, updates: Partial<MenuItem>) => void;
-  deleteMenuItem: (id: string) => void;
   
   // Order Actions
   setOrders: (orders: Order[]) => void;
@@ -161,7 +159,15 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   createMenuCategory: async (restaurantId: string, data: any) => {
     set({ loading: true, error: null });
     try {
-      const response = await apiService.createMenuCategory(restaurantId, data);
+      // Backend için veriyi dönüştür: sadece Türkçe string gönder
+      const backendData = {
+        name: typeof data.name === 'string' ? data.name : data.name?.tr || '',
+        description: typeof data.description === 'string' ? data.description : data.description?.tr || '',
+        displayOrder: data.order || data.displayOrder || 0,
+        isActive: data.isActive !== undefined ? data.isActive : true
+      };
+      
+      const response = await apiService.createMenuCategory(restaurantId, backendData);
       if (response.success) {
         set((state) => ({
           categories: [...state.categories, response.data],
@@ -181,7 +187,18 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   createMenuItem: async (restaurantId: string, data: any) => {
     set({ loading: true, error: null });
     try {
-      const response = await apiService.createMenuItem(restaurantId, data);
+      // Backend için veriyi dönüştür: sadece Türkçe string gönder
+      const backendData = {
+        categoryId: data.categoryId,
+        name: typeof data.name === 'string' ? data.name : data.name?.tr || '',
+        description: typeof data.description === 'string' ? data.description : data.description?.tr || '',
+        price: parseFloat(data.price),
+        image: data.image,
+        displayOrder: data.order || data.displayOrder || 0,
+        isAvailable: data.isAvailable !== undefined ? data.isAvailable : true
+      };
+      
+      const response = await apiService.createMenuItem(restaurantId, backendData);
       if (response.success) {
         set((state) => ({
           menuItems: [...state.menuItems, response.data],
@@ -201,7 +218,15 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   updateMenuCategory: async (restaurantId: string, categoryId: string, data: any) => {
     set({ loading: true, error: null });
     try {
-      const response = await apiService.updateMenuCategory(restaurantId, categoryId, data);
+      // Backend için veriyi dönüştür
+      const backendData = {
+        name: typeof data.name === 'string' ? data.name : data.name?.tr,
+        description: typeof data.description === 'string' ? data.description : data.description?.tr,
+        displayOrder: data.order || data.displayOrder,
+        isActive: data.isActive
+      };
+      
+      const response = await apiService.updateMenuCategory(restaurantId, categoryId, backendData);
       if (response.success) {
         set((state) => ({
           categories: state.categories.map(c => 
@@ -232,19 +257,32 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         }));
         return true;
       }
+      return false;
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Kategori silinemedi', 
         loading: false 
       });
-      throw error;
+      return false;
     }
   },
 
   updateMenuItem: async (restaurantId: string, itemId: string, data: any) => {
     set({ loading: true, error: null });
     try {
-      const response = await apiService.updateMenuItem(restaurantId, itemId, data);
+      // Backend için veriyi dönüştür
+      const backendData = {
+        categoryId: data.categoryId,
+        name: typeof data.name === 'string' ? data.name : data.name?.tr,
+        description: typeof data.description === 'string' ? data.description : data.description?.tr,
+        price: data.price ? parseFloat(data.price) : undefined,
+        imageUrl: data.image,
+        displayOrder: data.order || data.displayOrder,
+        isAvailable: data.isAvailable,
+        isPopular: data.isPopular
+      };
+      
+      const response = await apiService.updateMenuItem(restaurantId, itemId, backendData);
       if (response.success) {
         set((state) => ({
           menuItems: state.menuItems.map(item => 
@@ -274,12 +312,13 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         }));
         return true;
       }
+      return false;
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Ürün silinemedi', 
         loading: false 
       });
-      throw error;
+      return false;
     }
   },
 
@@ -288,9 +327,33 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
     try {
       const response = await apiService.getRestaurantMenu(restaurantId);
       if (response.success) {
+        // Backend'den gelen veriyi frontend formatına dönüştür
+        const categories = response.data.categories || [];
+        const items = response.data.items || [];
+        
         set({
-          categories: response.data.categories || [],
-          menuItems: response.data.items || [],
+          categories: categories.map((cat: any) => ({
+            id: cat.id,
+            restaurantId: cat.restaurantId,
+            name: cat.name, // Artık sadece string
+            description: cat.description,
+            order: cat.displayOrder || 0,
+            isActive: cat.isActive !== false
+          })),
+          menuItems: items.map((item: any) => ({
+            id: item.id,
+            restaurantId: item.restaurantId,
+            categoryId: item.categoryId,
+            name: item.name, // Artık sadece string
+            description: item.description,
+            price: parseFloat(item.price),
+            image: item.imageUrl || item.image,
+            order: item.displayOrder || 0,
+            isAvailable: item.isAvailable !== false,
+            isPopular: item.isPopular || false,
+            calories: item.calories,
+            preparationTime: item.preparationTime
+          })),
           loading: false
         });
         return response.data;
@@ -339,16 +402,6 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
       
   addMenuItem: (item: MenuItem) => set((state) => ({
         menuItems: [...state.menuItems, item]
-      })),
-      
-  updateMenuItem: (id: string, updates: Partial<MenuItem>) => set((state) => ({
-        menuItems: state.menuItems.map(item => 
-          item.id === id ? { ...item, ...updates } : item
-        )
-      })),
-      
-  deleteMenuItem: (id: string) => set((state) => ({
-        menuItems: state.menuItems.filter(item => item.id !== id)
       })),
       
       // Order Actions
