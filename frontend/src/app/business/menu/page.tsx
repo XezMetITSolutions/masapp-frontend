@@ -32,9 +32,9 @@ import {
   FaBars,
   FaMoneyBillWave
 } from 'react-icons/fa';
-// useMenuStore kaldırıldı - useRestaurantStore kullanıyoruz
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
+import useMenuStore from '@/store/useMenuStore';
 import { lazy, Suspense } from 'react';
 import BusinessSidebar from '@/components/BusinessSidebar';
 import { useFeature } from '@/hooks/useFeature';
@@ -46,7 +46,7 @@ const BulkImportModal = lazy(() => import('@/components/BulkImportModal'));
 
 export default function MenuManagement() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
   const { 
     currentRestaurant, 
     restaurants,
@@ -58,9 +58,11 @@ export default function MenuManagement() {
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,
-    createMenuCategory,
-    createMenuItem
+    createRestaurant
   } = useRestaurantStore();
+  
+  // Menu store'dan PostgreSQL API fonksiyonları
+  const { createCategory, createMenuItem, fetchMenu } = useMenuStore();
   
   // Feature kontrolü
   const hasQrMenu = useFeature('qr_menu');
@@ -138,6 +140,9 @@ export default function MenuManagement() {
   });
 
   useEffect(() => {
+    // Sayfa yüklendiğinde authentication durumunu restore et
+    initializeAuth();
+    
     // Eğer subdomain varsa authentication olmadan da çalışsın (test için)
     const hasSubdomain = typeof window !== 'undefined' && 
       !['localhost', 'www', 'guzellestir'].includes(window.location.hostname.split('.')[0]) &&
@@ -146,7 +151,7 @@ export default function MenuManagement() {
     if (!isAuthenticated() && !hasSubdomain) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, initializeAuth]);
 
   const handleLogout = () => {
     logout();
