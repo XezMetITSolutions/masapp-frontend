@@ -189,7 +189,7 @@ export default function RestaurantsManagement() {
           alert('Restoran başarıyla silindi!');
           
           // Görünümü güncelle
-          router.refresh();
+            router.refresh();
           break;
         default:
           console.log(`${action} işlemi tamamlandı`);
@@ -235,30 +235,30 @@ export default function RestaurantsManagement() {
   return (
     <AdminLayout title="Restoran Yönetimi" description="Restoranları yönetin ve izleyin">
       <div className="flex justify-end px-8 py-4">
-        <button 
-          onClick={handleAddRestaurant}
-          disabled={isLoading}
-          className="bg-blue-100 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed text-blue-700 px-4 py-2 rounded-lg flex items-center transition-colors"
-        >
-          <FaPlus className="mr-2" />
-          Yeni Restoran
-        </button>
-        <button 
-          onClick={handleBulkApprove}
-          disabled={isLoading}
+              <button 
+                onClick={handleAddRestaurant}
+                disabled={isLoading}
+                className="bg-blue-100 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed text-blue-700 px-4 py-2 rounded-lg flex items-center transition-colors"
+              >
+                <FaPlus className="mr-2" />
+                Yeni Restoran
+              </button>
+              <button 
+                onClick={handleBulkApprove}
+                disabled={isLoading}
           className="bg-green-100 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed text-green-700 px-4 py-2 rounded-lg flex items-center transition-colors ml-3"
-        >
-          <FaCheck className="mr-2" />
-          Toplu Onay
-        </button>
-        <button 
-          onClick={handleQRManagement}
-          disabled={isLoading}
+              >
+                <FaCheck className="mr-2" />
+                Toplu Onay
+              </button>
+              <button 
+                onClick={handleQRManagement}
+                disabled={isLoading}
           className="bg-purple-100 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed text-purple-700 px-4 py-2 rounded-lg flex items-center transition-colors ml-3"
-        >
-          <FaQrcode className="mr-2" />
-          QR Kodlar
-        </button>
+              >
+                <FaQrcode className="mr-2" />
+                QR Kodlar
+              </button>
       </div>
 
       {/* Filters */}

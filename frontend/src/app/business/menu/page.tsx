@@ -34,7 +34,6 @@ import {
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
-import useMenuStore from '@/store/useMenuStore';
 import { lazy, Suspense } from 'react';
 import BusinessSidebar from '@/components/BusinessSidebar';
 import { useFeature } from '@/hooks/useFeature';
@@ -46,33 +45,27 @@ const BulkImportModal = lazy(() => import('@/components/BulkImportModal'));
 
 export default function MenuManagement() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
   const { 
     currentRestaurant, 
     restaurants,
     categories: allCategories, 
     menuItems: allMenuItems,
-    addCategory,
-    updateCategory,
-    deleteCategory,
-    addMenuItem,
+    createMenuCategory,
+    createMenuItem,
+    updateMenuCategory,
+    deleteMenuCategory,
     updateMenuItem,
     deleteMenuItem,
-    createRestaurant
+    fetchRestaurantMenu,
+    loading,
+    error
   } = useRestaurantStore();
-  
-  // Menu store'dan PostgreSQL API fonksiyonları
-  const { 
-    createCategory: createCategoryAPI, 
-    createMenuItem: createMenuItemAPI, 
-    updateMenuItem: updateMenuItemAPI,
-    fetchMenu,
-    deleteMenuItem: deleteMenuItemAPI,
-    deleteCategory: deleteCategoryAPI 
-  } = useMenuStore();
   
   // Feature kontrolü
   const hasQrMenu = useFeature('qr_menu');
+  
+  // Restoran ID'sini al
   const getRestaurantId = useCallback(() => {
     // Önce authenticated restaurant'tan al
     if (authenticatedRestaurant?.id) {
@@ -97,12 +90,7 @@ export default function MenuManagement() {
     return null;
   }, [authenticatedRestaurant?.id, restaurants]);
   
-  // Eski fonksiyon - geriye uyumluluk için
-  // const getRestaurantIdFromSubdomain = () => {
-  //   return getRestaurantId();
-  // };
-  
-  const currentRestaurantId = authenticatedRestaurant?.id || currentRestaurant?.id || getRestaurantId();
+  const currentRestaurantId = getRestaurantId();
   
   // Sadece bu restorana ait kategorileri ve ürünleri filtrele
   const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
@@ -154,10 +142,14 @@ export default function MenuManagement() {
     isActive: true
   });
 
+  // Sayfa yüklendiğinde menüyü backend'den çek
   useEffect(() => {
-    // Sayfa yüklendiğinde authentication durumunu restore et
-    initializeAuth();
-    
+    if (currentRestaurantId) {
+      fetchRestaurantMenu(currentRestaurantId);
+    }
+  }, [currentRestaurantId, fetchRestaurantMenu]);
+
+  useEffect(() => {
     // Eğer subdomain varsa authentication olmadan da çalışsın (test için)
     const hasSubdomain = typeof window !== 'undefined' && 
       !['localhost', 'www', 'guzellestir'].includes(window.location.hostname.split('.')[0]) &&
@@ -166,14 +158,7 @@ export default function MenuManagement() {
     if (!isAuthenticated() && !hasSubdomain) {
       router.push('/login');
     }
-    
-    // Restaurant ID'sini al ve menu verilerini yükle
-    const restaurantId = getRestaurantId();
-    if (restaurantId) {
-      console.log('Loading menu data for restaurant:', restaurantId);
-      fetchMenu(restaurantId);
-    }
-  }, [isAuthenticated, router, initializeAuth, fetchMenu, getRestaurantId]);
+  }, [isAuthenticated, router]);
 
   const handleLogout = () => {
     logout();
@@ -248,19 +233,14 @@ export default function MenuManagement() {
 
   const handleDeleteItem = async (itemId: string) => {
     if (confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
-      const restaurantId = getRestaurantId();
-      if (restaurantId) {
-        // PostgreSQL API'den sil
-        const success = await deleteMenuItemAPI(restaurantId, itemId);
-        if (success) {
-          console.log('Ürün PostgreSQL\'den silindi:', itemId);
-        } else {
-          console.error('Ürün silinemedi:', itemId);
+      try {
+        if (currentRestaurantId) {
+          await deleteMenuItem(currentRestaurantId, itemId);
+          console.log('Ürün silindi:', itemId);
         }
-      } else {
-        // Fallback: local store'dan sil
-        deleteMenuItem(itemId);
-        console.log('Ürün local store\'dan silindi:', itemId);
+      } catch (error) {
+        console.error('Ürün silinirken hata:', error);
+        alert('Ürün silinirken bir hata oluştu');
       }
     }
   };
@@ -281,125 +261,29 @@ export default function MenuManagement() {
 
   const handleEditCategory = (category: any) => {
     setEditingCategory(category);
+    setCategoryFormData({
+      nameTr: category.name.tr || '',
+      nameEn: category.name.en || '',
+      descriptionTr: category.description.tr || '',
+      descriptionEn: category.description.en || '',
+      order: category.order || 0,
+      isActive: category.isActive !== false
+    });
     setShowCategoryForm(true);
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
     if (confirm('Bu kategoriyi silmek istediğinizden emin misiniz? Bu kategoriye ait tüm ürünler de silinecektir.')) {
-      const restaurantId = getRestaurantId();
-      if (restaurantId) {
-        // PostgreSQL API'den sil
-        const success = await deleteCategoryAPI(restaurantId, categoryId);
-        if (success) {
-          console.log('Kategori PostgreSQL\'den silindi:', categoryId);
-        } else {
-          console.error('Kategori silinemedi:', categoryId);
+      try {
+        if (currentRestaurantId) {
+          await deleteMenuCategory(currentRestaurantId, categoryId);
+          console.log('Kategori silindi:', categoryId);
         }
-      } else {
-        // Fallback: local store'dan sil
-        deleteCategory(categoryId);
-        console.log('Kategori local store\'dan silindi:', categoryId);
+      } catch (error) {
+        console.error('Kategori silinirken hata:', error);
+        alert('Kategori silinirken bir hata oluştu');
       }
     }
-  };
-
-  // Toplu fiyat düzenleme fonksiyonu
-  const handleBulkPriceUpdate = () => {
-    if (!bulkPriceValue || isNaN(Number(bulkPriceValue))) {
-      return;
-    }
-
-    const value = Number(bulkPriceValue);
-    const itemsToUpdate = selectedCategory === 'all' 
-      ? items 
-      : items.filter(item => item.category === selectedCategory);
-
-    if (itemsToUpdate.length === 0) {
-      return;
-    }
-
-    // Store'u kullanarak gerçek fiyat güncellemesi
-    bulkUpdatePrices(selectedCategory, bulkPriceOperation, bulkPriceType, value);
-
-    // Modal'ı kapat ve formu sıfırla
-    setShowBulkPriceModal(false);
-    setBulkPriceValue('');
-    setBulkPriceOperation('increase');
-    setBulkPriceType('percentage');
-    setSelectedCategory('all');
-  };
-
-  const handleImport = (importedItems: any[]) => {
-    setShowImportModal(false);
-  };
-
-  const handleBulkImport = (importedItems: any[]) => {
-    setShowBulkImport(false);
-    console.log(`${importedItems.length} ürün başarıyla içe aktarıldı!`);
-  };
-
-  const toggleItemAvailability = (itemId: string) => {
-    // Demo için ürün durumu değiştir
-    console.log('Ürün durumu değiştirildi:', itemId);
-  };
-
-  const duplicateItem = (item: any) => {
-    // Demo için ürün kopyala
-    console.log('Ürün kopyalandı:', item);
-  };
-
-  const handleSupport = () => {
-    router.push('/business/support');
-  };
-
-  const addSubcategory = () => {
-    const newSubcategory = {
-      id: `sub-${Date.now()}`,
-      name: { tr: '', en: '' }
-    };
-    setSubcategories([...subcategories, newSubcategory]);
-  };
-
-  const removeSubcategory = (id: string) => {
-    setSubcategories(subcategories.filter(sub => sub.id !== id));
-  };
-
-  const updateSubcategory = (id: string, field: 'tr' | 'en', value: string) => {
-    setSubcategories(subcategories.map(sub => 
-      sub.id === id ? { ...sub, name: { ...sub.name, [field]: value } } : sub
-    ));
-  };
-
-  const handleCameraCapture = (imageBlob: Blob) => {
-    // Blob'u base64'e çevir
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setCapturedImage(base64String);
-      console.log('📸 Fotoğraf başarıyla çekildi ve base64 encode edildi!');
-    };
-    reader.readAsDataURL(imageBlob);
-    setShowCamera(false);
-  };
-
-  const handleImageUpload = () => {
-    setShowCamera(true);
-  };
-
-  const handleFileUpload = () => {
-    setShowImageUploader(true);
-  };
-
-  const handleImageSelect = (imageBlob: Blob) => {
-    // Blob'u base64'e çevir
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setCapturedImage(base64String);
-      console.log('📁 Görsel başarıyla yüklendi ve base64 encode edildi!');
-    };
-    reader.readAsDataURL(imageBlob);
-    setShowImageUploader(false);
   };
 
   // Filtrelenmiş ürünler
@@ -454,6 +338,11 @@ export default function MenuManagement() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Menü Yönetimi</h1>
             <p className="text-gray-600 mt-2">Restoran menünüzü yönetin ve düzenleyin</p>
+            {error && (
+              <div className="mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                Hata: {error}
+              </div>
+            )}
           </div>
         </div>
 
@@ -495,29 +384,20 @@ export default function MenuManagement() {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <span className="ml-2 text-gray-600">Yükleniyor...</span>
+        </div>
+      )}
+
       {/* Content */}
-      {activeTab === 'items' && (
+      {!loading && activeTab === 'items' && (
         <div className="space-y-6">
           {/* Action Buttons - Mobile Optimized */}
           <div className="flex justify-center items-center">
             <div className="flex gap-2 sm:gap-3">
-              <button 
-                onClick={() => setShowBulkPriceModal(true)}
-                className="px-4 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 flex items-center gap-2 shadow-lg text-sm font-medium min-w-[80px] sm:min-w-auto"
-              >
-                <FaPercent className="text-sm" />
-                <span className="hidden sm:inline">Toplu Fiyat Düzenle</span>
-                <span className="sm:hidden">Fiyat</span>
-              </button>
-              <button 
-                onClick={() => setShowBulkImport(true)}
-                className="px-4 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 flex items-center gap-2 shadow-lg relative text-sm font-medium min-w-[80px] sm:min-w-auto"
-              >
-                <FaUpload className="text-sm" />
-                <span className="hidden sm:inline">Toplu İçe Aktar</span>
-                <span className="sm:hidden">İçe Aktar</span>
-                <span className="absolute -top-1 -right-1 bg-purple-300 text-white text-xs px-2 py-1 rounded-full font-bold">AI</span>
-              </button>
               <button 
                 onClick={handleAddItem}
                 className="px-4 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 flex items-center gap-2 shadow-lg text-sm font-medium min-w-[80px] sm:min-w-auto"
@@ -525,7 +405,6 @@ export default function MenuManagement() {
                 <FaPlus className="text-sm" />
                 <span className="hidden sm:inline">Yeni Ürün Ekle</span>
                 <span className="sm:hidden">Yeni</span>
-                <span className="absolute -top-1 -right-1 bg-pink-300 text-white text-xs px-2 py-1 rounded-full font-bold">AI</span>
               </button>
             </div>
           </div>
@@ -620,21 +499,21 @@ export default function MenuManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {categories.find(c => c.id === item.category)?.name.tr || item.category}
+                        {categories.find(c => c.id === item.categoryId)?.name.tr || 'Kategori Yok'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         ₺{item.price}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          (item as any).isAvailable !== false
+                          item.isAvailable !== false
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
                           <div className={`w-2 h-2 rounded-full mr-1 ${
-                            (item as any).isAvailable !== false ? 'bg-green-500' : 'bg-red-500'
+                            item.isAvailable !== false ? 'bg-green-500' : 'bg-red-500'
                           }`}></div>
-                          {(item as any).isAvailable !== false ? 'Mevcut' : 'Tükendi'}
+                          {item.isAvailable !== false ? 'Mevcut' : 'Tükendi'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -691,20 +570,20 @@ export default function MenuManagement() {
                           ₺{item.price}
                         </span>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          (item as any).isAvailable !== false
+                          item.isAvailable !== false
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
                           <div className={`w-2 h-2 rounded-full mr-1 ${
-                            (item as any).isAvailable !== false ? 'bg-green-500' : 'bg-red-500'
+                            item.isAvailable !== false ? 'bg-green-500' : 'bg-red-500'
                           }`}></div>
-                          {(item as any).isAvailable !== false ? 'Mevcut' : 'Tükendi'}
+                          {item.isAvailable !== false ? 'Mevcut' : 'Tükendi'}
                         </span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-xs text-gray-500">
-                        {categories.find(c => c.id === item.category)?.name.tr || item.category}
+                        {categories.find(c => c.id === item.categoryId)?.name.tr || 'Kategori Yok'}
                       </span>
                       <div className="flex gap-2">
                         <button 
@@ -729,7 +608,7 @@ export default function MenuManagement() {
         </div>
       )}
 
-      {activeTab === 'categories' && (
+      {!loading && activeTab === 'categories' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Kategoriler</h2>
@@ -764,13 +643,13 @@ export default function MenuManagement() {
               {categories.map(category => (
               <div key={category.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-lg">{typeof category.name === 'string' ? category.name : category.name.tr}</h3>
+                  <h3 className="font-semibold text-lg">{category.name.tr}</h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    (category as any).isActive !== false
+                    category.isActive !== false
                       ? 'bg-green-100 text-green-800'
                       : 'bg-red-100 text-red-800'
                   }`}>
-                    {(category as any).isActive !== false ? 'Aktif' : 'Pasif'}
+                    {category.isActive !== false ? 'Aktif' : 'Pasif'}
                   </span>
                 </div>
                 
@@ -778,23 +657,6 @@ export default function MenuManagement() {
                   <p className="text-sm text-gray-500 mb-4">
                     {items.filter(i => i.categoryId === category.id).length} ürün
                   </p>
-                  
-                  {/* Alt Kategoriler */}
-                  {(category as any).subcategories && (category as any).subcategories.length > 0 && (
-                    <div className="mb-4">
-                      <p className="text-xs font-medium text-gray-700 mb-2">Alt Kategoriler:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {(category as any).subcategories.map((sub: any, index: number) => (
-                          <span
-                            key={index}
-                            className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-                          >
-                            {sub.name.tr}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                   
                   <div className="flex gap-2">
                     <button 
@@ -819,11 +681,11 @@ export default function MenuManagement() {
         </div>
       )}
 
-      {activeTab === 'stats' && (
+      {!loading && activeTab === 'stats' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Menü İstatistikleri</h2>
-            <div className="text-xs text-gray-500">Demo verileri üzerinden hesaplanır</div>
+            <div className="text-xs text-gray-500">Backend verileri üzerinden hesaplanır</div>
           </div>
 
           {/* KPI Kartları */}
@@ -845,33 +707,6 @@ export default function MenuManagement() {
               </div>
             ))}
           </div>
-
-          {/* En Çok Satanlar & Fiyat Dağılımı (demo) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <h3 className="font-semibold mb-4">En Çok Satanlar (Demo)</h3>
-              <ul className="space-y-2 text-sm">
-                {items.slice(0,5).map((i,ix)=> (
-                  <li key={ix} className="flex justify-between">
-                    <span className="truncate pr-2">{(i as any).name?.tr || (i as any).name}</span>
-                    <span className="text-gray-600">{i.price} ₺</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-              <h3 className="font-semibold mb-4">Fiyat Dağılımı (Demo)</h3>
-              <div className="h-40 bg-gradient-to-r from-green-100 via-yellow-100 to-red-100 rounded"></div>
-              <p className="text-xs text-gray-500 mt-2">Gerçek satış verileri entegre edildiğinde grafikler otomatik güncellenecek.</p>
-            </div>
-          </div>
-
-          {/* Not: Gerekirse bu sekme kapatılabilir */}
-          {items.length === 0 && (
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
-              Henüz ürün eklenmedi. İstatistikler, ürün ve satış verileri oluştukça gösterilir. Bu sekmeyi Ayarlar’dan kapatabilirsiniz.
-            </div>
-          )}
         </div>
       )}
 
@@ -896,7 +731,7 @@ export default function MenuManagement() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Ürün Adı (Türkçe)
+                          Ürün Adı (Türkçe) *
                         </label>
                         <input
                           type="text"
@@ -904,6 +739,7 @@ export default function MenuManagement() {
                           onChange={(e) => setFormData({...formData, nameTr: e.target.value})}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="Örn: Bruschetta"
+                          required
                         />
                       </div>
                       <div>
@@ -948,106 +784,11 @@ export default function MenuManagement() {
                       </div>
                     </div>
 
-                    {/* Ürün Fotoğrafı */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Ürün Fotoğrafı
-                      </label>
-                      
-                      {capturedImage ? (
-                        /* Çekilen Fotoğraf Önizlemesi */
-                        <div className="space-y-4">
-                          <div className="relative">
-                            <img
-                              src={capturedImage}
-                              alt="Çekilen fotoğraf"
-                              className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setCapturedImage(null)}
-                              className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
-                            >
-                              <FaTimes size={16} />
-                            </button>
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={handleImageUpload}
-                              className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
-                            >
-                              <FaCamera size={16} />
-                              Yeniden Çek
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setCapturedImage(null)}
-                              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                            >
-                              Kaldır
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Kamera ve Dosya Yükleme Seçenekleri */
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <button
-                              type="button"
-                              onClick={handleImageUpload}
-                              className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-400 hover:bg-purple-50 transition-colors"
-                            >
-                              <div className="text-purple-500">
-                                <FaCamera className="mx-auto h-8 w-8 mb-2" />
-                                <p className="text-sm font-medium">Kameradan Çek</p>
-                                <p className="text-xs text-gray-500">Telefon kamerası</p>
-                              </div>
-                            </button>
-                            
-                            <button
-                              type="button"
-                              onClick={handleFileUpload}
-                              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 hover:bg-gray-50 transition-colors"
-                            >
-                              <div className="text-gray-500">
-                                <svg className="mx-auto h-8 w-8 mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <p className="text-sm font-medium">Dosyadan Yükle</p>
-                                <p className="text-xs text-gray-500">PNG, JPG, GIF</p>
-                              </div>
-                            </button>
-                          </div>
-                          
-                          <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="p-2 bg-purple-100 rounded-lg">
-                                <span className="text-2xl">✨</span>
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-purple-800 mb-2">AI Görsel İşleme Aktif!</h4>
-                                <div className="space-y-1 text-sm text-purple-700">
-                                  <p>• 🎯 Otomatik arka plan kaldırma</p>
-                                  <p>• 🎨 Renk ve parlaklık optimizasyonu</p>
-                                  <p>• 📐 Akıllı boyutlandırma</p>
-                                  <p>• ⚡ Keskinlik artırma</p>
-                                </div>
-                                <p className="text-xs text-purple-600 mt-2">
-                                  💡 Kameradan çekmek daha profesyonel sonuçlar verir
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
                     {/* Fiyat ve Kategori */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Fiyat (₺)
+                          Fiyat (₺) *
                         </label>
                         <input
                           type="number"
@@ -1055,11 +796,12 @@ export default function MenuManagement() {
                           onChange={(e) => setFormData({...formData, price: e.target.value})}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="45"
+                          required
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Kategori
+                          Kategori *
                         </label>
                         <select 
                           value={formData.category}
@@ -1082,7 +824,6 @@ export default function MenuManagement() {
                           </p>
                         )}
                       </div>
-                      {/* Alt Kategori özelliği şimdilik devre dışı */}
                     </div>
 
                     {/* Kalori ve Hazırlık Süresi */}
@@ -1113,50 +854,6 @@ export default function MenuManagement() {
                       </div>
                     </div>
 
-                    {/* Malzemeler */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Malzemeler (Türkçe)
-                        </label>
-                        <textarea
-                          defaultValue={editingItem?.ingredients?.join(', ') || ''}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Ekmek, Domates, Sarımsak, Zeytinyağı, Fesleğen..."
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Malzemeler (İngilizce)
-                        </label>
-                        <textarea
-                          defaultValue={editingItem?.ingredients?.join(', ') || ''}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Bread, Tomato, Garlic, Olive oil, Basil..."
-                        />
-                      </div>
-                    </div>
-
-                    {/* Alerjenler */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Alerjenler
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {['Gluten', 'Süt', 'Yumurta', 'Fındık', 'Fıstık', 'Soya', 'Balık', 'Kabuklu Deniz Ürünleri'].map((allergen) => (
-                          <label key={allergen} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                            />
-                            <span className="ml-2 text-sm text-gray-700">{allergen}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Durum ve Popüler */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-3">
@@ -1170,7 +867,8 @@ export default function MenuManagement() {
                                 type="radio"
                                 name="status"
                                 value="available"
-                                defaultChecked={editingItem?.isAvailable !== false}
+                                checked={formData.isAvailable}
+                                onChange={(e) => setFormData({...formData, isAvailable: e.target.value === 'available'})}
                                 className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
                               />
                               <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
@@ -1183,7 +881,8 @@ export default function MenuManagement() {
                                 type="radio"
                                 name="status"
                                 value="out-of-stock"
-                                defaultChecked={editingItem?.isAvailable === false}
+                                checked={!formData.isAvailable}
+                                onChange={(e) => setFormData({...formData, isAvailable: e.target.value !== 'out-of-stock'})}
                                 className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                               />
                               <span className="ml-2 text-sm text-gray-700 flex items-center gap-1">
@@ -1208,30 +907,6 @@ export default function MenuManagement() {
                           </label>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Porsiyon (TR)
-                          </label>
-                          <input
-                            type="text"
-                            defaultValue={editingItem?.servingInfo?.tr || ''}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Örn: 1-2 kişilik"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Porsiyon (EN)
-                          </label>
-                          <input
-                            type="text"
-                            defaultValue={editingItem?.servingInfo?.en || ''}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Örn: 1-2 people"
-                          />
-                        </div>
-                      </div>
                     </div>
                   </form>
                   
@@ -1247,29 +922,24 @@ export default function MenuManagement() {
                         // Gerçek güncelleme işlemi
                         if (editingItem) {
                           // Ürün güncelleme
-                          const restaurantId = getRestaurantId();
-                          if (restaurantId) {
-                            await updateMenuItemAPI(restaurantId, editingItem.id, {
-                              name: formData.nameTr,
-                              description: formData.descriptionTr,
-                              price: Number(formData.price),
-                              categoryId: formData.category,
-                              imageUrl: capturedImage || editingItem.image,
-                              isAvailable: formData.isAvailable
-                            });
-                            console.log('Ürün PostgreSQL\'de güncellendi:', formData);
-                          } else {
-                            // Fallback: local update
-                            updateMenuItem({
-                              ...editingItem,
-                              name: { tr: formData.nameTr, en: formData.nameEn },
-                              description: { tr: formData.descriptionTr, en: formData.descriptionEn },
-                              price: Number(formData.price),
-                              categoryId: formData.category,
-                              image: capturedImage || editingItem.image,
-                              isAvailable: formData.isAvailable
-                            });
-                            console.log('Ürün local store\'da güncellendi:', formData);
+                          try {
+                            if (currentRestaurantId) {
+                              await updateMenuItem(currentRestaurantId, editingItem.id, {
+                                name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
+                                description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                                price: Number(formData.price),
+                                categoryId: formData.category,
+                                preparationTime: Number(formData.preparationTime) || 0,
+                                calories: Number(formData.calories) || 0,
+                                isAvailable: formData.isAvailable,
+                                isPopular: formData.isPopular,
+                                image: capturedImage || editingItem.image
+                              });
+                              console.log('Ürün güncellendi:', formData);
+                            }
+                          } catch (error) {
+                            console.error('Ürün güncellenirken hata:', error);
+                            alert('Ürün güncellenirken bir hata oluştu');
                           }
                         } else {
                           // Yeni ürün ekleme
@@ -1278,36 +948,26 @@ export default function MenuManagement() {
                             return;
                           }
                           
-                          // Backend API'sine kaydet
-                          if (currentRestaurantId) {
-                            await createMenuItemAPI(currentRestaurantId, {
-                              categoryId: formData.category,
-                              name: formData.nameTr,
-                              description: formData.descriptionTr,
-                              price: Number(formData.price),
-                              image: capturedImage || '/placeholder-food.jpg',
-                              displayOrder: items.length + 1,
-                              isAvailable: formData.isAvailable
-                            });
-                            console.log('Yeni ürün backend\'e kaydedildi:', formData);
-                          } else {
-                            // Fallback: local storage
-                            addMenuItem({
-                              id: `item_${Date.now()}`,
-                              restaurantId: currentRestaurantId!,
-                              categoryId: formData.category,
-                              name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
-                              description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
-                              price: Number(formData.price),
-                              image: capturedImage || '/placeholder-food.jpg',
-                              order: items.length + 1,
-                              isAvailable: formData.isAvailable,
-                              isPopular: formData.isPopular,
-                              preparationTime: Number(formData.preparationTime) || 0,
-                              calories: Number(formData.calories) || 0,
-                              allergens: { tr: [], en: [] }
-                            });
-                            console.log('Yeni ürün local storage\'a kaydedildi:', formData);
+                          try {
+                            if (currentRestaurantId) {
+                              await createMenuItem(currentRestaurantId, {
+                                categoryId: formData.category,
+                                name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
+                                description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                                price: Number(formData.price),
+                                image: capturedImage || '/placeholder-food.jpg',
+                                order: items.length + 1,
+                                isAvailable: formData.isAvailable,
+                                isPopular: formData.isPopular,
+                                preparationTime: Number(formData.preparationTime) || 0,
+                                calories: Number(formData.calories) || 0,
+                                allergens: { tr: [], en: [] }
+                              });
+                              console.log('Yeni ürün backend\'e kaydedildi:', formData);
+                            }
+                          } catch (error) {
+                            console.error('Ürün eklenirken hata:', error);
+                            alert('Ürün eklenirken bir hata oluştu');
                           }
                         }
                         setShowItemForm(false);
@@ -1357,7 +1017,7 @@ export default function MenuManagement() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Kategori Adı (Türkçe)
+                          Kategori Adı (Türkçe) *
                         </label>
                         <input
                           type="text"
@@ -1382,65 +1042,32 @@ export default function MenuManagement() {
                       </div>
                     </div>
 
-
-                    {/* Alt Kategoriler */}
-                    <div>
-                      <div className="flex justify-between items-center mb-3">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Alt Kategoriler
+                    {/* Açıklama */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Açıklama (Türkçe)
                         </label>
-                        <button
-                          type="button"
-                          onClick={addSubcategory}
-                          className="px-3 py-1 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 flex items-center gap-1 transition-colors"
-                        >
-                          <FaPlus size={12} />
-                          Alt Kategori Ekle
-                        </button>
+                        <textarea
+                          value={categoryFormData.descriptionTr}
+                          onChange={(e) => setCategoryFormData({...categoryFormData, descriptionTr: e.target.value})}
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="Kategori açıklaması..."
+                        />
                       </div>
-                      <div className="space-y-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-4">
-                        {subcategories.length > 0 ? (
-                          subcategories.map((sub, index) => (
-                            <div key={sub.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                              <div className="flex-1 grid grid-cols-2 gap-2">
-                                <input
-                                  type="text"
-                                  value={sub.name.tr}
-                                  onChange={(e) => updateSubcategory(sub.id, 'tr', e.target.value)}
-                                  placeholder="Alt kategori adı (Türkçe)"
-                                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                />
-                                <input
-                                  type="text"
-                                  value={sub.name.en}
-                                  onChange={(e) => updateSubcategory(sub.id, 'en', e.target.value)}
-                                  placeholder="Alt kategori adı (İngilizce)"
-                                  className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                />
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => removeSubcategory(sub.id)}
-                                className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Alt kategoriyi sil"
-                              >
-                                <FaTrash size={14} />
-                              </button>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center text-gray-500 py-8">
-                            <FaFolderOpen className="mx-auto mb-3 text-gray-400" size={32} />
-                            <p className="text-sm font-medium mb-1">Henüz alt kategori eklenmemiş</p>
-                            <p className="text-xs text-gray-400">"Alt Kategori Ekle" butonuna tıklayarak başlayın</p>
-                          </div>
-                        )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Açıklama (İngilizce)
+                        </label>
+                        <textarea
+                          value={categoryFormData.descriptionEn}
+                          onChange={(e) => setCategoryFormData({...categoryFormData, descriptionEn: e.target.value})}
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="Category description..."
+                        />
                       </div>
-                      {subcategories.length > 0 && (
-                        <p className="text-xs text-gray-500 mt-2">
-                          💡 Alt kategoriler ürünlerde daha detaylı sınıflandırma için kullanılır
-                        </p>
-                      )}
                     </div>
 
                     {/* Sıralama */}
@@ -1450,7 +1077,8 @@ export default function MenuManagement() {
                       </label>
                       <input
                         type="number"
-                        defaultValue={editingCategory?.sortOrder || 0}
+                        value={categoryFormData.order}
+                        onChange={(e) => setCategoryFormData({...categoryFormData, order: Number(e.target.value)})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="0"
                       />
@@ -1461,7 +1089,8 @@ export default function MenuManagement() {
                       <label className="flex items-center">
                         <input
                           type="checkbox"
-                          defaultChecked={editingCategory?.isActive !== false}
+                          checked={categoryFormData.isActive}
+                          onChange={(e) => setCategoryFormData({...categoryFormData, isActive: e.target.checked})}
                           className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         />
                         <span className="ml-2 text-sm text-gray-700">Aktif</span>
@@ -1484,37 +1113,32 @@ export default function MenuManagement() {
                           return;
                         }
                         
-                        if (editingCategory) {
-                          updateCategory({
-                            ...editingCategory,
-                            name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
-                            description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
-                            order: categoryFormData.order,
-                            isActive: categoryFormData.isActive
-                          });
-                          console.log('Kategori güncellendi:', editingCategory);
-                        } else {
-                          // Backend API'sine kaydet
-                          if (currentRestaurantId) {
-                            await createCategoryAPI(currentRestaurantId, {
-                              name: categoryFormData.nameTr,
-                              description: categoryFormData.descriptionTr,
-                              displayOrder: categories.length,
-                              isActive: categoryFormData.isActive
-                            });
-                            console.log('Yeni kategori backend\'e kaydedildi');
+                        try {
+                          if (editingCategory) {
+                            if (currentRestaurantId) {
+                              await updateMenuCategory(currentRestaurantId, editingCategory.id, {
+                                name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
+                                description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                                order: categoryFormData.order,
+                                isActive: categoryFormData.isActive
+                              });
+                              console.log('Kategori güncellendi:', editingCategory);
+                            }
                           } else {
-                            // Fallback: local storage
-                            addCategory({
-                              id: `cat_${Date.now()}`,
-                              restaurantId: currentRestaurantId!,
-                              name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
-                              description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
-                              order: categories.length,
-                              isActive: categoryFormData.isActive
-                            });
-                            console.log('Yeni kategori local storage\'a kaydedildi');
+                            // Backend API'sine kaydet
+                            if (currentRestaurantId) {
+                              await createMenuCategory(currentRestaurantId, {
+                                name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
+                                description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
+                                order: categories.length,
+                                isActive: categoryFormData.isActive
+                              });
+                              console.log('Yeni kategori backend\'e kaydedildi');
+                            }
                           }
+                        } catch (error) {
+                          console.error('Kategori işlemi sırasında hata:', error);
+                          alert('Kategori işlemi sırasında bir hata oluştu');
                         }
                         setShowCategoryForm(false);
                         setEditingCategory(null);
@@ -1533,317 +1157,6 @@ export default function MenuManagement() {
                       {editingCategory ? 'Güncelle' : 'Kaydet'}
                     </button>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {showImportModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
-                <div className="p-6 border-b flex justify-between items-center">
-                  <h2 className="text-2xl font-bold">Menü İçe Aktarma</h2>
-                  <button
-                    onClick={() => setShowImportModal(false)}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <FaTimes size={24} />
-                  </button>
-                </div>
-                <div className="p-6 overflow-y-auto max-h-[70vh]">
-                  <div className="space-y-6">
-                    {/* Dosya Yükleme */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Excel/CSV Dosyası Yükle
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                        <div className="text-gray-500">
-                          <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          <p className="mt-2">Dosya seçmek için tıklayın</p>
-                          <p className="text-sm text-gray-400">Excel (.xlsx) veya CSV (.csv) dosyaları desteklenir</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Hazır Şablonlar */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Hazır Şablonlar
-                      </label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
-                          <div className="font-medium text-gray-900">Restoran Menüsü</div>
-                          <div className="text-sm text-gray-500">Genel restoran menü şablonu</div>
-                        </button>
-                        <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
-                          <div className="font-medium text-gray-900">Cafe Menüsü</div>
-                          <div className="text-sm text-gray-500">Kahve ve atıştırmalık menüsü</div>
-                        </button>
-                        <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
-                          <div className="font-medium text-gray-900">Fast Food</div>
-                          <div className="text-sm text-gray-500">Hızlı servis menü şablonu</div>
-                        </button>
-                        <button className="p-4 border border-gray-300 rounded-lg hover:bg-gray-50 text-left">
-                          <div className="font-medium text-gray-900">Boş Şablon</div>
-                          <div className="text-sm text-gray-500">Sıfırdan başlayın</div>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* İçe Aktarma Seçenekleri */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        İçe Aktarma Seçenekleri
-                      </label>
-                      <div className="space-y-3">
-                        <label className="flex items-center">
-                          <input type="checkbox" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" defaultChecked />
-                          <span className="ml-2 text-sm text-gray-700">Mevcut ürünleri güncelle</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input type="checkbox" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                          <span className="ml-2 text-sm text-gray-700">Yeni ürünleri ekle</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input type="checkbox" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                          <span className="ml-2 text-sm text-gray-700">Kategorileri de içe aktar</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-                    <button
-                      onClick={() => setShowImportModal(false)}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      İptal
-                    </button>
-                    <button
-                      onClick={() => {
-                        console.log('Menü içe aktarıldı!');
-                        setShowImportModal(false);
-                      }}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      İçe Aktar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Kamera Modal */}
-          {showCamera && (
-            <CameraCapture
-              onCapture={handleCameraCapture}
-              onClose={() => setShowCamera(false)}
-              aspectRatio="square"
-              enableAI={true}
-              productCategory="food"
-            />
-          )}
-
-          {/* Dosya Yükleme Modal */}
-          {showImageUploader && (
-            <Suspense fallback={
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-                <div className="bg-white rounded-lg p-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-2 text-center">Yükleniyor...</p>
-                </div>
-              </div>
-            }>
-              <ImageUploader
-                onImageSelect={handleImageSelect}
-                onClose={() => setShowImageUploader(false)}
-                aspectRatio="square"
-              />
-            </Suspense>
-          )}
-
-          {/* Toplu İçe Aktarma Modal */}
-          {showBulkImport && (
-            <Suspense fallback={
-              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-                <div className="bg-white rounded-lg p-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-2 text-center">Yükleniyor...</p>
-                </div>
-              </div>
-            }>
-              <BulkImportModal
-                onImport={handleBulkImport}
-                onClose={() => setShowBulkImport(false)}
-              />
-            </Suspense>
-          )}
-
-          {/* Toplu Fiyat Düzenleme Modal */}
-          {showBulkPriceModal && (
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-              onClick={() => setShowBulkPriceModal(false)}
-            >
-              <div 
-                className="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-gray-900">Toplu Fiyat Düzenleme</h3>
-                    <button
-                      onClick={() => setShowBulkPriceModal(false)}
-                      className="text-gray-500 hover:text-gray-700 text-xl"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="p-6 space-y-6">
-                  {/* Kategori Seçimi */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Kategori Seçimi
-                    </label>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    >
-                      <option value="all">Tüm Kategoriler</option>
-                      {categories.map(category => (
-                        <option key={category.id} value={category.id}>
-                          {typeof category.name === 'string' ? category.name : category.name.tr}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* İşlem Türü */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      İşlem Türü
-                    </label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="increase"
-                          checked={bulkPriceOperation === 'increase'}
-                          onChange={(e) => setBulkPriceOperation(e.target.value as 'increase' | 'decrease')}
-                          className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Fiyat Artır</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="decrease"
-                          checked={bulkPriceOperation === 'decrease'}
-                          onChange={(e) => setBulkPriceOperation(e.target.value as 'increase' | 'decrease')}
-                          className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Fiyat Azalt</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Değer Türü */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Değer Türü
-                    </label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="percentage"
-                          checked={bulkPriceType === 'percentage'}
-                          onChange={(e) => setBulkPriceType(e.target.value as 'percentage' | 'fixed')}
-                          className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Yüzde (%)</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          value="fixed"
-                          checked={bulkPriceType === 'fixed'}
-                          onChange={(e) => setBulkPriceType(e.target.value as 'percentage' | 'fixed')}
-                          className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Sabit Tutar (₺)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Değer Girişi */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {bulkPriceType === 'percentage' ? 'Yüzde Değeri' : 'Sabit Tutar'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={bulkPriceValue}
-                        onChange={(e) => setBulkPriceValue(e.target.value)}
-                        placeholder={bulkPriceType === 'percentage' ? 'Örn: 10' : 'Örn: 5'}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        min="0"
-                        step={bulkPriceType === 'percentage' ? '0.1' : '0.01'}
-                      />
-                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                        {bulkPriceType === 'percentage' ? '%' : '₺'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Önizleme */}
-                  {bulkPriceValue && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FaExclamationTriangle className="text-green-600" />
-                        <span className="text-sm font-medium text-green-800">Önizleme</span>
-                      </div>
-                      <p className="text-sm text-green-700">
-                        {selectedCategory === 'all' ? items.length : items.filter(item => item.category === selectedCategory).length} ürünün fiyatı 
-                        {bulkPriceOperation === 'increase' ? ' artırılacak' : ' azaltılacak'}: 
-                        <span className="font-semibold">
-                          {bulkPriceType === 'percentage' 
-                            ? ` %${bulkPriceValue}` 
-                            : ` ${bulkPriceValue}₺`
-                          }
-                        </span>
-                      </p>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-end gap-3 p-6 pt-0">
-                  <button
-                    onClick={() => setShowBulkPriceModal(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    İptal
-                  </button>
-                  <button
-                    onClick={handleBulkPriceUpdate}
-                    disabled={!bulkPriceValue || isNaN(Number(bulkPriceValue)) || Number(bulkPriceValue) <= 0}
-                    className={`px-6 py-2 rounded-lg transition-colors flex items-center gap-2 ${
-                      !bulkPriceValue || isNaN(Number(bulkPriceValue)) || Number(bulkPriceValue) <= 0
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
-                  >
-                    <FaCheck />
-                    Fiyatları Güncelle
-                  </button>
                 </div>
               </div>
             </div>

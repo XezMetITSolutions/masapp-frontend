@@ -27,7 +27,16 @@ interface RestaurantState {
   addRestaurant: (restaurant: Restaurant) => void;
   deleteRestaurant: (id: string) => void;
   
-  // Menu Actions
+  // Menu API Actions
+  createMenuCategory: (restaurantId: string, data: any) => Promise<any>;
+  createMenuItem: (restaurantId: string, data: any) => Promise<any>;
+  updateMenuCategory: (restaurantId: string, categoryId: string, data: any) => Promise<any>;
+  deleteMenuCategory: (restaurantId: string, categoryId: string) => Promise<boolean>;
+  updateMenuItem: (restaurantId: string, itemId: string, data: any) => Promise<any>;
+  deleteMenuItem: (restaurantId: string, itemId: string) => Promise<boolean>;
+  fetchRestaurantMenu: (restaurantId: string) => Promise<any>;
+  
+  // Menu Actions (for backward compatibility)
   setCategories: (categories: MenuCategory[]) => void;
   addCategory: (category: MenuCategory) => void;
   updateCategory: (id: string, updates: Partial<MenuCategory>) => void;
@@ -51,7 +60,7 @@ interface RestaurantState {
   clearCompletedCalls: () => void;
 }
 
-const useRestaurantStore = create<RestaurantState>()((set, get) => ({
+const useRestaurantStore = create<RestaurantState>((set, get) => ({
   // Initial state
   restaurants: [],
       currentRestaurant: null,
@@ -158,25 +167,14 @@ const useRestaurantStore = create<RestaurantState>()((set, get) => ({
           categories: [...state.categories, response.data],
           loading: false
         }));
+        return response.data;
       }
     } catch (error) {
-      // Backend API başarısız olduğunda localStorage'a kaydet
-      const newCategory: MenuCategory = {
-        id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        restaurantId,
-        name: data.name,
-        description: data.description,
-        order: data.order || 0,
-        isActive: data.isActive !== false,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      set((state) => ({
-        categories: [...state.categories, newCategory],
-        loading: false,
-        error: null
-      }));
+      set({ 
+        error: error instanceof Error ? error.message : 'Kategori oluşturulamadı', 
+        loading: false 
+      });
+      throw error;
     }
   },
 
@@ -189,32 +187,120 @@ const useRestaurantStore = create<RestaurantState>()((set, get) => ({
           menuItems: [...state.menuItems, response.data],
           loading: false
         }));
+        return response.data;
       }
     } catch (error) {
-      // Backend API başarısız olduğunda localStorage'a kaydet
-      const newMenuItem: MenuItem = {
-        id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        restaurantId,
-        categoryId: data.categoryId,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        image: data.image,
-        order: data.order || 0,
-        isAvailable: data.isAvailable !== false,
-        isPopular: data.isPopular || false,
-        preparationTime: data.preparationTime,
-        calories: data.calories,
-        allergens: data.allergens,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      set((state) => ({
-        menuItems: [...state.menuItems, newMenuItem],
-        loading: false,
-        error: null
-      }));
+      set({ 
+        error: error instanceof Error ? error.message : 'Ürün oluşturulamadı', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  updateMenuCategory: async (restaurantId: string, categoryId: string, data: any) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.updateMenuCategory(restaurantId, categoryId, data);
+      if (response.success) {
+        set((state) => ({
+          categories: state.categories.map(c => 
+            c.id === categoryId ? { ...c, ...response.data } : c
+          ),
+          loading: false
+        }));
+        return response.data;
+      }
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Kategori güncellenemedi', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  deleteMenuCategory: async (restaurantId: string, categoryId: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.deleteMenuCategory(restaurantId, categoryId);
+      if (response.success) {
+        set((state) => ({
+          categories: state.categories.filter(c => c.id !== categoryId),
+          menuItems: state.menuItems.filter(item => item.categoryId !== categoryId),
+          loading: false
+        }));
+        return true;
+      }
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Kategori silinemedi', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  updateMenuItem: async (restaurantId: string, itemId: string, data: any) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.updateMenuItem(restaurantId, itemId, data);
+      if (response.success) {
+        set((state) => ({
+          menuItems: state.menuItems.map(item => 
+            item.id === itemId ? { ...item, ...response.data } : item
+          ),
+          loading: false
+        }));
+        return response.data;
+      }
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Ürün güncellenemedi', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  deleteMenuItem: async (restaurantId: string, itemId: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.deleteMenuItem(restaurantId, itemId);
+      if (response.success) {
+        set((state) => ({
+          menuItems: state.menuItems.filter(item => item.id !== itemId),
+          loading: false
+        }));
+        return true;
+      }
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Ürün silinemedi', 
+        loading: false 
+      });
+      throw error;
+    }
+  },
+
+  fetchRestaurantMenu: async (restaurantId: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiService.getRestaurantMenu(restaurantId);
+      if (response.success) {
+        set({
+          categories: response.data.categories || [],
+          menuItems: response.data.items || [],
+          loading: false
+        });
+        return response.data;
+      }
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Menü yüklenemedi', 
+        loading: false 
+      });
+      throw error;
     }
   },
 

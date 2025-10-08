@@ -36,7 +36,7 @@ function CustomerMenuContent() {
   const [showCart, setShowCart] = useState(false);
   const [tableNumber, setTableNumber] = useState('');
 
-  // Subdomain'den restaurant bul
+  // Subdomain'den restaurant bul ve menüyü yükle
   useEffect(() => {
     const getRestaurantFromSubdomain = () => {
       if (typeof window !== 'undefined') {
@@ -72,7 +72,7 @@ function CustomerMenuContent() {
         
         setCategories(restaurantCategories);
         setMenuItems(restaurantItems);
-    } else {
+      } else {
         // Backend'den çekmeyi dene
         fetchRestaurantByUsername(targetRestaurant);
       }
