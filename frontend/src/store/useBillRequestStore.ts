@@ -28,9 +28,7 @@ interface BillRequestState {
   clearOldBills: (daysOld?: number) => void;
 }
 
-export const useBillRequestStore = create<BillRequestState>()(
-  persist(
-    (set, get) => ({
+export const useBillRequestStore = create<BillRequestState>()((set, get) => ({
       billRequests: [],
       bills: [],
       
@@ -177,15 +175,12 @@ export const useBillRequestStore = create<BillRequestState>()(
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysOld);
         
-        set(state => ({
+        set((state) => ({
           bills: state.bills.filter(bill => 
-            new Date(bill.generatedAt) > cutoffDate
+            new Date(bill.generatedAt).getTime() > cutoffDate.getTime()
           )
         }));
       }
-    }),
-    createPersistOptions('masapp-bill-request-storage')
-  )
-);
+}));
 
 export default useBillRequestStore;

@@ -35,9 +35,7 @@ interface OrderState {
   getRecentOrders: (limit?: number) => Order[];
 }
 
-const useOrderStore = create<OrderState>()(
-  persist(
-    (set, get) => ({
+const useOrderStore = create<OrderState>()((set, get) => ({
       orders: [],
       
       addOrder: (order) => {
@@ -89,9 +87,6 @@ const useOrderStore = create<OrderState>()(
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, limit);
       },
-    }),
-    createPersistOptions('order-storage')
-  )
-);
+}));
 
 export default useOrderStore;

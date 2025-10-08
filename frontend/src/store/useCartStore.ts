@@ -51,9 +51,7 @@ interface CartState {
   getTotal: () => number;
 }
 
-const useCartStore = create<CartState>()(
-  persist(
-    (set, get) => ({
+const useCartStore = create<CartState>()((set, get) => ({
       items: [],
       preparingItems: [], // Hazırlanan ürünler
       couponCode: null,
@@ -205,9 +203,6 @@ const useCartStore = create<CartState>()(
         
         return subtotal - discount + tipAmount;
       },
-    }),
-    createPersistOptions('masapp-cart-storage')
-  )
-);
+}));
 
 export default useCartStore;

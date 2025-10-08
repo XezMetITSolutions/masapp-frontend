@@ -34,9 +34,7 @@ interface PaymentHistoryState {
   clearPaymentsForTable: (tableNumber: number) => void;
 }
 
-const usePaymentHistoryStore = create<PaymentHistoryState>()(
-  persist(
-    (set, get) => ({
+const usePaymentHistoryStore = create<PaymentHistoryState>()((set, get) => ({
       payments: [],
       
       addPayment: (payment) => {
@@ -79,9 +77,6 @@ const usePaymentHistoryStore = create<PaymentHistoryState>()(
           payments: get().payments.filter(payment => payment.tableNumber !== tableNumber) 
         });
       },
-    }),
-    createPersistOptions('payment-history-storage')
-  )
-);
+}));
 
 export default usePaymentHistoryStore;

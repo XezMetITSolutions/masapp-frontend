@@ -29,9 +29,7 @@ interface NotificationState {
   createTableTransferNotification: (orderId: string, oldTable: number, newTable: number) => string;
 }
 
-export const useNotificationStore = create<NotificationState>()(
-  persist(
-    (set, get) => ({
+export const useNotificationStore = create<NotificationState>()((set, get) => ({
       notifications: [],
       
       // Create notification
@@ -244,9 +242,6 @@ export const useNotificationStore = create<NotificationState>()(
           isActive: true
         });
       }
-    }),
-    createPersistOptions('notification-storage')
-  )
-);
+}));
 
 export default useNotificationStore;

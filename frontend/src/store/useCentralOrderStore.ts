@@ -58,9 +58,7 @@ interface CentralOrderState {
   initializeDemoData: () => void;
 }
 
-const useCentralOrderStore = create<CentralOrderState>()(
-  persist(
-    (set, get) => ({
+const useCentralOrderStore = create<CentralOrderState>()((set, get) => ({
       orders: [],
       
       addOrder: (order) => {
@@ -851,9 +849,6 @@ const useCentralOrderStore = create<CentralOrderState>()(
         // Test verilerini kullanmıyoruz, sadece subdomain test verilerini kullan
         // set({ orders: demoOrders });
       }
-    }),
-    createPersistOptions('central-order-store')
-  )
-);
+}));
 
 export default useCentralOrderStore;
