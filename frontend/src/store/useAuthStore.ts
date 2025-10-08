@@ -13,9 +13,7 @@ interface AuthState {
   getRole: () => string | null;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
+export const useAuthStore = create<AuthState>()((set, get) => ({
       authenticatedRestaurant: null,
       authenticatedStaff: null,
       loginRestaurant: (restaurant) => set({ authenticatedRestaurant: restaurant, authenticatedStaff: null }),
@@ -31,13 +29,4 @@ export const useAuthStore = create<AuthState>()(
         if (state.authenticatedRestaurant) return 'restaurant_owner';
         return null;
       },
-    }),
-    {
-      ...createPersistOptions('restaurant-auth-storage'),
-      partialize: (state) => ({ 
-        authenticatedRestaurant: state.authenticatedRestaurant,
-        authenticatedStaff: state.authenticatedStaff 
-      }),
-    }
-  )
-);
+}));

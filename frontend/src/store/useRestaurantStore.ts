@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { Restaurant, MenuCategory, MenuItem, Order, ServiceCall } from '@/types';
 import { apiService } from '@/services/api';
+import { Restaurant, MenuCategory, MenuItem, Order, ServiceCall } from '@/types';
 
 interface RestaurantState {
   // Data
@@ -51,9 +51,7 @@ interface RestaurantState {
   clearCompletedCalls: () => void;
 }
 
-const useRestaurantStore = create<RestaurantState>()(
-  persist(
-    (set, get) => ({
+const useRestaurantStore = create<RestaurantState>()((set, get) => ({
   // Initial state
   restaurants: [],
       currentRestaurant: null,
@@ -327,20 +325,4 @@ const useRestaurantStore = create<RestaurantState>()(
       clearCompletedCalls: () => set((state) => ({
         serviceCalls: state.serviceCalls.filter(call => call.status !== 'completed')
       })),
-    }),
-    {
-      name: 'restaurant-store',
-      partialize: (state) => ({
-        restaurants: state.restaurants,
-        currentRestaurant: state.currentRestaurant,
-        categories: state.categories,
-        menuItems: state.menuItems,
-        orders: state.orders,
-        activeOrders: state.activeOrders,
-        serviceCalls: state.serviceCalls,
-      }),
-    }
-  )
-);
-
-export default useRestaurantStore;
+}));
