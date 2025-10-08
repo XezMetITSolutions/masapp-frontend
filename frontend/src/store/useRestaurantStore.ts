@@ -326,3 +326,5 @@ const useRestaurantStore = create<RestaurantState>()((set, get) => ({
         serviceCalls: state.serviceCalls.filter(call => call.status !== 'completed')
       })),
 }));
+
+export default useRestaurantStore;

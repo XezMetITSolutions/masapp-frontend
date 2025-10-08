@@ -28,3 +28,5 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         return null;
       },
 }));
+
+export default useAuthStore;
