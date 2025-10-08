@@ -229,6 +229,8 @@ export default function MenuManagement() {
         if (currentRestaurantId) {
           await deleteMenuItem(currentRestaurantId, itemId);
           console.log('Ürün silindi:', itemId);
+          // Menüyü yeniden yükle
+          await fetchRestaurantMenu(currentRestaurantId);
         }
       } catch (error) {
         console.error('Ürün silinirken hata:', error);
@@ -266,6 +268,8 @@ export default function MenuManagement() {
         if (currentRestaurantId) {
           await deleteMenuCategory(currentRestaurantId, categoryId);
           console.log('Kategori silindi:', categoryId);
+          // Menüyü yeniden yükle
+          await fetchRestaurantMenu(currentRestaurantId);
         }
       } catch (error) {
         console.error('Kategori silinirken hata:', error);
@@ -900,6 +904,8 @@ export default function MenuManagement() {
                                 image: capturedImage || editingItem.image
                               });
                               console.log('Ürün güncellendi:', formData);
+                              // Menüyü yeniden yükle
+                              await fetchRestaurantMenu(currentRestaurantId);
                             }
                           } catch (error) {
                             console.error('Ürün güncellenirken hata:', error);
@@ -927,6 +933,8 @@ export default function MenuManagement() {
                                 calories: Number(formData.calories) || 0
                               });
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
+                              // Menüyü yeniden yükle
+                              await fetchRestaurantMenu(currentRestaurantId);
                             }
                           } catch (error) {
                             console.error('Ürün eklenirken hata:', error);
@@ -1028,6 +1036,8 @@ export default function MenuManagement() {
                                 isActive: categoryFormData.isActive
                               });
                               console.log('Kategori güncellendi:', editingCategory);
+                              // Menüyü yeniden yükle
+                              await fetchRestaurantMenu(currentRestaurantId);
                             }
                           } else {
                             // Backend API'sine kaydet
@@ -1039,6 +1049,8 @@ export default function MenuManagement() {
                                 isActive: categoryFormData.isActive
                               });
                               console.log('Yeni kategori backend\'e kaydedildi');
+                              // Menüyü yeniden yükle
+                              await fetchRestaurantMenu(currentRestaurantId);
                             }
                           }
                         } catch (error) {
