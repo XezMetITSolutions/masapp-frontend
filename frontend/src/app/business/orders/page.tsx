@@ -56,92 +56,14 @@ export default function OrdersPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Siparişler her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
+  // Siparişleri backend'den yükle
   useEffect(() => {
-    // Eğer Kardeşler restoranı ise demo sipariş verilerini ekle
-    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
-        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
-      const demoOrders = [
-      {
-        id: 1,
-        tableNumber: 5,
-        customerName: 'Ahmet Yılmaz',
-        customerPhone: '0532 123 45 67',
-        items: [
-          { name: 'Izgara Köfte', quantity: 2, price: 120, status: 'ready' },
-          { name: 'Çoban Salata', quantity: 1, price: 35, status: 'ready' },
-          { name: 'Ayran', quantity: 2, price: 15, status: 'preparing' }
-        ],
-        totalAmount: 205,
-        status: 'preparing',
-        orderTime: '14:30',
-        waitTime: 12,
-        paymentMethod: 'cash',
-        notes: 'Köfte az pişmiş olsun',
-        calls: ['waiter'],
-        priority: 'normal'
-      },
-      {
-        id: 2,
-        tableNumber: 8,
-        customerName: 'Fatma Demir',
-        customerPhone: '0533 987 65 43',
-        items: [
-          { name: 'Tavuk Şiş', quantity: 1, price: 95, status: 'ready' },
-          { name: 'Pilav', quantity: 1, price: 25, status: 'ready' }
-        ],
-        totalAmount: 120,
-        status: 'ready',
-        orderTime: '14:15',
-        waitTime: 8,
-        paymentMethod: 'card',
-        notes: '',
-        calls: [],
-        priority: 'normal'
-      },
-      {
-        id: 3,
-        tableNumber: 3,
-        customerName: 'Mehmet Kaya',
-        customerPhone: '0534 555 44 33',
-        items: [
-          { name: 'Humus', quantity: 1, price: 45, status: 'delivered' },
-          { name: 'Sigara Böreği', quantity: 1, price: 55, status: 'delivered' },
-          { name: 'Çay', quantity: 2, price: 10, status: 'delivered' }
-        ],
-        totalAmount: 120,
-        status: 'completed',
-        orderTime: '13:45',
-        waitTime: 0,
-        paymentMethod: 'cash',
-        notes: '',
-        calls: [],
-        priority: 'normal'
-      },
-      {
-        id: 4,
-        tableNumber: 12,
-        customerName: 'Ayşe Özkan',
-        customerPhone: '0535 777 88 99',
-        items: [
-          { name: 'Mantı', quantity: 1, price: 85, status: 'preparing' },
-          { name: 'Yoğurt', quantity: 1, price: 20, status: 'preparing' }
-        ],
-        totalAmount: 105,
-        status: 'preparing',
-        orderTime: '14:45',
-        waitTime: 5,
-        paymentMethod: 'qr',
-        notes: 'Mantı bol soslu olsun',
-        calls: ['water'],
-        priority: 'high'
-      }
-      ];
-
-      setOrders(demoOrders);
-      setFilteredOrders(demoOrders);
-    }
-    // Diğer restoranlar boş başlar
+    // Backend'den siparişleri çek (gelecekte implement edilecek)
+    // TODO: API call to fetch orders from backend
+    console.log('📦 Orders will be loaded from backend');
+    // Şimdilik boş array
+    setOrders([]);
+    setFilteredOrders([]);
   }, [authenticatedRestaurant]);
 
   // Filtreleme ve arama

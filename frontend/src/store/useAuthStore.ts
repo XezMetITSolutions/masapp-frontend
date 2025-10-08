@@ -17,17 +17,15 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       authenticatedStaff: null,
       loginRestaurant: (restaurant) => {
         set({ authenticatedRestaurant: restaurant, authenticatedStaff: null });
-        // Cookie'ye kaydet
+        // localStorage'a kaydet
         if (typeof window !== 'undefined') {
-          document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
           localStorage.setItem('currentRestaurant', JSON.stringify(restaurant));
         }
       },
       loginStaff: (staff) => {
         set({ authenticatedStaff: staff, authenticatedRestaurant: null });
-        // Cookie'ye kaydet
+        // localStorage'a kaydet
         if (typeof window !== 'undefined') {
-          document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
           localStorage.setItem('currentStaff', JSON.stringify(staff));
         }
       },

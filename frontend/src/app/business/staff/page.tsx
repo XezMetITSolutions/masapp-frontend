@@ -89,98 +89,14 @@ export default function StaffPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Personel her restoran için ayrı (boş başla, Kardeşler için demo yüklenecek)
+  // Personel listesini backend'den yükle
   useEffect(() => {
-    // Eğer Kardeşler restoranı ise demo personel verilerini ekle
-    if (authenticatedRestaurant?.name.toLowerCase().includes('kardeşler') || 
-        authenticatedRestaurant?.name.toLowerCase().includes('kardesler')) {
-      const demoStaff = [
-      {
-        id: 1,
-        name: 'Ahmet Yılmaz',
-        email: 'ahmet@restaurant.com',
-        phone: '0532 123 45 67',
-        role: 'manager',
-        department: 'management',
-        salary: 8500,
-        startDate: '2023-01-15',
-        status: 'active',
-        lastLogin: '2024-01-15 14:30',
-        totalOrders: 245,
-        rating: 4.8,
-        notes: 'Deneyimli yönetici, müşteri memnuniyeti odaklı',
-        avatar: null
-      },
-      {
-        id: 2,
-        name: 'Fatma Demir',
-        email: 'fatma@restaurant.com',
-        phone: '0533 987 65 43',
-        role: 'waiter',
-        department: 'service',
-        salary: 4500,
-        startDate: '2023-03-20',
-        status: 'active',
-        lastLogin: '2024-01-15 14:25',
-        totalOrders: 189,
-        rating: 4.6,
-        notes: 'Hızlı ve dikkatli servis',
-        avatar: null
-      },
-      {
-        id: 3,
-        name: 'Mehmet Kaya',
-        email: 'mehmet@restaurant.com',
-        phone: '0534 555 44 33',
-        role: 'chef',
-        department: 'kitchen',
-        salary: 6500,
-        startDate: '2022-11-10',
-        status: 'active',
-        lastLogin: '2024-01-15 14:20',
-        totalOrders: 0,
-        rating: 4.9,
-        notes: 'Usta aşçı, yaratıcı menü önerileri',
-        avatar: null
-      },
-      {
-        id: 4,
-        name: 'Ayşe Özkan',
-        email: 'ayse@restaurant.com',
-        phone: '0535 777 88 99',
-        role: 'waiter',
-        department: 'service',
-        salary: 4200,
-        startDate: '2023-06-01',
-        status: 'active',
-        lastLogin: '2024-01-15 14:15',
-        totalOrders: 156,
-        rating: 4.4,
-        notes: 'Yeni başlayan, öğrenmeye açık',
-        avatar: null
-      },
-      {
-        id: 5,
-        name: 'Ali Veli',
-        email: 'ali@restaurant.com',
-        phone: '0536 111 22 33',
-        role: 'cashier',
-        department: 'finance',
-        salary: 4000,
-        startDate: '2023-08-15',
-        status: 'inactive',
-        lastLogin: '2024-01-10 16:45',
-        totalOrders: 0,
-        rating: 4.2,
-        notes: 'İzinli, 2 hafta sonra dönecek',
-        avatar: null
-      }
-      ];
-
-      setStaff(demoStaff);
-      setFilteredStaff(demoStaff);
-    }
-    // Diğer restoranlar boş başlar
+    // Backend'den personel listesini çek (gelecekte implement edilecek)
+    // TODO: API call to fetch staff from backend
+    console.log('👥 Staff will be loaded from backend');
+    // Şimdilik boş array
+    setStaff([]);
+    setFilteredStaff([]);
   }, [authenticatedRestaurant]);
 
   // Filtreleme ve arama
