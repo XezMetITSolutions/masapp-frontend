@@ -65,6 +65,7 @@ export default function MenuManagement() {
   const { 
     createCategory: createCategoryAPI, 
     createMenuItem: createMenuItemAPI, 
+    updateMenuItem: updateMenuItemAPI,
     fetchMenu,
     deleteMenuItem: deleteMenuItemAPI,
     deleteCategory: deleteCategoryAPI 
@@ -1246,19 +1247,30 @@ export default function MenuManagement() {
                         // Gerçek güncelleme işlemi
                         if (editingItem) {
                           // Ürün güncelleme
-                          updateMenuItem({
-                            ...editingItem,
-                            name: { tr: formData.nameTr, en: formData.nameEn },
-                            description: { tr: formData.descriptionTr, en: formData.descriptionEn },
-                            price: Number(formData.price),
-                            categoryId: formData.category,
-                            preparationTime: Number(formData.preparationTime) || 0,
-                            calories: Number(formData.calories) || 0,
-                            isAvailable: formData.isAvailable,
-                            isPopular: formData.isPopular,
-                            image: capturedImage || editingItem.image
-                          });
-                          console.log('Ürün güncellendi:', formData);
+                          const restaurantId = getRestaurantId();
+                          if (restaurantId) {
+                            await updateMenuItemAPI(restaurantId, editingItem.id, {
+                              name: formData.nameTr,
+                              description: formData.descriptionTr,
+                              price: Number(formData.price),
+                              categoryId: formData.category,
+                              imageUrl: capturedImage || editingItem.image,
+                              isAvailable: formData.isAvailable
+                            });
+                            console.log('Ürün PostgreSQL\'de güncellendi:', formData);
+                          } else {
+                            // Fallback: local update
+                            updateMenuItem({
+                              ...editingItem,
+                              name: { tr: formData.nameTr, en: formData.nameEn },
+                              description: { tr: formData.descriptionTr, en: formData.descriptionEn },
+                              price: Number(formData.price),
+                              categoryId: formData.category,
+                              image: capturedImage || editingItem.image,
+                              isAvailable: formData.isAvailable
+                            });
+                            console.log('Ürün local store\'da güncellendi:', formData);
+                          }
                         } else {
                           // Yeni ürün ekleme
                           if (!formData.nameTr || !formData.price || !formData.category) {
@@ -1273,11 +1285,9 @@ export default function MenuManagement() {
                               name: formData.nameTr,
                               description: formData.descriptionTr,
                               price: Number(formData.price),
-                              imageUrl: capturedImage || '/placeholder-food.jpg',
+                              image: capturedImage || '/placeholder-food.jpg',
                               displayOrder: items.length + 1,
-                              isAvailable: formData.isAvailable,
-                              preparationTime: Number(formData.preparationTime) || 0,
-                              calories: Number(formData.calories) || 0
+                              isAvailable: formData.isAvailable
                             });
                             console.log('Yeni ürün backend\'e kaydedildi:', formData);
                           } else {
