@@ -111,19 +111,19 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
     if (!restaurant) return;
 
     setIsLoading(true);
-    
+
     try {
       const updatedData: Partial<Restaurant> = {
-        name: formData.name,
+      name: formData.name,
         address: formData.address,
         phone: formData.phone,
-        email: formData.email,
+      email: formData.email,
         website: formData.website,
         ownerName: formData.ownerName,
         ownerEmail: formData.ownerEmail,
         ownerPhone: formData.ownerPhone,
         category: formData.category,
-        tableCount: formData.tableCount,
+      tableCount: formData.tableCount,
         status: formData.status,
         workingHours: formData.workingHours,
         features: formData.features,
@@ -133,7 +133,7 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
 
       await updateRestaurant(restaurantId, updatedData);
       alert('Restoran başarıyla güncellendi!');
-      onClose();
+    onClose();
     } catch (error) {
       console.error('Restaurant update error:', error);
       alert('Restoran güncellenirken hata oluştu!');
@@ -158,21 +158,21 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <FaBuilding className="mr-2" />
             Temel Bilgiler
-          </h3>
+            </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Restoran Adı *</label>
-              <input
-                type="text"
+                <input
+                  type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                required
+                  required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Restoran adını girin"
-              />
-            </div>
-            <div>
+                />
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
               <select
                 name="category"
@@ -190,16 +190,16 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Masa Sayısı</label>
-              <input
+                <input
                 type="number"
                 name="tableCount"
                 value={formData.tableCount}
                 onChange={handleInputChange}
                 min="1"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
+                />
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Durum</label>
               <select
                 name="status"
@@ -229,24 +229,24 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                required
+                  required
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Tam adres bilgisi"
-              />
-            </div>
-            <div>
+                />
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
-              <input
-                type="tel"
+                <input
+                  type="tel"
                 name="phone"
-                value={formData.phone}
+                  value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="+90 555 123 45 67"
-              />
-            </div>
-            <div>
+                />
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
               <input
                 type="email"
@@ -255,40 +255,40 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="info@restoran.com"
-              />
-            </div>
-            <div>
+                />
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Website</label>
-              <input
+                <input
                 type="url"
                 name="website"
                 value={formData.website}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="https://www.restoran.com"
-              />
+                />
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Sahip Bilgileri */}
         <div className="bg-gray-50 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <FaUser className="mr-2" />
             Sahip Bilgileri
-          </h3>
+            </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Adı</label>
-              <input
-                type="text"
+                  <input
+                    type="text"
                 name="ownerName"
                 value={formData.ownerName}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Sahip adı soyadı"
-              />
-            </div>
+                  />
+                </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Sahip E-posta</label>
               <input
@@ -299,27 +299,27 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="sahip@restoran.com"
               />
-            </div>
-            <div>
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Sahip Telefon</label>
-              <input
+                  <input
                 type="tel"
                 name="ownerPhone"
                 value={formData.ownerPhone}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="+90 555 123 45 67"
-              />
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
         {/* Özellikler */}
         <div className="bg-gray-50 p-6 rounded-lg">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
             <FaGlobe className="mr-2" />
             Özellikler
-          </h3>
+            </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
               { key: 'qr-menu', label: 'QR Menü' },
@@ -339,29 +339,29 @@ export default function EditRestaurantForm({ restaurantId, onClose }: EditRestau
                 <span className="text-sm text-gray-700">{feature.label}</span>
               </label>
             ))}
-          </div>
-        </div>
+              </div>
+            </div>
 
         {/* Butonlar */}
         <div className="flex justify-end space-x-4 pt-6">
-          <button
-            type="button"
-            onClick={onClose}
+        <button
+          type="button"
+          onClick={onClose}
             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-          >
+        >
             <FaTimes className="inline mr-2" />
-            İptal
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
+          İptal
+        </button>
+        <button
+          type="submit"
+          disabled={isLoading}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+        >
             <FaSave className="inline mr-2" />
             {isLoading ? 'Güncelleniyor...' : 'Güncelle'}
-          </button>
-        </div>
-      </form>
+        </button>
+      </div>
+    </form>
     </div>
   );
 }
