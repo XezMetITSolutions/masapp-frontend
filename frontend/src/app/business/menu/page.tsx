@@ -1003,7 +1003,7 @@ export default function MenuManagement() {
 
           {showCategoryForm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+              <div className="bg-white rounded-xl max-w-md w-full overflow-hidden">
                 <div className="p-6 border-b flex justify-between items-center">
                   <h2 className="text-2xl font-bold">
                     {editingCategory ? 'Kategoriyi Düzenle' : 'Yeni Kategori Ekle'}
@@ -1015,76 +1015,20 @@ export default function MenuManagement() {
                     <FaTimes size={24} />
                   </button>
                 </div>
-                <div className="p-6 overflow-y-auto max-h-[70vh]">
-                  <form className="space-y-6">
+                <div className="p-6">
+                  <form className="space-y-4">
                     {/* Kategori Adı */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Kategori Adı (Türkçe) *
-                        </label>
-                        <input
-                          type="text"
-                          value={categoryFormData.nameTr}
-                          onChange={(e) => setCategoryFormData({...categoryFormData, nameTr: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Örn: Başlangıçlar"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Kategori Adı (İngilizce)
-                        </label>
-                        <input
-                          type="text"
-                          value={categoryFormData.nameEn}
-                          onChange={(e) => setCategoryFormData({...categoryFormData, nameEn: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Örn: Starters"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Açıklama */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Açıklama (Türkçe)
-                        </label>
-                        <textarea
-                          value={categoryFormData.descriptionTr}
-                          onChange={(e) => setCategoryFormData({...categoryFormData, descriptionTr: e.target.value})}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Kategori açıklaması..."
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Açıklama (İngilizce)
-                        </label>
-                        <textarea
-                          value={categoryFormData.descriptionEn}
-                          onChange={(e) => setCategoryFormData({...categoryFormData, descriptionEn: e.target.value})}
-                          rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="Category description..."
-                        />
-                      </div>
-                    </div>
-
-                    {/* Sıralama */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Sıralama
+                        Kategori Adı *
                       </label>
                       <input
-                        type="number"
-                        value={categoryFormData.order}
-                        onChange={(e) => setCategoryFormData({...categoryFormData, order: Number(e.target.value)})}
+                        type="text"
+                        value={categoryFormData.nameTr}
+                        onChange={(e) => setCategoryFormData({...categoryFormData, nameTr: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="0"
+                        placeholder="Örn: Başlangıçlar, Ana Yemekler, Tatlılar"
+                        required
                       />
                     </div>
 
