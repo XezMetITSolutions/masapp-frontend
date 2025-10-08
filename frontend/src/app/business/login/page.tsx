@@ -3,53 +3,44 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
-// React Icons yerine emoji kullanıyoruz
+import apiService from '@/services/api';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
-  const [selectedRole, setSelectedRole] = useState<'waiter' | 'kitchen' | 'cashier' | null>(null);
+  const { loginRestaurant } = useAuthStore();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleDemoLogin = async (role: 'waiter' | 'kitchen' | 'cashier' | 'restaurant_owner') => {
-    console.log('handleDemoLogin called with role:', role);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     
-    const demoUser = {
-      id: `demo-${role}-1`,
-      name: role === 'waiter' ? 'MasApp Garson' : 
-            role === 'kitchen' ? 'MasApp Mutfak' : 
-            role === 'cashier' ? 'MasApp Kasa' : 'MasApp İşletme',
-      email: `demo@${role === 'restaurant_owner' ? 'restaurant' : role}.com`,
-      role: role,
-      restaurantId: 'demo-restaurant-1',
-      status: 'active' as const,
-      createdAt: new Date(),
-      lastLogin: new Date()
-    };
-
-    console.log('Demo user created:', demoUser);
+    console.log('🔐 Attempting login:', { username });
     
     try {
-      await login(demoUser, 'demo-access-token', 'demo-refresh-token');
-      console.log('Login successful');
+      const response = await apiService.login({ username, password });
       
-      // Cookie set et (middleware için)
-      document.cookie = 'accessToken=demo-access-token; path=/; max-age=86400'; // 24 saat
+      console.log('✅ Login successful:', response);
       
-      if (role === 'waiter') {
-        console.log('Redirecting to waiter panel');
-        router.push('/business/waiter');
-      } else if (role === 'kitchen') {
-        console.log('Redirecting to kitchen panel');
-        router.push('/business/kitchen');
-      } else if (role === 'cashier') {
-        console.log('Redirecting to cashier panel');
-        router.push('/business/cashier');
-      } else if (role === 'restaurant_owner') {
-        console.log('Redirecting to dashboard');
+      if (response.success && response.data) {
+        // Backend'den gelen GERÇEK restaurant datası
+        loginRestaurant(response.data);
+        
+        console.log('🏪 Restaurant logged in:', response.data);
+        
+        // Dashboard'a yönlendir
         router.push('/business/dashboard');
+      } else {
+        setError('Giriş başarısız');
       }
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      setError(error.message || 'Kullanıcı adı veya şifre hatalı');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,76 +52,71 @@ export default function LoginPage() {
             <span className="text-purple-600 text-2xl">🍽️</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">MasApp Business</h1>
-          <p className="text-gray-600 mt-2">MasApp Giriş Paneli</p>
+          <p className="text-gray-600 mt-2">İşletme Paneli Giriş</p>
         </div>
 
-        <div className="space-y-4">
-          {/* Test Button */}
+        <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              Kullanıcı Adı
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="username"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Şifre
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="••••••••"
+              required
+              disabled={loading}
+            />
+          </div>
+
           <button
-            onClick={() => {
-              console.log('Test button clicked');
-              alert('Test button works!');
-            }}
-            className="w-full p-2 bg-red-500 text-white rounded-lg cursor-pointer"
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            TEST BUTONU - TIKLA
-          </button>
-          
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('Waiter button clicked');
-              handleDemoLogin('waiter');
-            }}
-            className="w-full p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
-          >
-            <span className="text-xl">🔔</span>
-            <div className="text-left">
-              <div className="font-semibold">Garson Paneli</div>
-              <div className="text-sm opacity-90">Siparişleri yönet ve müşteri çağrılarını gör</div>
-            </div>
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Giriş yapılıyor...
+              </span>
+            ) : (
+              'Giriş Yap'
+            )}
           </button>
 
-                <button
-            onClick={() => handleDemoLogin('kitchen')}
-            className="w-full p-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
-          >
-            <span className="text-xl">👨‍🍳</span>
-            <div className="text-left">
-              <div className="font-semibold">Mutfak Paneli</div>
-              <div className="text-sm opacity-90">Siparişleri hazırla ve durumları güncelle</div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => handleDemoLogin('cashier')}
-            className="w-full p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
-          >
-            <span className="text-xl">💰</span>
-            <div className="text-left">
-              <div className="font-semibold">Kasa Paneli</div>
-              <div className="text-sm opacity-90">Ödemeleri al ve kasa işlemlerini yönet</div>
-            </div>
-          </button>
-
-            <button
-            onClick={() => handleDemoLogin('restaurant_owner')}
-            className="w-full p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center gap-3 shadow-lg cursor-pointer"
-          >
-            <span className="text-xl">🏪</span>
-            <div className="text-left">
-              <div className="font-semibold">İşletme Paneli</div>
-              <div className="text-sm opacity-90">Restoranı yönet ve istatistikleri gör</div>
-            </div>
-          </button>
-            </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
-            MasApp için herhangi bir rol seçebilirsiniz
-          </p>
-        </div>
+          <div className="text-center text-sm text-gray-600 mt-4">
+            <p>Backend: PostgreSQL (Render)</p>
+            <p className="text-xs text-gray-500 mt-1">Gerçek veri kullanılıyor</p>
+          </div>
+        </form>
       </div>
     </div>
   );
