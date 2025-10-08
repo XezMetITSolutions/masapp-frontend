@@ -1270,16 +1270,14 @@ export default function MenuManagement() {
                           if (currentRestaurantId) {
                             await createMenuItemAPI(currentRestaurantId, {
                               categoryId: formData.category,
-                              name: { tr: formData.nameTr, en: formData.nameEn || formData.nameTr },
-                              description: { tr: formData.descriptionTr, en: formData.descriptionEn || formData.descriptionTr },
+                              name: formData.nameTr,
+                              description: formData.descriptionTr,
                               price: Number(formData.price),
-                              image: capturedImage || '/placeholder-food.jpg',
-                              order: items.length + 1,
+                              imageUrl: capturedImage || '/placeholder-food.jpg',
+                              displayOrder: items.length + 1,
                               isAvailable: formData.isAvailable,
-                              isPopular: formData.isPopular,
                               preparationTime: Number(formData.preparationTime) || 0,
-                              calories: Number(formData.calories) || 0,
-                              allergens: { tr: [], en: [] }
+                              calories: Number(formData.calories) || 0
                             });
                             console.log('Yeni ürün backend\'e kaydedildi:', formData);
                           } else {
@@ -1489,9 +1487,9 @@ export default function MenuManagement() {
                           // Backend API'sine kaydet
                           if (currentRestaurantId) {
                             await createCategoryAPI(currentRestaurantId, {
-                              name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
-                              description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
-                              order: categories.length,
+                              name: categoryFormData.nameTr,
+                              description: categoryFormData.descriptionTr,
+                              displayOrder: categories.length,
                               isActive: categoryFormData.isActive
                             });
                             console.log('Yeni kategori backend\'e kaydedildi');
