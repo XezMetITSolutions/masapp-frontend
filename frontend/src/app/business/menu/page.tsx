@@ -45,7 +45,7 @@ const BulkImportModal = lazy(() => import('@/components/BulkImportModal'));
 
 export default function MenuManagement() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
   const { 
     currentRestaurant, 
     restaurants,
@@ -137,6 +137,11 @@ export default function MenuManagement() {
     order: 0,
     isActive: true
   });
+
+  // Sayfa yüklendiğinde auth'u initialize et
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   // Sayfa yüklendiğinde menüyü backend'den çek
   useEffect(() => {
