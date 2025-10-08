@@ -288,8 +288,12 @@ export default function MenuManagement() {
 
   // Filtrelenmiş ürünler
   const filteredItems = items.filter(item => {
-    const matchesSearch = item.name.tr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description.tr.toLowerCase().includes(searchTerm.toLowerCase());
+    // Güvenlik kontrolü - item.name ve item.description undefined olabilir
+    const nameTr = item.name?.tr || '';
+    const descriptionTr = item.description?.tr || '';
+    
+    const matchesSearch = nameTr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         descriptionTr.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || 
                          (statusFilter === 'available' && item.isAvailable !== false) ||
