@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Restaurant, Staff } from '@/types';
-import { createPersistOptions } from './storageConfig';
 
 interface AuthState {
   authenticatedRestaurant: Restaurant | null;

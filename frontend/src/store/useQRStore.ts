@@ -1,7 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { QRCode } from '@/types';
-import { createPersistOptions } from './storageConfig';
 
 interface QRState {
   qrCodes: QRCode[];

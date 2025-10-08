@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { createPersistOptions } from './storageConfig';
 
 export interface SalesReport {
   date: string;
