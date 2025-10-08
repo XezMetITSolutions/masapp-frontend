@@ -508,8 +508,20 @@ const useMenuStore = create<MenuState>()((set, get) => ({
       const result = await response.json();
       
       if (result.success) {
-        // Refresh menu data
-        await get().fetchMenu(restaurantId);
+        // Add to local state immediately
+        const newCategory = {
+          id: result.data.id,
+          name: result.data.name,
+          description: result.data.description,
+          displayOrder: result.data.displayOrder,
+          isActive: result.data.isActive,
+          restaurantId: result.data.restaurantId
+        };
+        
+        set((state) => ({
+          categories: [...state.categories, newCategory]
+        }));
+        
         return result.data;
       } else {
         throw new Error(result.message || 'Failed to create category');
@@ -537,8 +549,26 @@ const useMenuStore = create<MenuState>()((set, get) => ({
       const result = await response.json();
       
       if (result.success) {
-        // Refresh menu data
-        await get().fetchMenu(restaurantId);
+        // Add to local state immediately
+        const newItem = {
+          id: result.data.id,
+          name: result.data.name,
+          description: result.data.description,
+          price: result.data.price,
+          image: result.data.imageUrl,
+          categoryId: result.data.categoryId,
+          displayOrder: result.data.displayOrder,
+          isActive: result.data.isActive,
+          isAvailable: result.data.isAvailable,
+          allergens: result.data.allergens || [],
+          ingredients: result.data.ingredients || [],
+          nutritionInfo: result.data.nutritionInfo || {}
+        };
+        
+        set((state) => ({
+          items: [...state.items, newItem]
+        }));
+        
         return result.data;
       } else {
         throw new Error(result.message || 'Failed to create menu item');
