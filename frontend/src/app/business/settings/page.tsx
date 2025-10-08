@@ -49,7 +49,12 @@ import BusinessSidebar from '@/components/BusinessSidebar';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
+  
+  // Sayfa yüklendiğinde auth'u initialize et
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Restaurant-specific settings kullan

@@ -33,7 +33,12 @@ import { useFeature } from '@/hooks/useFeature';
 
 export default function BusinessDashboard() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
+  
+  // Sayfa yüklendiginde auth'u initialize et
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
   
   // Giriş yapan kişinin adını al
   const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';

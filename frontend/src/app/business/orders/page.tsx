@@ -34,7 +34,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
+  
+  // Sayfa yüklendiğinde auth'u initialize et
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
   const [orders, setOrders] = useState<any[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
