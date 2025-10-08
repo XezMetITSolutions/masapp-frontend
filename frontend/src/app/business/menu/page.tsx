@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -61,33 +61,42 @@ export default function MenuManagement() {
     createRestaurant
   } = useRestaurantStore();
   
-  // Menu store'dan PostgreSQL API fonksiyonları
   const { createCategory, createMenuItem, fetchMenu } = useMenuStore();
   
   // Feature kontrolü
   const hasQrMenu = useFeature('qr_menu');
   
-  // Giriş yapan restoranın ID'si - subdomain'den de alabilir
-  const getRestaurantIdFromSubdomain = () => {
+  // Restaurant ID'sini al - authenticated restaurant'tan veya subdomain'den
+  const getRestaurantId = useCallback(() => {
+    // Önce authenticated restaurant'tan al
+    if (authenticatedRestaurant?.id) {
+      return authenticatedRestaurant.id;
+    }
+    
+    // Subdomain'den de alabilir (fallback)
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       const subdomain = hostname.split('.')[0];
       const mainDomains = ['localhost', 'www', 'guzellestir'];
       
       if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
-        // Store'dan subdomain'e göre restaurant bul
+        // Subdomain'e göre restaurant bul
         const restaurant = restaurants.find(r => 
-          r.username === subdomain || 
-          r.name.toLowerCase().replace(/\s+/g, '-') === subdomain ||
-          r.name.toLowerCase().includes(subdomain)
+          r.name.toLowerCase().replace(/\s+/g, '') === subdomain ||
+          r.username === subdomain
         );
         return restaurant?.id;
       }
     }
     return null;
-  };
+  }, [authenticatedRestaurant?.id, restaurants]);
   
-  const currentRestaurantId = authenticatedRestaurant?.id || currentRestaurant?.id || getRestaurantIdFromSubdomain();
+  // Eski fonksiyon - geriye uyumluluk için
+  // const getRestaurantIdFromSubdomain = () => {
+  //   return getRestaurantId();
+  // };
+  
+  const currentRestaurantId = authenticatedRestaurant?.id || currentRestaurant?.id || getRestaurantId();
   
   // Sadece bu restorana ait kategorileri ve ürünleri filtrele
   const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
@@ -151,7 +160,14 @@ export default function MenuManagement() {
     if (!isAuthenticated() && !hasSubdomain) {
       router.push('/login');
     }
-  }, [isAuthenticated, router, initializeAuth]);
+    
+    // Restaurant ID'sini al ve menu verilerini yükle
+    const restaurantId = getRestaurantId();
+    if (restaurantId) {
+      console.log('Loading menu data for restaurant:', restaurantId);
+      fetchMenu(restaurantId);
+    }
+  }, [isAuthenticated, router, initializeAuth, fetchMenu, getRestaurantId]);
 
   const handleLogout = () => {
     logout();
@@ -1445,7 +1461,7 @@ export default function MenuManagement() {
                         } else {
                           // Backend API'sine kaydet
                           if (currentRestaurantId) {
-                            await createMenuCategory(currentRestaurantId, {
+                            await createCategory(currentRestaurantId, {
                               name: { tr: categoryFormData.nameTr, en: categoryFormData.nameEn || categoryFormData.nameTr },
                               description: { tr: categoryFormData.descriptionTr, en: categoryFormData.descriptionEn },
                               order: categories.length,
