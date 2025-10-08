@@ -167,15 +167,23 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         isActive: data.isActive !== undefined ? data.isActive : true
       };
       
+      console.log('🚀 Creating category:', { restaurantId, backendData });
+      
       const response = await apiService.createMenuCategory(restaurantId, backendData);
+      
+      console.log('✅ Category created:', response);
+      
       if (response.success) {
         set((state) => ({
           categories: [...state.categories, response.data],
           loading: false
         }));
         return response.data;
+      } else {
+        throw new Error(response.message || 'Failed to create category');
       }
     } catch (error) {
+      console.error('❌ Create category error:', error);
       set({ 
         error: error instanceof Error ? error.message : 'Kategori oluşturulamadı', 
         loading: false 
@@ -195,18 +203,29 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         price: parseFloat(data.price),
         image: data.image,
         displayOrder: data.order || data.displayOrder || 0,
-        isAvailable: data.isAvailable !== undefined ? data.isAvailable : true
+        isAvailable: data.isAvailable !== undefined ? data.isAvailable : true,
+        isPopular: data.isPopular || false,
+        preparationTime: data.preparationTime || null,
+        calories: data.calories || null
       };
       
+      console.log('🚀 Creating menu item:', { restaurantId, backendData });
+      
       const response = await apiService.createMenuItem(restaurantId, backendData);
+      
+      console.log('✅ Menu item created:', response);
+      
       if (response.success) {
         set((state) => ({
           menuItems: [...state.menuItems, response.data],
           loading: false
         }));
         return response.data;
+      } else {
+        throw new Error(response.message || 'Failed to create menu item');
       }
     } catch (error) {
+      console.error('❌ Create menu item error:', error);
       set({ 
         error: error instanceof Error ? error.message : 'Ürün oluşturulamadı', 
         loading: false 

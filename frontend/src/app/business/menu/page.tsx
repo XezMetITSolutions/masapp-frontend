@@ -145,8 +145,12 @@ export default function MenuManagement() {
 
   // Sayfa yüklendiğinde menüyü backend'den çek
   useEffect(() => {
+    console.log('🏪 Current Restaurant ID:', currentRestaurantId);
     if (currentRestaurantId) {
+      console.log('📥 Fetching menu for restaurant:', currentRestaurantId);
       fetchRestaurantMenu(currentRestaurantId);
+    } else {
+      console.warn('⚠️ No restaurant ID found!');
     }
   }, [currentRestaurantId, fetchRestaurantMenu]);
 
