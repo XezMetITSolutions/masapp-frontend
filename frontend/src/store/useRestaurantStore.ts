@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Restaurant, MenuCategory, MenuItem, Order, ServiceCall } from '@/types';
 import { apiService } from '@/services/api';
 
@@ -51,7 +52,9 @@ interface RestaurantState {
   clearCompletedCalls: () => void;
 }
 
-const useRestaurantStore = create<RestaurantState>((set, get) => ({
+const useRestaurantStore = create<RestaurantState>()(
+  persist(
+    (set, get) => ({
   // Initial state
   restaurants: [],
   currentRestaurant: null,
@@ -160,7 +163,23 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         }));
       }
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to create category', loading: false });
+      // Backend API başarısız olduğunda localStorage'a kaydet
+      const newCategory: MenuCategory = {
+        id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        restaurantId,
+        name: data.name,
+        description: data.description,
+        order: data.order || 0,
+        isActive: data.isActive !== false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      set((state) => ({
+        categories: [...state.categories, newCategory],
+        loading: false,
+        error: null
+      }));
     }
   },
 
@@ -175,7 +194,30 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         }));
       }
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : 'Failed to create menu item', loading: false });
+      // Backend API başarısız olduğunda localStorage'a kaydet
+      const newMenuItem: MenuItem = {
+        id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        restaurantId,
+        categoryId: data.categoryId,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        image: data.image,
+        order: data.order || 0,
+        isAvailable: data.isAvailable !== false,
+        isPopular: data.isPopular || false,
+        preparationTime: data.preparationTime,
+        calories: data.calories,
+        allergens: data.allergens,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      set((state) => ({
+        menuItems: [...state.menuItems, newMenuItem],
+        loading: false,
+        error: null
+      }));
     }
   },
 
@@ -286,6 +328,20 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   clearCompletedCalls: () => set((state) => ({
     serviceCalls: state.serviceCalls.filter(call => call.status !== 'completed')
   })),
-}));
+    }),
+    {
+      name: 'restaurant-store',
+      partialize: (state) => ({
+        restaurants: state.restaurants,
+        currentRestaurant: state.currentRestaurant,
+        categories: state.categories,
+        menuItems: state.menuItems,
+        orders: state.orders,
+        activeOrders: state.activeOrders,
+        serviceCalls: state.serviceCalls,
+      }),
+    }
+  )
+);
 
 export default useRestaurantStore;
