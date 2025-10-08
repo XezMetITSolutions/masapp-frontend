@@ -7,19 +7,20 @@ export interface MenuItem {
   name: {
     en: string;
     tr: string;
-  };
+  } | string;
   description: {
     en: string;
     tr: string;
-  };
+  } | string;
   price: number;
-  image: string;
+  image?: string;
   images?: string[];
-  category: string;
+  category?: string; // Legacy field
+  categoryId?: string; // New field for PostgreSQL
   subcategory?: string;
-  popular: boolean;
+  popular?: boolean;
   ingredients?: string[];
-  allergens?: { en: string; tr: string }[];
+  allergens?: { en: string; tr: string }[] | string[];
   calories?: number;
   preparationTime?: number;
   servingInfo?: {
@@ -27,6 +28,9 @@ export interface MenuItem {
     tr: string;
   };
   isAvailable?: boolean;
+  isActive?: boolean;
+  displayOrder?: number;
+  nutritionInfo?: any;
 }
 
 export interface MenuSubcategory {
@@ -61,7 +65,7 @@ interface MenuState {
   error: string | null;
   
   // Actions
-  fetchMenu: () => Promise<void>;
+  fetchMenu: (restaurantId?: string) => Promise<void>;
   getItemsByCategory: (categoryId: string) => MenuItem[];
   getItemsBySubcategory: (subcategoryId: string) => MenuItem[];
   getPopularItems: () => MenuItem[];
@@ -69,6 +73,12 @@ interface MenuState {
   getSubcategoriesByParent: (parentId: string) => MenuSubcategory[];
   updateItemPrice: (itemId: string, newPrice: number) => void;
   bulkUpdatePrices: (categoryId: string | 'all', operation: 'increase' | 'decrease', type: 'percentage' | 'fixed', value: number) => void;
+  
+  // PostgreSQL API functions
+  createCategory: (restaurantId: string, categoryData: any) => Promise<any>;
+  createMenuItem: (restaurantId: string, itemData: any) => Promise<any>;
+  updateMenuItem: (restaurantId: string, itemId: string, itemData: any) => Promise<any>;
+  deleteMenuItem: (restaurantId: string, itemId: string) => Promise<boolean>;
 }
 
 // Sample menu data
@@ -409,52 +419,68 @@ const useMenuStore = create<MenuState>()((set, get) => ({
   isLoading: false,
   error: null,
   
-  fetchMenu: async () => {
+  fetchMenu: async (restaurantId?: string) => {
     set({ isLoading: true, error: null });
     
     try {
-      // Check cache first
-      const cacheKey = 'menu_data';
-      const cachedData = localStorage.getItem(cacheKey);
+      if (!restaurantId) {
+        // Fallback to sample data if no restaurant ID
+        set({ 
+          items: sampleItems,
+          categories: sampleCategories,
+          subcategories: sampleSubcategories,
+          isLoading: false 
+        });
+        return;
+      }
+
+      // Fetch from PostgreSQL API
+      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/categories`);
       
-      if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        const now = Date.now();
-        const cacheAge = now - timestamp;
-        const cacheTTL = 5 * 60 * 1000; // 5 minutes
-        
-        if (cacheAge < cacheTTL) {
-          // Use cached data
-          set({ 
-            items: data.items,
-            categories: data.categories,
-            subcategories: data.subcategories,
-            isLoading: false 
-          });
-          return;
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      // In a real app, this would be an API call
-      // For now, we'll just simulate a delay and use our sample data
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const result = await response.json();
       
-      const menuDataToCache = {
-        items: sampleItems,
-        categories: sampleCategories,
-        subcategories: sampleSubcategories,
-      };
-      
-      // Cache the data
-      localStorage.setItem(cacheKey, JSON.stringify({
-        data: menuDataToCache,
-        timestamp: Date.now()
-      }));
-      
-      set({ 
-        ...menuDataToCache,
-        isLoading: false 
-      });
+      if (result.success) {
+        // Transform backend data to frontend format
+        const categories = result.data.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name,
+          description: cat.description,
+          displayOrder: cat.displayOrder,
+          isActive: cat.isActive,
+          restaurantId: cat.restaurantId
+        }));
+        
+        // Extract items from categories
+        const items = result.data.flatMap((cat: any) => 
+          cat.items?.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            image: item.image,
+            categoryId: item.categoryId,
+            displayOrder: item.displayOrder,
+            isActive: item.isActive,
+            isAvailable: item.isAvailable,
+            allergens: item.allergens || [],
+            ingredients: item.ingredients || [],
+            nutritionInfo: item.nutritionInfo || {}
+          })) || []
+        );
+        
+        set({ 
+          categories,
+          items,
+          subcategories: [], // Backend doesn't have subcategories yet
+          isLoading: false 
+        });
+      } else {
+        throw new Error(result.message || 'Failed to fetch menu');
+      }
     } catch (error) {
       set({ 
         error: 'Failed to fetch menu data',
@@ -462,9 +488,122 @@ const useMenuStore = create<MenuState>()((set, get) => ({
       });
     }
   },
+
+  // PostgreSQL API functions
+  createCategory: async (restaurantId: string, categoryData: any) => {
+    try {
+      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(categoryData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh menu data
+        await get().fetchMenu(restaurantId);
+        return result.data;
+      } else {
+        throw new Error(result.message || 'Failed to create category');
+      }
+    } catch (error) {
+      console.error('Create category error:', error);
+      throw error;
+    }
+  },
+
+  createMenuItem: async (restaurantId: string, itemData: any) => {
+    try {
+      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh menu data
+        await get().fetchMenu(restaurantId);
+        return result.data;
+      } else {
+        throw new Error(result.message || 'Failed to create menu item');
+      }
+    } catch (error) {
+      console.error('Create menu item error:', error);
+      throw error;
+    }
+  },
+
+  updateMenuItem: async (restaurantId: string, itemId: string, itemData: any) => {
+    try {
+      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items/${itemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh menu data
+        await get().fetchMenu(restaurantId);
+        return result.data;
+      } else {
+        throw new Error(result.message || 'Failed to update menu item');
+      }
+    } catch (error) {
+      console.error('Update menu item error:', error);
+      throw error;
+    }
+  },
+
+  deleteMenuItem: async (restaurantId: string, itemId: string) => {
+    try {
+      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items/${itemId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh menu data
+        await get().fetchMenu(restaurantId);
+        return true;
+      } else {
+        throw new Error(result.message || 'Failed to delete menu item');
+      }
+    } catch (error) {
+      console.error('Delete menu item error:', error);
+      throw error;
+    }
+  },
   
   getItemsByCategory: (categoryId) => {
-    return get().items.filter(item => item.category === categoryId);
+    return get().items.filter(item => item.categoryId === categoryId || item.category === categoryId);
   },
   
   getItemsBySubcategory: (subcategoryId) => {

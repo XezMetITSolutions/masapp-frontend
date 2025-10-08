@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Restaurant, MenuCategory, MenuItem, Order, ServiceCall } from '@/types';
 import { apiService } from '@/services/api';
 
@@ -57,12 +56,12 @@ const useRestaurantStore = create<RestaurantState>()(
     (set, get) => ({
   // Initial state
   restaurants: [],
-  currentRestaurant: null,
-  categories: [],
-  menuItems: [],
-  orders: [],
-  activeOrders: [],
-  serviceCalls: [],
+      currentRestaurant: null,
+      categories: [],
+      menuItems: [],
+      orders: [],
+      activeOrders: [],
+      serviceCalls: [],
   loading: false,
   error: null,
   
@@ -137,10 +136,10 @@ const useRestaurantStore = create<RestaurantState>()(
       const response = await apiService.updateRestaurantFeatures(id, features);
       if (response.success) {
         set((state) => ({
-          restaurants: state.restaurants.map(r => 
+        restaurants: state.restaurants.map(r => 
             r.id === id ? { ...r, features } : r
-          ),
-          currentRestaurant: state.currentRestaurant?.id === id 
+        ),
+        currentRestaurant: state.currentRestaurant?.id === id 
             ? { ...state.currentRestaurant, features }
             : state.currentRestaurant,
           loading: false
@@ -231,103 +230,103 @@ const useRestaurantStore = create<RestaurantState>()(
   })),
   
   deleteRestaurant: (id: string) => set((state) => ({
-    restaurants: state.restaurants.filter(r => r.id !== id)
-  })),
-  
+        restaurants: state.restaurants.filter(r => r.id !== id)
+      })),
+      
   // Menu Actions
   setCategories: (categories: MenuCategory[]) => set({ categories }),
-  
+      
   addCategory: (category: MenuCategory) => set((state) => ({
-    categories: [...state.categories, category]
-  })),
-  
+        categories: [...state.categories, category]
+      })),
+      
   updateCategory: (id: string, updates: Partial<MenuCategory>) => set((state) => ({
-    categories: state.categories.map(c => 
-      c.id === id ? { ...c, ...updates } : c
-    )
-  })),
-  
+        categories: state.categories.map(c => 
+          c.id === id ? { ...c, ...updates } : c
+        )
+      })),
+      
   deleteCategory: (id: string) => set((state) => ({
-    categories: state.categories.filter(c => c.id !== id),
-    menuItems: state.menuItems.filter(item => item.categoryId !== id)
-  })),
-  
+        categories: state.categories.filter(c => c.id !== id),
+        menuItems: state.menuItems.filter(item => item.categoryId !== id)
+      })),
+      
   setMenuItems: (items: MenuItem[]) => set({ menuItems: items }),
-  
+      
   addMenuItem: (item: MenuItem) => set((state) => ({
-    menuItems: [...state.menuItems, item]
-  })),
-  
+        menuItems: [...state.menuItems, item]
+      })),
+      
   updateMenuItem: (id: string, updates: Partial<MenuItem>) => set((state) => ({
-    menuItems: state.menuItems.map(item => 
-      item.id === id ? { ...item, ...updates } : item
-    )
-  })),
-  
+        menuItems: state.menuItems.map(item => 
+          item.id === id ? { ...item, ...updates } : item
+        )
+      })),
+      
   deleteMenuItem: (id: string) => set((state) => ({
-    menuItems: state.menuItems.filter(item => item.id !== id)
-  })),
-  
-  // Order Actions
+        menuItems: state.menuItems.filter(item => item.id !== id)
+      })),
+      
+      // Order Actions
   setOrders: (orders: Order[]) => set({ 
-    orders,
-    activeOrders: orders.filter(o => 
-      ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(o.status)
-    )
-  }),
-  
+        orders,
+        activeOrders: orders.filter(o => 
+          ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(o.status)
+        )
+      }),
+      
   addOrder: (order: Order) => set((state) => ({
-    orders: [...state.orders, order],
-    activeOrders: [...state.activeOrders, order]
-  })),
-  
+        orders: [...state.orders, order],
+        activeOrders: [...state.activeOrders, order]
+      })),
+      
   updateOrderStatus: (id: string, status: Order['status']) => set((state) => {
-    const updatedOrders = state.orders.map(o => 
-      o.id === id ? { ...o, status } : o
-    );
-    return {
-      orders: updatedOrders,
-      activeOrders: updatedOrders.filter(o => 
-        ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(o.status)
-      )
-    };
-  }),
-  
+        const updatedOrders = state.orders.map(o => 
+          o.id === id ? { ...o, status } : o
+        );
+        return {
+          orders: updatedOrders,
+          activeOrders: updatedOrders.filter(o => 
+            ['pending', 'confirmed', 'preparing', 'ready', 'served'].includes(o.status)
+          )
+        };
+      }),
+      
   updateOrderItemStatus: (orderId: string, itemIndex: number, status: 'pending' | 'preparing' | 'ready' | 'served') => set((state) => ({
-    orders: state.orders.map(order => {
-      if (order.id === orderId) {
-        const updatedItems = [...order.items];
-        updatedItems[itemIndex] = { ...updatedItems[itemIndex], status };
-        return { ...order, items: updatedItems };
-      }
-      return order;
-    })
-  })),
-  
-  // Service Call Actions
-  setServiceCalls: (calls: ServiceCall[]) => set({ serviceCalls: calls }),
-  
-  addServiceCall: (call: ServiceCall) => set((state) => ({
-    serviceCalls: [...state.serviceCalls, call]
-  })),
-  
-  updateServiceCallStatus: (id: string, status: ServiceCall['status'], acknowledgedBy?: string) => set((state) => ({
-    serviceCalls: state.serviceCalls.map(call => 
-      call.id === id 
-        ? { 
-            ...call, 
-            status,
-            acknowledgedBy: acknowledgedBy || call.acknowledgedBy,
-            acknowledgedAt: status === 'acknowledged' ? new Date() : call.acknowledgedAt,
-            completedAt: status === 'completed' ? new Date() : call.completedAt
+        orders: state.orders.map(order => {
+          if (order.id === orderId) {
+            const updatedItems = [...order.items];
+            updatedItems[itemIndex] = { ...updatedItems[itemIndex], status };
+            return { ...order, items: updatedItems };
           }
-        : call
-    )
-  })),
-  
-  clearCompletedCalls: () => set((state) => ({
-    serviceCalls: state.serviceCalls.filter(call => call.status !== 'completed')
-  })),
+          return order;
+        })
+      })),
+      
+      // Service Call Actions
+  setServiceCalls: (calls: ServiceCall[]) => set({ serviceCalls: calls }),
+      
+  addServiceCall: (call: ServiceCall) => set((state) => ({
+        serviceCalls: [...state.serviceCalls, call]
+      })),
+      
+  updateServiceCallStatus: (id: string, status: ServiceCall['status'], acknowledgedBy?: string) => set((state) => ({
+        serviceCalls: state.serviceCalls.map(call => 
+          call.id === id 
+            ? { 
+                ...call, 
+                status,
+                acknowledgedBy: acknowledgedBy || call.acknowledgedBy,
+                acknowledgedAt: status === 'acknowledged' ? new Date() : call.acknowledgedAt,
+                completedAt: status === 'completed' ? new Date() : call.completedAt
+              }
+            : call
+        )
+      })),
+      
+      clearCompletedCalls: () => set((state) => ({
+        serviceCalls: state.serviceCalls.filter(call => call.status !== 'completed')
+      })),
     }),
     {
       name: 'restaurant-store',
