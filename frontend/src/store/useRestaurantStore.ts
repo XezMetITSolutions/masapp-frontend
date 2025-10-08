@@ -344,40 +344,58 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   fetchRestaurantMenu: async (restaurantId: string) => {
     set({ loading: true, error: null });
     try {
+      console.log('🔄 Fetching restaurant menu:', restaurantId);
       const response = await apiService.getRestaurantMenu(restaurantId);
+      console.log('📦 Backend response:', response);
+      
       if (response.success) {
         // Backend'den gelen veriyi frontend formatına dönüştür
         const categories = response.data.categories || [];
         const items = response.data.items || [];
         
+        console.log('📊 Raw categories from backend:', categories.length);
+        console.log('📊 Raw items from backend:', items.length);
+        console.log('📋 First item:', items[0]);
+        
+        const transformedCategories = categories.map((cat: any) => ({
+          id: cat.id,
+          restaurantId: cat.restaurantId,
+          name: cat.name,
+          description: cat.description,
+          order: cat.displayOrder || 0,
+          isActive: cat.isActive !== false
+        }));
+        
+        const transformedItems = items.map((item: any) => ({
+          id: item.id,
+          restaurantId: item.restaurantId,
+          categoryId: item.categoryId,
+          name: item.name,
+          description: item.description,
+          price: parseFloat(item.price),
+          image: item.imageUrl || item.image,
+          order: item.displayOrder || 0,
+          isAvailable: item.isAvailable !== false,
+          isPopular: item.isPopular || false,
+          calories: item.calories,
+          preparationTime: item.preparationTime
+        }));
+        
+        console.log('✅ Transformed categories:', transformedCategories.length);
+        console.log('✅ Transformed items:', transformedItems.length);
+        console.log('✅ First transformed item:', transformedItems[0]);
+        
         set({
-          categories: categories.map((cat: any) => ({
-            id: cat.id,
-            restaurantId: cat.restaurantId,
-            name: cat.name, // Artık sadece string
-            description: cat.description,
-            order: cat.displayOrder || 0,
-            isActive: cat.isActive !== false
-          })),
-          menuItems: items.map((item: any) => ({
-            id: item.id,
-            restaurantId: item.restaurantId,
-            categoryId: item.categoryId,
-            name: item.name, // Artık sadece string
-            description: item.description,
-            price: parseFloat(item.price),
-            image: item.imageUrl || item.image,
-            order: item.displayOrder || 0,
-            isAvailable: item.isAvailable !== false,
-            isPopular: item.isPopular || false,
-            calories: item.calories,
-            preparationTime: item.preparationTime
-          })),
+          categories: transformedCategories,
+          menuItems: transformedItems,
           loading: false
         });
+        
+        console.log('💾 State updated successfully');
         return response.data;
       }
     } catch (error) {
+      console.error('❌ Fetch menu error:', error);
       set({ 
         error: error instanceof Error ? error.message : 'Menü yüklenemedi', 
         loading: false 
