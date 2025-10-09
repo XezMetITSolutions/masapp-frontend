@@ -465,27 +465,41 @@ function MenuPageContent() {
         </div>
 
         {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg z-50">
           <div className="container mx-auto flex justify-around">
-            <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
-              <FaUtensils className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
+            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
+              <FaUtensils className="mb-0.5" size={20} />
+              <span className="text-xs font-medium"><TranslatedText>Menü</TranslatedText></span>
             </Link>
-            <Link href="/demo/cart" className="flex flex-col items-center" style={{ color: primary }}>
+            <button 
+              onClick={() => {
+                // Sepet sayfasına yönlendir veya modal aç
+                window.location.href = '/cart';
+              }}
+              className="flex flex-col items-center" 
+              style={{ color: primary }}
+            >
               <div className="relative">
-                <FaShoppingCart className="mb-0.5" size={16} />
+                <FaShoppingCart className="mb-0.5" size={20} />
                 {isClient && cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[9px] w-4 h-4 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold">
                     {cartCount}
                   </span>
                 )}
               </div>
-              <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
-            </Link>
-            <Link href="/demo/waiter" className="flex flex-col items-center" style={{ color: primary }}>
-              <FaBell className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Garson Çağır</TranslatedText></span>
-            </Link>
+              <span className="text-xs font-medium"><TranslatedText>Sepet</TranslatedText></span>
+            </button>
+            <button 
+              onClick={() => {
+                // Garson çağır fonksiyonu
+                alert('Garson çağrıldı! Masa numaranız: ' + tableNumber);
+              }}
+              className="flex flex-col items-center" 
+              style={{ color: primary }}
+            >
+              <FaBell className="mb-0.5" size={20} />
+              <span className="text-xs font-medium"><TranslatedText>Garson Çağır</TranslatedText></span>
+            </button>
           </div>
         </nav>
       </main>
