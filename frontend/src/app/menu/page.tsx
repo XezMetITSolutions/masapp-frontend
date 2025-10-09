@@ -22,6 +22,7 @@ function MenuPageContent() {
   // Restaurant store (BACKEND DATA)
   const { 
     restaurants, 
+    currentRestaurant,
     categories: allCategories, 
     menuItems: allMenuItems,
     fetchRestaurantByUsername,
@@ -79,16 +80,30 @@ function MenuPageContent() {
     const targetRestaurant = subdomain || restaurantParam || 'aksaray'; // Default to aksaray for testing
 
     console.log('[MENU] Target restaurant:', targetRestaurant);
+    console.log('[MENU] Current restaurant in store:', currentRestaurant?.name);
     console.log('[MENU] Restaurants in store:', restaurants.length);
     console.log('[MENU] All restaurants:', restaurants.map(r => ({ id: r.id, name: r.name, username: r.username })));
 
     if (targetRestaurant) {
-      // Find restaurant in store
-      const foundRestaurant = restaurants.find(r => 
-        r.username === targetRestaurant || 
-        r.name.toLowerCase().replace(/\s+/g, '-') === targetRestaurant ||
-        r.name.toLowerCase().includes(targetRestaurant)
-      );
+      // First check currentRestaurant if it matches
+      let foundRestaurant = null;
+      
+      if (currentRestaurant && (
+        currentRestaurant.username === targetRestaurant || 
+        currentRestaurant.name.toLowerCase().replace(/\s+/g, '-') === targetRestaurant ||
+        currentRestaurant.name.toLowerCase().includes(targetRestaurant)
+      )) {
+        foundRestaurant = currentRestaurant;
+        console.log('[MENU] Using currentRestaurant:', foundRestaurant.name);
+      } else {
+        // Find restaurant in restaurants array
+        foundRestaurant = restaurants.find(r => 
+          r.username === targetRestaurant || 
+          r.name.toLowerCase().replace(/\s+/g, '-') === targetRestaurant ||
+          r.name.toLowerCase().includes(targetRestaurant)
+        );
+        console.log('[MENU] Found in restaurants array:', foundRestaurant?.name);
+      }
 
       if (foundRestaurant) {
         console.log('[MENU] Found restaurant in store:', foundRestaurant.name);
