@@ -152,7 +152,7 @@ export default function MenuManagement() {
     } else {
       console.warn('⚠️ No restaurant ID found!');
     }
-  }, [currentRestaurantId, fetchRestaurantMenu]);
+  }, [currentRestaurantId, fetchRestaurantMenu, authenticatedRestaurant]);
 
   useEffect(() => {
     // Eğer subdomain varsa authentication olmadan da çalışsın (test için)
