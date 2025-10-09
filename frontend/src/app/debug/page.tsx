@@ -3,13 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import useRestaurantStore from '@/store/useRestaurantStore';
+import { apiService } from '@/services/api';
 
 export default function DebugPage() {
   const [hostname, setHostname] = useState('');
   const [subdomain, setSubdomain] = useState('');
+  const [testResults, setTestResults] = useState<any[]>([]);
+  const [isRunningTests, setIsRunningTests] = useState(false);
   
   // Auth store
-  const { authenticatedRestaurant, authenticatedStaff } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, initializeAuth } = useAuthStore();
   
   // Restaurant store
   const { 
@@ -22,7 +25,11 @@ export default function DebugPage() {
     setCategories,
     addCategory,
     setMenuItems,
-    addMenuItem
+    addMenuItem,
+    fetchRestaurantByUsername,
+    fetchRestaurantMenu,
+    loading,
+    error
   } = useRestaurantStore();
 
   useEffect(() => {
@@ -55,6 +62,110 @@ export default function DebugPage() {
   };
 
   const filteredData = getFilteredData(activeRestaurant?.id);
+
+  // Test fonksiyonları
+  const addTestResult = (name: string, status: 'success' | 'error' | 'info', message: string, data?: any) => {
+    setTestResults(prev => [...prev, { name, status, message, data, timestamp: new Date().toISOString() }]);
+  };
+
+  const runAllTests = async () => {
+    setIsRunningTests(true);
+    setTestResults([]);
+    
+    try {
+      // Test 1: Auth initialization
+      addTestResult('Auth Init', 'info', 'Initializing auth...', null);
+      initializeAuth();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      addTestResult('Auth Init', authenticatedRestaurant ? 'success' : 'info', 
+        authenticatedRestaurant ? `Authenticated as: ${authenticatedRestaurant.name}` : 'No authenticated restaurant',
+        { authenticatedRestaurant, authenticatedStaff });
+
+      // Test 2: Subdomain detection
+      addTestResult('Subdomain', 'info', `Detected subdomain: ${subdomain}`, { hostname, subdomain });
+
+      // Test 3: Fetch restaurant by username (aksaray)
+      addTestResult('API: fetchRestaurantByUsername', 'info', 'Fetching restaurant by username: aksaray...', null);
+      try {
+        const restaurant = await fetchRestaurantByUsername('aksaray');
+        if (restaurant) {
+          addTestResult('API: fetchRestaurantByUsername', 'success', 
+            `Restaurant found: ${restaurant.name} (ID: ${restaurant.id})`, restaurant);
+        } else {
+          addTestResult('API: fetchRestaurantByUsername', 'error', 'Restaurant not found', null);
+        }
+      } catch (err: any) {
+        addTestResult('API: fetchRestaurantByUsername', 'error', `Error: ${err.message}`, err);
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Test 4: Check currentRestaurant in store
+      addTestResult('Store: currentRestaurant', currentRestaurant ? 'success' : 'error',
+        currentRestaurant ? `Current restaurant: ${currentRestaurant.name}` : 'No current restaurant in store',
+        currentRestaurant);
+
+      // Test 5: Fetch menu for current restaurant
+      if (currentRestaurant?.id) {
+        addTestResult('API: fetchRestaurantMenu', 'info', `Fetching menu for restaurant ID: ${currentRestaurant.id}...`, null);
+        try {
+          const menuData = await fetchRestaurantMenu(currentRestaurant.id);
+          addTestResult('API: fetchRestaurantMenu', 'success', 
+            `Menu fetched: ${allCategories.length} categories, ${allMenuItems.length} items`, 
+            { categories: allCategories.length, items: allMenuItems.length, menuData });
+        } catch (err: any) {
+          addTestResult('API: fetchRestaurantMenu', 'error', `Error: ${err.message}`, err);
+        }
+      } else {
+        addTestResult('API: fetchRestaurantMenu', 'error', 'Cannot fetch menu: No restaurant ID', null);
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Test 6: Direct API call to backend
+      addTestResult('Direct API: getRestaurantByUsername', 'info', 'Making direct API call...', null);
+      try {
+        const response = await apiService.getRestaurantByUsername('aksaray');
+        addTestResult('Direct API: getRestaurantByUsername', response.success ? 'success' : 'error',
+          response.success ? 'API call successful' : 'API call failed',
+          response);
+      } catch (err: any) {
+        addTestResult('Direct API: getRestaurantByUsername', 'error', `API Error: ${err.message}`, err);
+      }
+
+      // Test 7: Check menu items in store
+      addTestResult('Store: Menu Items', allMenuItems.length > 0 ? 'success' : 'error',
+        `${allMenuItems.length} menu items in store`,
+        { count: allMenuItems.length, items: allMenuItems.slice(0, 3) });
+
+      // Test 8: Check categories in store
+      addTestResult('Store: Categories', allCategories.length > 0 ? 'success' : 'error',
+        `${allCategories.length} categories in store`,
+        { count: allCategories.length, categories: allCategories });
+
+    } catch (err: any) {
+      addTestResult('Test Suite', 'error', `Test suite error: ${err.message}`, err);
+    } finally {
+      setIsRunningTests(false);
+    }
+  };
+
+  const testDirectMenuFetch = async () => {
+    if (!currentRestaurant?.id) {
+      alert('No current restaurant! Run "All Tests" first.');
+      return;
+    }
+    
+    addTestResult('Manual Menu Fetch', 'info', `Fetching menu for ${currentRestaurant.name}...`, null);
+    try {
+      await fetchRestaurantMenu(currentRestaurant.id);
+      addTestResult('Manual Menu Fetch', 'success', 
+        `Menu loaded: ${allCategories.length} categories, ${allMenuItems.length} items`,
+        { categories: allCategories, items: allMenuItems });
+    } catch (err: any) {
+      addTestResult('Manual Menu Fetch', 'error', err.message, err);
+    }
+  };
 
   // Demo data yükleme fonksiyonu
   const loadDemoData = () => {
@@ -392,28 +503,90 @@ ${!existingKardesler ? '🏢 Kardeşler Lokantası:\n- Username: kardesler\n- Pa
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">🔍 Restaurant Store Debug</h1>
+          <h1 className="text-3xl font-bold text-gray-900">🔍 Backend API Debug & Test</h1>
           <div className="flex gap-3">
             <button
-              onClick={clearAllData}
-              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium"
+              onClick={runAllTests}
+              disabled={isRunningTests}
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              🗑️ Tüm Verileri Sil
+              {isRunningTests ? '⏳ Testing...' : '🧪 Run All Tests'}
             </button>
             <button
-              onClick={createLezzetAndKardesler}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium"
-            >
-              🏢 Lezzet & Kardeşler Oluştur
-            </button>
-            <button
-              onClick={loadDemoData}
+              onClick={testDirectMenuFetch}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
             >
-              📊 Demo Data Yükle
+              📥 Fetch Menu
+            </button>
+            <button
+              onClick={() => setTestResults([])}
+              className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 font-medium"
+            >
+              🗑️ Clear Results
             </button>
           </div>
         </div>
+
+        {/* Store Status */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">📊 Current Store Status</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{loading ? '⏳' : '✓'}</div>
+              <div className="text-sm text-gray-600">Loading: {loading ? 'Yes' : 'No'}</div>
+            </div>
+            <div className="text-center p-4 bg-red-50 rounded-lg">
+              <div className="text-2xl font-bold text-red-600">{error ? '❌' : '✓'}</div>
+              <div className="text-sm text-gray-600">Error: {error || 'None'}</div>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">{allCategories.length}</div>
+              <div className="text-sm text-gray-600">Categories</div>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">{allMenuItems.length}</div>
+              <div className="text-sm text-gray-600">Menu Items</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Test Results */}
+        {testResults.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">🧪 Test Results</h2>
+            <div className="space-y-3">
+              {testResults.map((result, index) => (
+                <div key={index} className={`border-l-4 p-4 rounded ${
+                  result.status === 'success' ? 'bg-green-50 border-green-500' :
+                  result.status === 'error' ? 'bg-red-50 border-red-500' :
+                  'bg-blue-50 border-blue-500'
+                }`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-800">
+                        {result.status === 'success' ? '✅' : result.status === 'error' ? '❌' : 'ℹ️'} {result.name}
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">{result.message}</div>
+                      {result.data && (
+                        <details className="mt-2">
+                          <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                            View data
+                          </summary>
+                          <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto max-h-40">
+                            {JSON.stringify(result.data, null, 2)}
+                          </pre>
+                        </details>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-400 ml-4">
+                      {new Date(result.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Cross-Domain LocalStorage Info */}
         <div className="bg-green-50 border-l-4 border-green-400 p-6 mb-6">
@@ -584,13 +757,16 @@ ${!existingKardesler ? '🏢 Kardeşler Lokantası:\n- Username: kardesler\n- Pa
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">🍽️ Menu Items for {activeRestaurant?.name}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredData.items.slice(0, 9).map((item) => (
-                <div key={item.id} className="border rounded-lg p-3">
-                  <div className="font-medium text-gray-800">{item.name.tr || item.name.en}</div>
-                  <div className="text-sm text-gray-600">₺{item.price}</div>
-                  <div className="text-xs text-gray-500 mt-1">ID: {item.restaurantId}</div>
-                </div>
-              ))}
+              {filteredData.items.slice(0, 9).map((item) => {
+                const itemName = typeof item.name === 'string' ? item.name : (item.name as any)?.tr || (item.name as any)?.en || 'N/A';
+                return (
+                  <div key={item.id} className="border rounded-lg p-3">
+                    <div className="font-medium text-gray-800">{itemName}</div>
+                    <div className="text-sm text-gray-600">₺{item.price}</div>
+                    <div className="text-xs text-gray-500 mt-1">ID: {item.restaurantId}</div>
+                  </div>
+                );
+              })}
             </div>
             {filteredData.items.length > 9 && (
               <div className="mt-4 text-center text-gray-600">

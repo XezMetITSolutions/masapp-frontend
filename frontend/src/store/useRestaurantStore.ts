@@ -16,7 +16,7 @@ interface RestaurantState {
   
   // API Actions
   fetchRestaurants: () => Promise<void>;
-  fetchRestaurantByUsername: (username: string) => Promise<void>;
+  fetchRestaurantByUsername: (username: string) => Promise<Restaurant | null>;
   createRestaurant: (data: Partial<Restaurant>) => Promise<void>;
   updateRestaurant: (id: string, updates: Partial<Restaurant>) => Promise<void>;
   updateRestaurantFeatures: (id: string, features: string[]) => Promise<void>;
@@ -94,9 +94,13 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
           menuItems: response.data?.menuItems || [],
           loading: false 
         });
+        return response.data as Restaurant;
       }
+      set({ loading: false });
+      return null;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to fetch restaurant', loading: false });
+      return null;
     }
   },
   

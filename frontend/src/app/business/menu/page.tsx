@@ -148,7 +148,7 @@ export default function MenuManagement() {
     initializeAuth();
   }, [initializeAuth]);
 
-  // Subdomain ile giriş yapılmadan görüntüleme: restoranı yükle
+  // Subdomain ile giriş yapılmadan görüntüleme: restoranı yükle ve menüyü getir
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const hostname = window.location.hostname;
@@ -157,12 +157,19 @@ export default function MenuManagement() {
     const hasSub = !mainDomains.includes(sub) && hostname.includes('.');
 
     if (hasSub && !authenticatedRestaurant && !currentRestaurant) {
-      // Restoranı username ile getir (ör: aksaray)
-      fetchRestaurantByUsername(sub).catch((e) => {
-        console.warn('Restoran getirilemedi:', e);
-      });
+      // Restoranı username ile getir (ör: aksaray) ve menüyü yükle
+      fetchRestaurantByUsername(sub)
+        .then((res) => {
+          const restId = res?.id;
+          if (restId) {
+            fetchRestaurantMenu(restId);
+          }
+        })
+        .catch((e) => {
+          console.warn('Restoran getirilemedi:', e);
+        });
     }
-  }, [authenticatedRestaurant, currentRestaurant, fetchRestaurantByUsername]);
+  }, [authenticatedRestaurant, currentRestaurant, fetchRestaurantByUsername, fetchRestaurantMenu]);
 
   // Sayfa yüklendiğinde menüyü backend'den çek
   useEffect(() => {
