@@ -94,12 +94,13 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         console.log('✅ Setting currentRestaurant:', response.data);
         const restaurantData = response.data;
         
-        set({ 
+        set((state) => ({ 
           currentRestaurant: restaurantData,
+          restaurants: [...state.restaurants.filter(r => r.id !== restaurantData.id), restaurantData],
           categories: restaurantData?.categories || [],
           menuItems: restaurantData?.menuItems || [],
           loading: false 
-        });
+        }));
         
         // Verify state was set
         const state = get();
