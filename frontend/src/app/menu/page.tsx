@@ -165,7 +165,7 @@ function CustomerMenuContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">{restaurant.name}</h1>
+              <h1 className="text-xl font-bold text-gray-900">{restaurant?.name || 'Menü'}</h1>
               {tableNumber && (
                 <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
                   Masa #{tableNumber}
