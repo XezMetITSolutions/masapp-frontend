@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { FaTimes, FaPlus, FaMinus, FaStar } from 'react-icons/fa';
-import { useCartStore, useLanguageStore } from '@/store';
+import { useCartStore } from '@/store';
 import { MenuItem } from '@/store/useMenuStore';
 
 interface MenuItemModalProps {
@@ -12,7 +12,6 @@ interface MenuItemModalProps {
 }
 
 export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalProps) {
-  const { language } = useLanguageStore();
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
@@ -31,30 +30,9 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
   if (!isOpen) return null;
 
-  const translations = {
-    en: {
-      addToCart: 'Add to Cart',
-      quantity: 'Quantity',
-      notes: 'Special Notes',
-      notesPlaceholder: 'Any special requests?',
-      total: 'Total',
-      allergens: 'Allergens',
-      calories: 'Calories',
-      popular: 'Popular'
-    },
-    tr: {
-      addToCart: 'Sepete Ekle',
-      quantity: 'Adet',
-      notes: 'Özel Notlar',
-      notesPlaceholder: 'Özel istekleriniz var mı?',
-      total: 'Toplam',
-      allergens: 'Alerjenler',
-      calories: 'Kalori',
-      popular: 'Popüler'
-    }
-  };
-
-  const t = translations[language as 'en' | 'tr'];
+  // Helper function to get Turkish text
+  const getName = () => typeof item.name === 'string' ? item.name : (item.name?.tr || '');
+  const getDescription = () => typeof item.description === 'string' ? item.description : (item.description?.tr || '');
 
   return (
     <div 
@@ -67,7 +45,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b" style={{ borderColor: 'var(--brand-subtle)' }}>
-          <h2 className="text-lg font-semibold">{item.name[language]}</h2>
+          <h2 className="text-lg font-semibold">{getName()}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -80,7 +58,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
         <div className="relative h-48 w-full cursor-pointer" onClick={() => window.open(item.image, '_blank')}>
           <img
             src={item.image}
-            alt={item.name[language]}
+            alt={getName()}
             className="w-full h-full object-cover hover:opacity-90 transition-opacity"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -97,14 +75,14 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
           {item.popular && (
             <div className="absolute top-2 left-2 text-xs px-2 py-1 rounded-full flex items-center" style={{ backgroundColor: 'var(--brand-strong)', color: 'var(--on-primary)' }}>
               <FaStar className="mr-1" size={10} />
-              {t.popular}
+              Popüler
             </div>
           )}
         </div>
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-gray-600 mb-4">{item.description[language]}</p>
+          <p className="text-gray-600 mb-4">{getDescription()}</p>
           
           <div className="text-2xl font-bold mb-4" style={{ color: 'var(--brand-strong)' }}>
             {item.price} ₺
@@ -113,7 +91,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
           {/* Allergens */}
           {item.allergens && item.allergens.length > 0 && (
             <div className="mb-4">
-              <h3 className="font-semibold mb-2">{t.allergens}</h3>
+              <h3 className="font-semibold mb-2">Alerjenler</h3>
               <div className="flex flex-wrap gap-1">
                 {item.allergens.map((allergen, index) => (
                   <span
@@ -121,7 +99,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
                     className="text-xs px-2 py-1 rounded-full"
                     style={{ backgroundColor: 'var(--tone2-bg)', color: 'var(--tone2-text)', border: '1px solid var(--tone2-border)' }}
                   >
-                    {allergen[language]}
+                    {typeof allergen === 'string' ? allergen : (allergen?.tr || '')}
                   </span>
                 ))}
               </div>
@@ -130,7 +108,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
           {/* Quantity */}
           <div className="mb-4">
-            <label className="block font-semibold mb-2">{t.quantity}</label>
+            <label className="block font-semibold mb-2">Adet</label>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -152,11 +130,11 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
           {/* Notes */}
           <div className="mb-6">
-            <label className="block font-semibold mb-2">{t.notes}</label>
+            <label className="block font-semibold mb-2">Özel Notlar</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={t.notesPlaceholder}
+              placeholder="Özel istekleriniz var mı?"
               className="w-full p-3 border rounded-lg resize-none"
               rows={3}
             />
@@ -164,7 +142,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
 
           {/* Total */}
           <div className="flex justify-between items-center mb-4">
-            <span className="font-semibold">{t.total}</span>
+            <span className="font-semibold">Toplam</span>
             <span className="text-xl font-bold" style={{ color: 'var(--brand-strong)' }}>
               {(item.price * quantity).toFixed(2)} ₺
             </span>
@@ -175,7 +153,7 @@ export default function MenuItemModal({ item, isOpen, onClose }: MenuItemModalPr
             onClick={handleAddToCart}
             className="w-full btn btn-primary font-semibold py-3 rounded-lg"
           >
-            {t.addToCart}
+            Sepete Ekle
           </button>
         </div>
       </div>
