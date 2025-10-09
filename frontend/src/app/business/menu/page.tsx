@@ -132,6 +132,9 @@ export default function MenuManagement() {
     category: '',
     preparationTime: '',
     calories: '',
+    ingredients: '',
+    allergens: [] as string[],
+    portionSize: '',
     isAvailable: true,
     isPopular: false
   });
@@ -211,6 +214,9 @@ export default function MenuManagement() {
       category: '',
       preparationTime: '',
       calories: '',
+      ingredients: '',
+      allergens: [],
+      portionSize: '',
       isAvailable: true,
       isPopular: false
     });
@@ -226,6 +232,9 @@ export default function MenuManagement() {
       category: item.categoryId || '',
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
+      ingredients: item.ingredients || '',
+      allergens: item.allergens || [],
+      portionSize: item.portionSize || '',
       isAvailable: item.isAvailable !== false,
       isPopular: item.isPopular || false
     });
@@ -807,8 +816,8 @@ export default function MenuManagement() {
                       </div>
                     </div>
 
-                    {/* Kalori ve Hazırlık Süresi */}
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* Kalori, Hazırlık Süresi ve Porsiyon */}
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Kalori
@@ -823,7 +832,7 @@ export default function MenuManagement() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Hazırlık Süresi (dakika)
+                          Hazırlık Süresi (dk)
                         </label>
                         <input
                           type="number"
@@ -832,6 +841,67 @@ export default function MenuManagement() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="15"
                         />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Porsiyon
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.portionSize}
+                          onChange={(e) => setFormData({...formData, portionSize: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="250g"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Malzemeler */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Malzemeler
+                      </label>
+                      <textarea
+                        value={formData.ingredients}
+                        onChange={(e) => setFormData({...formData, ingredients: e.target.value})}
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Domates, mozzarella, fesleğen, zeytinyağı..."
+                      />
+                    </div>
+
+                    {/* Alerjenler */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Alerjenler
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {[
+                          { value: 'gluten', label: 'Gluten' },
+                          { value: 'dairy', label: 'Süt' },
+                          { value: 'eggs', label: 'Yumurta' },
+                          { value: 'nuts', label: 'Fındık' },
+                          { value: 'peanuts', label: 'Fıstık' },
+                          { value: 'soy', label: 'Soya' },
+                          { value: 'fish', label: 'Balık' },
+                          { value: 'shellfish', label: 'Kabuklu Deniz Ürünleri' }
+                        ].map((allergen) => (
+                          <label key={allergen.value} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={formData.allergens.includes(allergen.value)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({...formData, allergens: [...formData.allergens, allergen.value]});
+                                } else {
+                                  setFormData({...formData, allergens: formData.allergens.filter(a => a !== allergen.value)});
+                                }
+                              }}
+                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">{allergen.label}</span>
+                          </label>
+                        ))}
                       </div>
                     </div>
 
@@ -912,6 +982,9 @@ export default function MenuManagement() {
                                 categoryId: formData.category,
                                 preparationTime: Number(formData.preparationTime) || 0,
                                 calories: Number(formData.calories) || 0,
+                                ingredients: formData.ingredients,
+                                allergens: formData.allergens,
+                                portionSize: formData.portionSize,
                                 isAvailable: formData.isAvailable,
                                 isPopular: formData.isPopular,
                                 image: capturedImage || editingItem.image
@@ -943,7 +1016,10 @@ export default function MenuManagement() {
                                 isAvailable: formData.isAvailable,
                                 isPopular: formData.isPopular,
                                 preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0
+                                calories: Number(formData.calories) || 0,
+                                ingredients: formData.ingredients,
+                                allergens: formData.allergens,
+                                portionSize: formData.portionSize
                               });
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
                               // Menüyü yeniden yükle
