@@ -92,19 +92,9 @@ export default function MenuManagement() {
   
   const currentRestaurantId = getRestaurantId();
   
-  console.log('🔍 Filtering data:');
-  console.log('  currentRestaurantId:', currentRestaurantId);
-  console.log('  allCategories:', allCategories.length);
-  console.log('  allMenuItems:', allMenuItems.length);
-  
-  // Sadece bu restorana ait kategorileri ve ürünleri filtrele
-  const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
-  const items = allMenuItems.filter(i => i.restaurantId === currentRestaurantId);
-  
-  console.log('  filtered categories:', categories.length);
-  console.log('  filtered items:', items.length);
-  console.log('  first item restaurantId:', allMenuItems[0]?.restaurantId);
-  console.log('  match?', allMenuItems[0]?.restaurantId === currentRestaurantId);
+  // Veri zaten store'dan restorana özel olarak geliyor, tekrar filtrelemeye gerek yok.
+  const categories = allCategories;
+  const items = allMenuItems;
   
   const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
 
