@@ -16,7 +16,7 @@ interface RestaurantState {
   
   // API Actions
   fetchRestaurants: () => Promise<void>;
-  fetchRestaurantByUsername: (username: string) => Promise<Restaurant | null>;
+  fetchRestaurantByUsername: (username: string) => Promise<void>;
   createRestaurant: (data: Partial<Restaurant>) => Promise<void>;
   updateRestaurant: (id: string, updates: Partial<Restaurant>) => Promise<void>;
   updateRestaurantFeatures: (id: string, features: string[]) => Promise<void>;
@@ -86,37 +86,19 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   fetchRestaurantByUsername: async (username: string) => {
     set({ loading: true, error: null });
     try {
-      console.log('🔍 Fetching restaurant by username:', username);
       const response = await apiService.getRestaurantByUsername(username);
-      console.log('📦 API Response:', response);
-      
-      if (response.success && response.data) {
-        console.log('✅ Setting currentRestaurant:', response.data);
-        const restaurantData = response.data;
-        
-        set((state) => ({ 
-          currentRestaurant: restaurantData,
-          restaurants: [...state.restaurants.filter(r => r.id !== restaurantData.id), restaurantData],
-          categories: restaurantData?.categories || [],
-          menuItems: restaurantData?.menuItems || [],
+      if (response.success) {
+        set({ 
+          currentRestaurant: response.data,
+          categories: response.data?.categories || [],
+          menuItems: response.data?.menuItems || [],
           loading: false 
-        }));
-        
-        // Verify state was set
-        const state = get();
-        console.log('💾 State after set - currentRestaurant:', state.currentRestaurant);
-        console.log('💾 State after set - categories:', state.categories.length);
-        console.log('💾 State after set - menuItems:', state.menuItems.length);
-        
-        return restaurantData as Restaurant;
+        });
+      } else {
+        set({ loading: false });
       }
-      console.warn('⚠️ No data in response or not successful');
-      set({ loading: false });
-      return null;
     } catch (error) {
-      console.error('❌ fetchRestaurantByUsername error:', error);
       set({ error: error instanceof Error ? error.message : 'Failed to fetch restaurant', loading: false });
-      return null;
     }
   },
   
@@ -405,21 +387,16 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         console.log('✅ Transformed items:', transformedItems.length);
         console.log('✅ First transformed item:', transformedItems[0]);
         
-        // Mevcut verileri koruyarak güncelle
-        set((state) => ({
-          categories: [
-            ...state.categories.filter(c => c.restaurantId !== restaurantId),
-            ...transformedCategories
-          ],
-          menuItems: [
-            ...state.menuItems.filter(i => i.restaurantId !== restaurantId),
-            ...transformedItems
-          ],
+        set({
+          categories: transformedCategories,
+          menuItems: transformedItems,
           loading: false
-        }));
+        });
         
         console.log('💾 State updated successfully');
         return response.data;
+      } else {
+        set({ loading: false });
       }
     } catch (error) {
       console.error('❌ Fetch menu error:', error);
