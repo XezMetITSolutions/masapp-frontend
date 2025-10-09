@@ -83,6 +83,16 @@ function MenuPageContent() {
     console.log('[MENU] Current restaurant in store:', currentRestaurant?.name);
     console.log('[MENU] Restaurants in store:', restaurants.length);
     console.log('[MENU] All restaurants:', restaurants.map(r => ({ id: r.id, name: r.name, username: r.username })));
+    
+    // Global debug function
+    (window as any).debugMenu = () => ({
+      targetRestaurant,
+      currentRestaurant: currentRestaurant?.name,
+      restaurantsCount: restaurants.length,
+      categoriesCount: allCategories.length,
+      itemsCount: allMenuItems.length,
+      foundRestaurant: restaurant?.name
+    });
 
     if (targetRestaurant) {
       // First check currentRestaurant if it matches
