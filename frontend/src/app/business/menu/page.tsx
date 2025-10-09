@@ -58,6 +58,7 @@ export default function MenuManagement() {
     updateMenuItem,
     deleteMenuItem,
     fetchRestaurantMenu,
+    fetchRestaurantByUsername,
     loading,
     error
   } = useRestaurantStore();
@@ -71,6 +72,10 @@ export default function MenuManagement() {
     if (authenticatedRestaurant?.id) {
       return authenticatedRestaurant.id;
     }
+    // Ardından store'daki currentRestaurant'tan al
+    if (currentRestaurant?.id) {
+      return currentRestaurant.id;
+    }
     
     // Subdomain'den de alabilir (fallback)
     if (typeof window !== 'undefined') {
@@ -79,16 +84,16 @@ export default function MenuManagement() {
       const mainDomains = ['localhost', 'www', 'guzellestir'];
       
       if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
-        // Subdomain'e göre restaurant bul
+        // Subdomain ile eşleşen kayıt varsa kullan
         const restaurant = restaurants.find(r => 
           r.name.toLowerCase().replace(/\s+/g, '') === subdomain ||
           r.username === subdomain
         );
-        return restaurant?.id;
+        return restaurant?.id || null;
       }
     }
     return null;
-  }, [authenticatedRestaurant?.id, restaurants]);
+  }, [authenticatedRestaurant?.id, currentRestaurant?.id, restaurants]);
   
   const currentRestaurantId = getRestaurantId();
   
@@ -142,6 +147,22 @@ export default function MenuManagement() {
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
+
+  // Subdomain ile giriş yapılmadan görüntüleme: restoranı yükle
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hostname = window.location.hostname;
+    const sub = hostname.split('.')[0];
+    const mainDomains = ['localhost', 'www', 'guzellestir'];
+    const hasSub = !mainDomains.includes(sub) && hostname.includes('.');
+
+    if (hasSub && !authenticatedRestaurant && !currentRestaurant) {
+      // Restoranı username ile getir (ör: aksaray)
+      fetchRestaurantByUsername(sub).catch((e) => {
+        console.warn('Restoran getirilemedi:', e);
+      });
+    }
+  }, [authenticatedRestaurant, currentRestaurant, fetchRestaurantByUsername]);
 
   // Sayfa yüklendiğinde menüyü backend'den çek
   useEffect(() => {
