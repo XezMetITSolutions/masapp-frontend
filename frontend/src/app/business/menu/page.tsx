@@ -785,7 +785,7 @@ export default function MenuManagement() {
                             <img 
                               src={capturedImage} 
                               alt="Ürün fotoğrafı" 
-                              className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+                              className="w-full h-64 object-cover rounded-lg border-2 border-gray-200"
                             />
                             <button
                               type="button"
@@ -796,42 +796,108 @@ export default function MenuManagement() {
                             </button>
                           </div>
                         ) : (
-                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-                            <div className="flex flex-col items-center gap-3">
-                              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-600 mb-2">Fotoğraf yüklemek için tıklayın</p>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      const reader = new FileReader();
-                                      reader.onloadend = () => {
-                                        setCapturedImage(reader.result as string);
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }
-                                  }}
-                                  className="hidden"
-                                  id="image-upload"
-                                />
-                                <label
-                                  htmlFor="image-upload"
-                                  className="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer transition-colors"
-                                >
-                                  Dosya Seç
-                                </label>
-                              </div>
-                              <p className="text-xs text-gray-500">PNG, JPG, JPEG (Max 5MB)</p>
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Kameradan Çek */}
+                            <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      setCapturedImage(reader.result as string);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                                className="hidden"
+                                id="camera-upload"
+                              />
+                              <label htmlFor="camera-upload" className="cursor-pointer">
+                                <div className="flex flex-col items-center gap-3">
+                                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-purple-600">Kameradan Çek</p>
+                                    <p className="text-xs text-gray-500 mt-1">Telefon kamerası</p>
+                                  </div>
+                                </div>
+                              </label>
+                            </div>
+
+                            {/* Dosyadan Yükle */}
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      setCapturedImage(reader.result as string);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                                className="hidden"
+                                id="file-upload"
+                              />
+                              <label htmlFor="file-upload" className="cursor-pointer">
+                                <div className="flex flex-col items-center gap-3">
+                                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-gray-700">Dosyadan Yükle</p>
+                                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF</p>
+                                  </div>
+                                </div>
+                              </label>
                             </div>
                           </div>
                         )}
+
+                        {/* AI Görsel İşleme Aktif */}
+                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="text-2xl">✨</div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-purple-900 mb-2">AI Görsel İşleme Aktif!</h4>
+                              <ul className="space-y-1 text-sm text-purple-700">
+                                <li className="flex items-center gap-2">
+                                  <span className="text-purple-500">🎯</span>
+                                  Otomatik arka plan kaldırma
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <span className="text-pink-500">🎨</span>
+                                  Renk ve parlaklık optimizasyonu
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <span className="text-purple-500">🔍</span>
+                                  Akıllı boyutlandırma
+                                </li>
+                                <li className="flex items-center gap-2">
+                                  <span className="text-pink-500">⚡</span>
+                                  Keskinlik artırma
+                                </li>
+                              </ul>
+                              <p className="text-xs text-purple-600 mt-2 flex items-center gap-1">
+                                <span>💡</span>
+                                Kameradan çekmek daha profesyonel sonuçlar verir
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -1102,6 +1168,9 @@ export default function MenuManagement() {
                           category: '',
                           preparationTime: '',
                           calories: '',
+                          ingredients: '',
+                          allergens: [],
+                          portionSize: '',
                           isAvailable: true,
                           isPopular: false
                         });
