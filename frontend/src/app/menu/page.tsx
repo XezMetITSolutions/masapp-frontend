@@ -80,6 +80,7 @@ function MenuPageContent() {
 
     console.log('[MENU] Target restaurant:', targetRestaurant);
     console.log('[MENU] Restaurants in store:', restaurants.length);
+    console.log('[MENU] All restaurants:', restaurants.map(r => ({ id: r.id, name: r.name, username: r.username })));
 
     if (targetRestaurant) {
       // Find restaurant in store
@@ -263,7 +264,7 @@ function MenuPageContent() {
                 <FaArrowLeft size={16} />
               </Link>
               <h1 className="text-dynamic-lg font-bold text-primary">
-                Menü
+                {restaurant?.name || 'Menü'}
               </h1>
               <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
                 Masa #{tableNumber}
@@ -384,8 +385,38 @@ function MenuPageContent() {
 
         {/* Menu Items */}
         <div className="container mx-auto px-3 py-2">
-          <div className="grid grid-cols-1 gap-3">
-            {filteredItems.map((item) => (
+          {/* Debug Info */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-yellow-100 border border-yellow-400 rounded p-3 mb-4 text-sm">
+              <strong>DEBUG:</strong> Restaurant: {restaurant?.name || 'None'} | 
+              Categories: {categories.length} | 
+              Items: {items.length} | 
+              Filtered: {filteredItems.length} | 
+              Active Category: {activeCategory}
+            </div>
+          )}
+          
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🍽️</div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                {restaurant ? `${restaurant.name} - Henüz menü eklenmemiş` : 'Restaurant bulunamadı'}
+              </h2>
+              <p className="text-gray-600 mb-4">
+                {restaurant 
+                  ? 'Restoran sahibi henüz menü ürünlerini eklememiş. Lütfen daha sonra tekrar deneyin.'
+                  : 'Aradığınız restoran bulunamadı veya menü henüz hazırlanmamış.'
+                }
+              </p>
+              {!restaurant && (
+                <div className="text-sm text-gray-500 mt-4">
+                  Debug: Target = "aksaray" | Store'da {restaurants.length} restaurant var
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {filteredItems.map((item) => (
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-3 flex">
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image 
@@ -441,8 +472,9 @@ function MenuPageContent() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sabit Duyurular */}
