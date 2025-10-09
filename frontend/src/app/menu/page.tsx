@@ -19,13 +19,13 @@ import {
 function CustomerMenuContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { 
-    restaurants, 
-    categories: allCategories, 
+  const {
+    restaurants,
+    categories: allCategories,
     menuItems: allMenuItems,
-    fetchRestaurants,
     fetchRestaurantByUsername,
-    loading 
+    fetchRestaurantMenu,
+    loading
   } = useRestaurantStore();
 
   const [restaurant, setRestaurant] = useState<any>(null);
@@ -36,16 +36,8 @@ function CustomerMenuContent() {
   const [cart, setCart] = useState<any[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [tableNumber, setTableNumber] = useState('');
-  
-  // İlk yüklemede tüm restoranları çek
-  useEffect(() => {
-    if (restaurants.length === 0) {
-      console.log('📡 Restoranlar yükleniyor...');
-      fetchRestaurants();
-    }
-  }, []);
 
-  // Subdomain'den restaurant bul ve menüyü yükle
+  // Subdomain'den restaurant bul
   useEffect(() => {
     const getRestaurantFromSubdomain = () => {
       if (typeof window !== 'undefined') {
@@ -65,8 +57,6 @@ function CustomerMenuContent() {
     const targetRestaurant = subdomain || restaurantParam;
 
     if (targetRestaurant) {
-      console.log('🔍 Aranan restoran:', targetRestaurant);
-      
       // Store'dan restaurant bul
       const foundRestaurant = restaurants.find(r => 
         r.username === targetRestaurant || 
@@ -75,41 +65,28 @@ function CustomerMenuContent() {
       );
 
       if (foundRestaurant) {
-        console.log('✅ Restoran bulundu:', foundRestaurant);
         setRestaurant(foundRestaurant);
-        
-        // Bu restorana ait kategorileri ve ürünleri filtrele
-        const restaurantCategories = allCategories.filter(c => c.restaurantId === foundRestaurant.id);
-        const restaurantItems = allMenuItems.filter(i => i.restaurantId === foundRestaurant.id);
-        
-        console.log('📦 Kategoriler:', restaurantCategories.length);
-        console.log('🍽️ Ürünler:', restaurantItems.length);
-        
-        setCategories(restaurantCategories);
-        setMenuItems(restaurantItems);
-      } else {
-        console.log('⚠️ Store\'da bulunamadı, backend\'den çekiliyor...');
+    } else {
         // Backend'den çekmeyi dene
         fetchRestaurantByUsername(targetRestaurant);
       }
     }
-  }, [restaurants, allCategories, allMenuItems, searchParams, fetchRestaurantByUsername]);
-  
-  // Store'dan gelen veriyi dinle ve güncelle
+  }, [restaurants, allCategories, allMenuItems, searchParams, fetchRestaurantByUsername, fetchRestaurantMenu]);
+
+  // Restaurant belirlendiğinde menüyü yükle ve state'e yansıt
   useEffect(() => {
-    if (allCategories.length > 0 || allMenuItems.length > 0) {
-      const subdomain = typeof window !== 'undefined' ? window.location.hostname.split('.')[0] : null;
-      const targetRestaurant = subdomain || searchParams.get('restaurant');
-      
-      if (targetRestaurant && restaurant) {
+    if (!restaurant?.id) return;
+    (async () => {
+      try {
+        await fetchRestaurantMenu(restaurant.id);
+      } finally {
         const restaurantCategories = allCategories.filter(c => c.restaurantId === restaurant.id);
         const restaurantItems = allMenuItems.filter(i => i.restaurantId === restaurant.id);
-        
         setCategories(restaurantCategories);
         setMenuItems(restaurantItems);
       }
-    }
-  }, [allCategories, allMenuItems, restaurant, searchParams]);
+    })();
+  }, [restaurant?.id, allCategories, allMenuItems, fetchRestaurantMenu]);
 
   // Sepete ürün ekle
   const addToCart = (item: any) => {
