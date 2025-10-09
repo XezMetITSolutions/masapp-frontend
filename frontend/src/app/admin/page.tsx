@@ -256,7 +256,7 @@ export default function SuperAdminDashboard() {
             <div className="text-center py-8">
               <div className="text-gray-400 mb-2">
                 <FaChartBar className="text-4xl mx-auto" />
-              </div>
+                  </div>
               <p className="text-gray-500">Henüz aktivite bulunmuyor</p>
               <p className="text-sm text-gray-400">Sistem kullanılmaya başlandığında aktiviteler burada görünecek</p>
             </div>

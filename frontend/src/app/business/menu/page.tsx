@@ -58,7 +58,6 @@ export default function MenuManagement() {
     updateMenuItem,
     deleteMenuItem,
     fetchRestaurantMenu,
-    fetchRestaurantByUsername,
     loading,
     error
   } = useRestaurantStore();
@@ -72,10 +71,6 @@ export default function MenuManagement() {
     if (authenticatedRestaurant?.id) {
       return authenticatedRestaurant.id;
     }
-    // Ardından store'daki currentRestaurant'tan al
-    if (currentRestaurant?.id) {
-      return currentRestaurant.id;
-    }
     
     // Subdomain'den de alabilir (fallback)
     if (typeof window !== 'undefined') {
@@ -84,22 +79,32 @@ export default function MenuManagement() {
       const mainDomains = ['localhost', 'www', 'guzellestir'];
       
       if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
-        // Subdomain ile eşleşen kayıt varsa kullan
+        // Subdomain'e göre restaurant bul
         const restaurant = restaurants.find(r => 
           r.name.toLowerCase().replace(/\s+/g, '') === subdomain ||
           r.username === subdomain
         );
-        return restaurant?.id || null;
+        return restaurant?.id;
       }
     }
     return null;
-  }, [authenticatedRestaurant?.id, currentRestaurant?.id, restaurants]);
+  }, [authenticatedRestaurant?.id, restaurants]);
   
   const currentRestaurantId = getRestaurantId();
   
-  // Veri zaten store'dan restorana özel olarak geliyor, tekrar filtrelemeye gerek yok.
-  const categories = allCategories;
-  const items = allMenuItems;
+  console.log('🔍 Filtering data:');
+  console.log('  currentRestaurantId:', currentRestaurantId);
+  console.log('  allCategories:', allCategories.length);
+  console.log('  allMenuItems:', allMenuItems.length);
+  
+  // Sadece bu restorana ait kategorileri ve ürünleri filtrele
+  const categories = allCategories.filter(c => c.restaurantId === currentRestaurantId);
+  const items = allMenuItems.filter(i => i.restaurantId === currentRestaurantId);
+  
+  console.log('  filtered categories:', categories.length);
+  console.log('  filtered items:', items.length);
+  console.log('  first item restaurantId:', allMenuItems[0]?.restaurantId);
+  console.log('  match?', allMenuItems[0]?.restaurantId === currentRestaurantId);
   
   const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
 
@@ -132,9 +137,6 @@ export default function MenuManagement() {
     category: '',
     preparationTime: '',
     calories: '',
-    ingredients: '',
-    allergens: [] as string[],
-    portionSize: '',
     isAvailable: true,
     isPopular: false
   });
@@ -151,29 +153,6 @@ export default function MenuManagement() {
     initializeAuth();
   }, [initializeAuth]);
 
-  // Subdomain ile giriş yapılmadan görüntüleme: restoranı yükle ve menüyü getir
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const hostname = window.location.hostname;
-    const sub = hostname.split('.')[0];
-    const mainDomains = ['localhost', 'www', 'guzellestir'];
-    const hasSub = !mainDomains.includes(sub) && hostname.includes('.');
-
-    if (hasSub && !authenticatedRestaurant && !currentRestaurant) {
-      // Restoranı username ile getir (ör: aksaray) ve menüyü yükle
-      fetchRestaurantByUsername(sub)
-        .then((res) => {
-          const restId = res?.id;
-          if (restId) {
-            fetchRestaurantMenu(restId);
-          }
-        })
-        .catch((e) => {
-          console.warn('Restoran getirilemedi:', e);
-        });
-    }
-  }, [authenticatedRestaurant, currentRestaurant, fetchRestaurantByUsername, fetchRestaurantMenu]);
-
   // Sayfa yüklendiğinde menüyü backend'den çek
   useEffect(() => {
     console.log('🏪 Current Restaurant ID:', currentRestaurantId);
@@ -183,7 +162,7 @@ export default function MenuManagement() {
     } else {
       console.warn('⚠️ No restaurant ID found!');
     }
-  }, [currentRestaurantId, fetchRestaurantMenu, authenticatedRestaurant, currentRestaurant]);
+  }, [currentRestaurantId, fetchRestaurantMenu]);
 
   useEffect(() => {
     // Eğer subdomain varsa authentication olmadan da çalışsın (test için)
@@ -201,8 +180,32 @@ export default function MenuManagement() {
     router.push('/business/login');
   };
 
-  // Özellik kontrolünü geçici olarak pasifleştir (menü yönetimi herkes için açık)
-  // if (!hasQrMenu) { ... }
+  // Feature kontrolü - erişim yok sayfası göster
+  if (!hasQrMenu) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <BusinessSidebar 
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          onLogout={handleLogout}
+        />
+        <div className="ml-0 lg:ml-64 flex items-center justify-center min-h-screen">
+          <div className="text-center p-8">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Erişim Yok</h1>
+            <p className="text-gray-600 mb-6">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
+            <p className="text-sm text-gray-500 mb-6">Menü Yönetimi özelliğine erişmek için lütfen yöneticinizle iletişime geçin.</p>
+            <button
+              onClick={() => router.push('/business/dashboard')}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            >
+              Kontrol Paneline Dön
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleAddItem = () => {
     setEditingItem(null);
@@ -214,9 +217,6 @@ export default function MenuManagement() {
       category: '',
       preparationTime: '',
       calories: '',
-      ingredients: '',
-      allergens: [],
-      portionSize: '',
       isAvailable: true,
       isPopular: false
     });
@@ -225,24 +225,6 @@ export default function MenuManagement() {
 
   const handleEditItem = (item: any) => {
     setEditingItem(item);
-    
-    // Alerjen array'ini düzgün parse et
-    let allergenArray: string[] = [];
-    if (item.allergens) {
-      if (Array.isArray(item.allergens)) {
-        allergenArray = item.allergens;
-      } else if (typeof item.allergens === 'string') {
-        try {
-          allergenArray = JSON.parse(item.allergens);
-        } catch {
-          allergenArray = [];
-        }
-      }
-    }
-    
-    console.log('📝 Editing item:', item);
-    console.log('🏷️ Allergens:', allergenArray);
-    
     setFormData({
       name: item.name || '',
       description: item.description || '',
@@ -250,9 +232,6 @@ export default function MenuManagement() {
       category: item.categoryId || '',
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
-      ingredients: item.ingredients || '',
-      allergens: allergenArray,
-      portionSize: item.portionSize || '',
       isAvailable: item.isAvailable !== false,
       isPopular: item.isPopular || false
     });
@@ -268,7 +247,7 @@ export default function MenuManagement() {
       try {
         if (currentRestaurantId) {
           await deleteMenuItem(currentRestaurantId, itemId);
-          console.log('Ürün silindi:', itemId);
+      console.log('Ürün silindi:', itemId);
           // Menüyü yeniden yükle
           await fetchRestaurantMenu(currentRestaurantId);
         }
@@ -307,7 +286,7 @@ export default function MenuManagement() {
       try {
         if (currentRestaurantId) {
           await deleteMenuCategory(currentRestaurantId, categoryId);
-          console.log('Kategori silindi:', categoryId);
+      console.log('Kategori silindi:', categoryId);
           // Menüyü yeniden yükle
           await fetchRestaurantMenu(currentRestaurantId);
         }
@@ -764,159 +743,32 @@ export default function MenuManagement() {
                 <div className="p-6 overflow-y-auto max-h-[70vh]">
                   <form className="space-y-6">
                     {/* Ürün Adı */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                         Ürün Adı *
-                      </label>
-                      <input
-                        type="text"
+                        </label>
+                        <input
+                          type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Örn: Bruschetta"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="Örn: Bruschetta"
                         required
                       />
                     </div>
 
                     {/* Açıklama */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                         Açıklama
-                      </label>
-                      <textarea
+                        </label>
+                        <textarea
                         value={formData.description}
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Ürün açıklaması..."
-                      />
-                    </div>
-
-                    {/* Ürün Fotoğrafı */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Ürün Fotoğrafı
-                      </label>
-                      <div className="space-y-3">
-                        {capturedImage ? (
-                          <div className="relative">
-                            <img 
-                              src={capturedImage} 
-                              alt="Ürün fotoğrafı" 
-                              className="w-full h-64 object-cover rounded-lg border-2 border-gray-200"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setCapturedImage(null)}
-                              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 shadow-lg"
-                            >
-                              <FaTimes size={16} />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 gap-4">
-                            {/* Kameradan Çek */}
-                            <div className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer">
-                              <input
-                                type="file"
-                                accept="image/*"
-                                capture="environment"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => {
-                                      setCapturedImage(reader.result as string);
-                                    };
-                                    reader.readAsDataURL(file);
-                                  }
-                                }}
-                                className="hidden"
-                                id="camera-upload"
-                              />
-                              <label htmlFor="camera-upload" className="cursor-pointer">
-                                <div className="flex flex-col items-center gap-3">
-                                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium text-purple-600">Kameradan Çek</p>
-                                    <p className="text-xs text-gray-500 mt-1">Telefon kamerası</p>
-                                  </div>
-                                </div>
-                              </label>
-                            </div>
-
-                            {/* Dosyadan Yükle */}
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => {
-                                      setCapturedImage(reader.result as string);
-                                    };
-                                    reader.readAsDataURL(file);
-                                  }
-                                }}
-                                className="hidden"
-                                id="file-upload"
-                              />
-                              <label htmlFor="file-upload" className="cursor-pointer">
-                                <div className="flex flex-col items-center gap-3">
-                                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium text-gray-700">Dosyadan Yükle</p>
-                                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF</p>
-                                  </div>
-                                </div>
-                              </label>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* AI Görsel İşleme Aktif */}
-                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
-                          <div className="flex items-start gap-3">
-                            <div className="text-2xl">✨</div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-purple-900 mb-2">AI Görsel İşleme Aktif!</h4>
-                              <ul className="space-y-1 text-sm text-purple-700">
-                                <li className="flex items-center gap-2">
-                                  <span className="text-purple-500">🎯</span>
-                                  Otomatik arka plan kaldırma
-                                </li>
-                                <li className="flex items-center gap-2">
-                                  <span className="text-pink-500">🎨</span>
-                                  Renk ve parlaklık optimizasyonu
-                                </li>
-                                <li className="flex items-center gap-2">
-                                  <span className="text-purple-500">🔍</span>
-                                  Akıllı boyutlandırma
-                                </li>
-                                <li className="flex items-center gap-2">
-                                  <span className="text-pink-500">⚡</span>
-                                  Keskinlik artırma
-                                </li>
-                              </ul>
-                              <p className="text-xs text-purple-600 mt-2 flex items-center gap-1">
-                                <span>💡</span>
-                                Kameradan çekmek daha profesyonel sonuçlar verir
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="Ürün açıklaması..."
+                        />
                     </div>
 
                     {/* Fiyat ve Kategori */}
@@ -961,8 +813,8 @@ export default function MenuManagement() {
                       </div>
                     </div>
 
-                    {/* Kalori, Hazırlık Süresi ve Porsiyon */}
-                    <div className="grid grid-cols-3 gap-4">
+                    {/* Kalori ve Hazırlık Süresi */}
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Kalori
@@ -977,7 +829,7 @@ export default function MenuManagement() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Hazırlık Süresi (dk)
+                          Hazırlık Süresi (dakika)
                         </label>
                         <input
                           type="number"
@@ -986,86 +838,6 @@ export default function MenuManagement() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="15"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Porsiyon
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.portionSize}
-                          onChange={(e) => setFormData({...formData, portionSize: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          placeholder="250g"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Malzemeler */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Malzemeler
-                      </label>
-                      <textarea
-                        value={formData.ingredients}
-                        onChange={(e) => setFormData({...formData, ingredients: e.target.value})}
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Domates, mozzarella, fesleğen, zeytinyağı..."
-                      />
-                    </div>
-
-                    {/* Alerjenler */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Alerjenler
-                      </label>
-                      {/* Debug: Seçili alerjenler */}
-                      {formData.allergens.length > 0 && (
-                        <div className="mb-2 text-xs text-purple-600">
-                          Seçili: {formData.allergens.join(', ')}
-                        </div>
-                      )}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {[
-                          { value: 'gluten', label: 'Gluten' },
-                          { value: 'dairy', label: 'Süt' },
-                          { value: 'eggs', label: 'Yumurta' },
-                          { value: 'nuts', label: 'Fındık' },
-                          { value: 'peanuts', label: 'Fıstık' },
-                          { value: 'soy', label: 'Soya' },
-                          { value: 'fish', label: 'Balık' },
-                          { value: 'shellfish', label: 'Kabuklu Deniz Ürünleri' }
-                        ].map((allergen) => {
-                          const isChecked = formData.allergens.includes(allergen.value);
-                          return (
-                            <label 
-                              key={allergen.value} 
-                              className={`flex items-center p-2 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
-                                isChecked ? 'border-purple-500 bg-purple-50' : 'border-gray-200'
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  console.log('Checkbox changed:', allergen.value, e.target.checked);
-                                  if (e.target.checked) {
-                                    const newAllergens = [...formData.allergens, allergen.value];
-                                    console.log('New allergens:', newAllergens);
-                                    setFormData({...formData, allergens: newAllergens});
-                                  } else {
-                                    const newAllergens = formData.allergens.filter(a => a !== allergen.value);
-                                    console.log('Filtered allergens:', newAllergens);
-                                    setFormData({...formData, allergens: newAllergens});
-                                  }
-                                }}
-                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                              />
-                              <span className="ml-2 text-sm text-gray-700">{allergen.label}</span>
-                            </label>
-                          );
-                        })}
                       </div>
                     </div>
 
@@ -1142,18 +914,15 @@ export default function MenuManagement() {
                               await updateMenuItem(currentRestaurantId, editingItem.id, {
                                 name: formData.name,
                                 description: formData.description,
-                                price: Number(formData.price),
-                                categoryId: formData.category,
-                                preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0,
-                                ingredients: formData.ingredients,
-                                allergens: formData.allergens,
-                                portionSize: formData.portionSize,
-                                isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular,
-                                image: capturedImage || editingItem.image
-                              });
-                              console.log('Ürün güncellendi:', formData);
+                            price: Number(formData.price),
+                            categoryId: formData.category,
+                            preparationTime: Number(formData.preparationTime) || 0,
+                            calories: Number(formData.calories) || 0,
+                            isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
+                            image: capturedImage || editingItem.image
+                          });
+                          console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
                             }
@@ -1171,19 +940,16 @@ export default function MenuManagement() {
                           try {
                             if (currentRestaurantId) {
                               await createMenuItem(currentRestaurantId, {
-                                categoryId: formData.category,
+                            categoryId: formData.category,
                                 name: formData.name,
                                 description: formData.description,
-                                price: Number(formData.price),
-                                image: capturedImage || '/placeholder-food.jpg',
-                                order: items.length + 1,
-                                isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular,
-                                preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0,
-                                ingredients: formData.ingredients,
-                                allergens: formData.allergens,
-                                portionSize: formData.portionSize
+                            price: Number(formData.price),
+                            image: capturedImage || '/placeholder-food.jpg',
+                            order: items.length + 1,
+                            isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
+                            preparationTime: Number(formData.preparationTime) || 0,
+                                calories: Number(formData.calories) || 0
                               });
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
                               // Menüyü yeniden yükle
@@ -1205,9 +971,6 @@ export default function MenuManagement() {
                           category: '',
                           preparationTime: '',
                           calories: '',
-                          ingredients: '',
-                          allergens: [],
-                          portionSize: '',
                           isAvailable: true,
                           isPopular: false
                         });
@@ -1239,17 +1002,17 @@ export default function MenuManagement() {
                 <div className="p-6">
                   <form className="space-y-4">
                     {/* Kategori Adı */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                         Kategori Adı *
-                      </label>
-                      <input
-                        type="text"
+                        </label>
+                        <input
+                          type="text"
                         value={categoryFormData.name}
                         onChange={(e) => setCategoryFormData({...categoryFormData, name: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="Örn: Başlangıçlar, Ana Yemekler, Tatlılar"
-                        required
+                          required
                       />
                     </div>
 
@@ -1283,27 +1046,27 @@ export default function MenuManagement() {
                         }
                         
                         try {
-                          if (editingCategory) {
+                        if (editingCategory) {
                             if (currentRestaurantId) {
                               await updateMenuCategory(currentRestaurantId, editingCategory.id, {
                                 name: categoryFormData.name,
                                 description: categoryFormData.description,
-                                order: categoryFormData.order,
-                                isActive: categoryFormData.isActive
-                              });
-                              console.log('Kategori güncellendi:', editingCategory);
+                            order: categoryFormData.order,
+                            isActive: categoryFormData.isActive
+                          });
+                          console.log('Kategori güncellendi:', editingCategory);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
                             }
-                          } else {
+                        } else {
                             // Backend API'sine kaydet
                             if (currentRestaurantId) {
                               await createMenuCategory(currentRestaurantId, {
                                 name: categoryFormData.name,
                                 description: categoryFormData.description,
-                                order: categories.length,
-                                isActive: categoryFormData.isActive
-                              });
+                            order: categories.length,
+                            isActive: categoryFormData.isActive
+                          });
                               console.log('Yeni kategori backend\'e kaydedildi');
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);

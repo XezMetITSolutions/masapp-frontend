@@ -94,8 +94,6 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
           menuItems: response.data?.menuItems || [],
           loading: false 
         });
-      } else {
-        set({ loading: false });
       }
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to fetch restaurant', loading: false });
@@ -395,8 +393,6 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         
         console.log('💾 State updated successfully');
         return response.data;
-      } else {
-        set({ loading: false });
       }
     } catch (error) {
       console.error('❌ Fetch menu error:', error);
