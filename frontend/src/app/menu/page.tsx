@@ -88,10 +88,21 @@ function MenuPageContent() {
     (window as any).debugMenu = () => ({
       targetRestaurant,
       currentRestaurant: currentRestaurant?.name,
+      currentRestaurantId: currentRestaurant?.id,
       restaurantsCount: restaurants.length,
       categoriesCount: allCategories.length,
       itemsCount: allMenuItems.length,
-      foundRestaurant: restaurant?.name
+      foundRestaurant: restaurant?.name,
+      allItems: allMenuItems.map(item => ({ 
+        id: item.id, 
+        name: typeof item.name === 'string' ? item.name : (item.name?.tr || ''), 
+        restaurantId: item.restaurantId 
+      })),
+      allCategories: allCategories.map(cat => ({ 
+        id: cat.id, 
+        name: typeof cat.name === 'string' ? cat.name : (cat.name?.tr || ''), 
+        restaurantId: cat.restaurantId 
+      }))
     });
 
     if (targetRestaurant) {
