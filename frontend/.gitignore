@@ -43,3 +43,8 @@ next-env.d.ts
 # OS
 Thumbs.db
 
+# Temp folders
+../backend-temp/
+../API-TESTING-GUIDE.md
+../DEPLOYMENT-CHECKLIST.md
+../MENU-FIX-SUMMARY.md
