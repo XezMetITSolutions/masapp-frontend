@@ -86,19 +86,34 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
   fetchRestaurantByUsername: async (username: string) => {
     set({ loading: true, error: null });
     try {
+      console.log('🔍 Fetching restaurant by username:', username);
       const response = await apiService.getRestaurantByUsername(username);
-      if (response.success) {
+      console.log('📦 API Response:', response);
+      
+      if (response.success && response.data) {
+        console.log('✅ Setting currentRestaurant:', response.data);
+        const restaurantData = response.data;
+        
         set({ 
-          currentRestaurant: response.data,
-          categories: response.data?.categories || [],
-          menuItems: response.data?.menuItems || [],
+          currentRestaurant: restaurantData,
+          categories: restaurantData?.categories || [],
+          menuItems: restaurantData?.menuItems || [],
           loading: false 
         });
-        return response.data as Restaurant;
+        
+        // Verify state was set
+        const state = get();
+        console.log('💾 State after set - currentRestaurant:', state.currentRestaurant);
+        console.log('💾 State after set - categories:', state.categories.length);
+        console.log('💾 State after set - menuItems:', state.menuItems.length);
+        
+        return restaurantData as Restaurant;
       }
+      console.warn('⚠️ No data in response or not successful');
       set({ loading: false });
       return null;
     } catch (error) {
+      console.error('❌ fetchRestaurantByUsername error:', error);
       set({ error: error instanceof Error ? error.message : 'Failed to fetch restaurant', loading: false });
       return null;
     }

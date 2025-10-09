@@ -91,6 +91,17 @@ export default function DebugPage() {
         if (restaurant) {
           addTestResult('API: fetchRestaurantByUsername', 'success', 
             `Restaurant found: ${restaurant.name} (ID: ${restaurant.id})`, restaurant);
+          
+          // Immediately check store after fetch
+          await new Promise(resolve => setTimeout(resolve, 100));
+          const storeState = useRestaurantStore.getState();
+          addTestResult('Store: Immediate Check', storeState.currentRestaurant ? 'success' : 'error',
+            storeState.currentRestaurant ? `Store updated: ${storeState.currentRestaurant.name}` : 'Store NOT updated!',
+            { 
+              currentRestaurant: storeState.currentRestaurant,
+              categories: storeState.categories.length,
+              menuItems: storeState.menuItems.length
+            });
         } else {
           addTestResult('API: fetchRestaurantByUsername', 'error', 'Restaurant not found', null);
         }
@@ -100,8 +111,8 @@ export default function DebugPage() {
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Test 4: Check currentRestaurant in store
-      addTestResult('Store: currentRestaurant', currentRestaurant ? 'success' : 'error',
+      // Test 4: Check currentRestaurant in store (after delay)
+      addTestResult('Store: currentRestaurant (after delay)', currentRestaurant ? 'success' : 'error',
         currentRestaurant ? `Current restaurant: ${currentRestaurant.name}` : 'No current restaurant in store',
         currentRestaurant);
 
