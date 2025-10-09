@@ -65,19 +65,26 @@ function CustomerMenuContent() {
 
       if (foundRestaurant) {
         setRestaurant(foundRestaurant);
-        
         // Bu restorana ait kategorileri ve ürünleri filtrele
         const restaurantCategories = allCategories.filter(c => c.restaurantId === foundRestaurant.id);
         const restaurantItems = allMenuItems.filter(i => i.restaurantId === foundRestaurant.id);
         
         setCategories(restaurantCategories);
         setMenuItems(restaurantItems);
-      } else {
+      } else if (!loading) {
         // Backend'den çekmeyi dene
-        fetchRestaurantByUsername(targetRestaurant);
+        fetchRestaurantByUsername(targetRestaurant).then((res) => {
+          if (res) {
+            setRestaurant(res);
+            const restaurantCategories = allCategories.filter(c => c.restaurantId === res.id);
+            const restaurantItems = allMenuItems.filter(i => i.restaurantId === res.id);
+            setCategories(restaurantCategories);
+            setMenuItems(restaurantItems);
+          }
+        });
       }
     }
-  }, [restaurants, allCategories, allMenuItems, searchParams, fetchRestaurantByUsername]);
+  }, [restaurants, allCategories, allMenuItems, searchParams, fetchRestaurantByUsername, loading]);
 
   // Sepete ürün ekle
   const addToCart = (item: any) => {
