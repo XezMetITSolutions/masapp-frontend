@@ -1,195 +1,194 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import useRestaurantStore from '@/store/useRestaurantStore';
-import { 
-  FaShoppingCart, 
-  FaSearch,
-  FaUtensils,
-  FaFire,
-  FaTag,
-  FaPlus,
-  FaMinus,
-  FaCheck,
-  FaTimes
-} from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter } from 'react-icons/fa';
+import { useMenuStore, useCartStore } from '@/store';
+import AnnouncementPopup from '@/components/AnnouncementPopup';
+import Toast from '@/components/Toast';
+import MenuItemModal from '@/components/MenuItemModal';
+import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
+import TranslatedText from '@/components/TranslatedText';
+import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
+import SetBrandColor from '@/components/SetBrandColor';
 
-function CustomerMenuContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { 
-    restaurants, 
-    categories: allCategories, 
-    menuItems: allMenuItems,
-    fetchRestaurantByUsername,
-    loading 
-  } = useRestaurantStore();
-
-  const [restaurant, setRestaurant] = useState<any>(null);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [menuItems, setMenuItems] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [cart, setCart] = useState<any[]>([]);
-  const [showCart, setShowCart] = useState(false);
-  const [tableNumber, setTableNumber] = useState('1');
-  const [showSplash, setShowSplash] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+function MenuPageContent() {
+  // Store states
+  const { currentLanguage, translate } = useLanguage();
+  const addItem = useCartStore(state => state.addItem);
+  const cartItems = useCartStore(state => state.items);
+  const tableNumber = useCartStore(state => state.tableNumber);
+  
+  // Menu store
+  const items = useMenuStore(state => state.items);
+  const categories = useMenuStore(state => state.categories);
+  const subcategories = useMenuStore(state => state.subcategories);
+  const fetchMenu = useMenuStore(state => state.fetchMenu);
+  
+  // Local states
+  const [activeCategory, setActiveCategory] = useState('popular');
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-
-  // Splash screen göster
+  const [isClient, setIsClient] = useState(false);
+  const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
+  const { settings } = useBusinessSettingsStore();
+  const [showSplash, setShowSplash] = useState(false);
+  const primary = settings.branding.primaryColor;
+  const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
+  
+  // Fetch menu on mount
   useEffect(() => {
+    fetchMenu();
+    setIsClient(true);
     try {
-      const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('menuVisited');
+      const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('menuVisitedOnce');
       if (!hasVisited) {
         setShowSplash(true);
-        sessionStorage.setItem('menuVisited', '1');
+        sessionStorage.setItem('menuVisitedOnce', '1');
         setTimeout(() => setShowSplash(false), 1600);
       }
     } catch {}
   }, []);
-
-  // Subdomain'den restaurant bul ve menüyü yükle
+  
+  // Update search placeholder based on language
   useEffect(() => {
-    const getRestaurantFromSubdomain = () => {
-      if (typeof window !== 'undefined') {
-        const hostname = window.location.hostname;
-        const subdomain = hostname.split('.')[0];
-        const mainDomains = ['localhost', 'www', 'guzellestir'];
-        
-        if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
-          return subdomain;
+    if (currentLanguage === 'Turkish') {
+      setSearchPlaceholder('Menüde ara...');
+    } else {
+      // For other languages, we'll translate this
+      const translatePlaceholder = async () => {
+        try {
+          const translated = await translate('Menüde ara...');
+          setSearchPlaceholder(translated);
+        } catch (error) {
+          setSearchPlaceholder('Search menu...');
         }
-      }
-      return null;
-    };
-
-    const subdomain = getRestaurantFromSubdomain();
-    const restaurantParam = searchParams.get('restaurant');
-    const targetRestaurant = subdomain || restaurantParam;
-
-    if (targetRestaurant) {
-      const foundRestaurant = restaurants.find(r => 
-        r.username === targetRestaurant || 
-        r.name.toLowerCase().replace(/\s+/g, '-') === targetRestaurant ||
-        r.name.toLowerCase().includes(targetRestaurant)
-      );
-
-      if (foundRestaurant) {
-        setRestaurant(foundRestaurant);
-        const restaurantCategories = allCategories.filter(c => c.restaurantId === foundRestaurant.id);
-        const restaurantItems = allMenuItems.filter(i => i.restaurantId === foundRestaurant.id);
-        
-        setCategories(restaurantCategories);
-        setMenuItems(restaurantItems);
-      } else if (!loading) {
-        fetchRestaurantByUsername(targetRestaurant).then((res) => {
-          if (res) {
-            setRestaurant(res);
-            const restaurantCategories = allCategories.filter(c => c.restaurantId === res.id);
-            const restaurantItems = allMenuItems.filter(i => i.restaurantId === res.id);
-            setCategories(restaurantCategories);
-            setMenuItems(restaurantItems);
-          }
-        });
-      }
+      };
+      translatePlaceholder();
     }
-  }, [restaurants, allCategories, allMenuItems, searchParams, fetchRestaurantByUsername, loading]);
-
-  // Sepete ürün ekle
-  const addToCart = (item: any) => {
-    setCart(prev => {
-      const existingItem = prev.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        return prev.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prev, { ...item, quantity: 1 }];
-      }
-    });
-    setToastMessage('Ürün sepete eklendi!');
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 3000);
+  }, [currentLanguage, translate]);
+  
+  // Helper functions - defined inside component to avoid dependency issues
+  const getPopularItems = () => {
+    return items.filter(item => item.popular);
   };
-
-  // Sepetten ürün çıkar
-  const removeFromCart = (itemId: string) => {
-    setCart(prev => {
-      const existingItem = prev.find(cartItem => cartItem.id === itemId);
-      if (existingItem && existingItem.quantity > 1) {
-        return prev.map(cartItem =>
-          cartItem.id === itemId
-            ? { ...cartItem, quantity: cartItem.quantity - 1 }
-            : cartItem
-        );
-      } else {
-        return prev.filter(cartItem => cartItem.id !== itemId);
-      }
-    });
+  
+  const getItemsByCategory = (categoryId: string) => {
+    return items.filter(item => item.category === categoryId);
   };
-
-  // Toplam fiyat hesapla
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+  
+  const getItemsBySubcategory = (subcategoryId: string) => {
+    return items.filter(item => item.subcategory === subcategoryId);
   };
+  
+  const getSubcategoriesByParent = (parentId: string) => {
+    return subcategories.filter(subcategory => subcategory.parentId === parentId);
+  };
+  
+  // Get cart count - only calculate on client side to avoid hydration mismatch
+  const [cartCount, setCartCount] = useState(0);
+  
+  useEffect(() => {
+    if (isClient) {
+      setCartCount(cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0));
+    }
+  }, [isClient, cartItems]);
+  
+  // Get language code for menu data
+  const language = currentLanguage === 'Turkish' ? 'tr' : 'en';
 
-  // Popüler ürünleri al
-  const popularItems = menuItems.filter(item => item.isPopular);
+  // Get menu categories
+  const menuCategories = [
+    { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
+    ...categories.map(cat => ({
+      id: cat.id,
+      name: cat.name[language as keyof typeof cat.name]
+    }))
+  ];
 
-  // Filtrelenmiş ürünler
-  let filteredItems = activeCategory === 'all' 
-    ? menuItems
-    : activeCategory === 'popular'
-    ? popularItems
-    : menuItems.filter(item => item.categoryId === activeCategory);
+  // Get subcategories for active category
+  const activeSubcategories = activeCategory === 'popular' ? [] : getSubcategoriesByParent(activeCategory);
 
-  if (searchTerm.trim() !== '') {
-    filteredItems = filteredItems.filter(item => {
-      const name = item.name || '';
-      const description = item.description || '';
-      return name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             description.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-  }
-
-  if (!restaurant && !loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <FaUtensils className="text-6xl text-gray-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Restoran Bulunamadı</h1>
-          <p className="text-gray-600 mb-4">
-            Aradığınız restoran bulunamadı veya menü henüz hazırlanmamış.
-          </p>
-          <button
-            onClick={() => router.push('/')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Ana Sayfaya Dön
-          </button>
-        </div>
-      </div>
+  // Get filtered items
+  let filteredItems = activeCategory === 'popular' 
+    ? getPopularItems()
+    : activeSubcategory 
+      ? getItemsBySubcategory(activeSubcategory)
+      : getItemsByCategory(activeCategory);
+      
+  if (search.trim() !== '') {
+    filteredItems = filteredItems.filter(item =>
+      item.name[language as keyof typeof item.name].toLowerCase().includes(search.toLowerCase()) ||
+      (item.description[language as keyof typeof item.description] && item.description[language as keyof typeof item.description].toLowerCase().includes(search.toLowerCase()))
     );
   }
 
+  // Event handlers
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    setActiveSubcategory(null);
+  };
+
+  const handleSubcategoryChange = (subcategoryId: string | null) => {
+    setActiveSubcategory(subcategoryId);
+  };
+
+  const addToCart = (item: any) => {
+    try {
+      addItem({
+        itemId: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+        image: item.image
+      });
+      setToastVisible(true);
+      // Auto hide toast after 3 seconds
+      setTimeout(() => setToastVisible(false), 3000);
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+    }
+  };
+
+  const openModal = (item: any) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
+
   return (
     <>
-      {/* Splash Screen */}
+      <SetBrandColor />
       {showSplash && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white animate-fadeIn">
           <div className="text-center px-6 animate-scaleIn">
-            <div className="relative inline-flex items-center justify-center mb-4">
-              <div className="h-20 w-20 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-2xl">
-                {restaurant?.name?.charAt(0) || 'M'}
-              </div>
+            <div className="relative inline-flex items-center justify-center mb-3">
+              <div className="absolute inset-0 -z-10 h-24 w-24 rounded-full opacity-10" style={{ backgroundColor: 'var(--brand-primary)' }} />
+              {settings.branding.logo ? (
+                <img src={settings.branding.logo} alt="Logo" className="h-20 w-20 object-contain rounded-md shadow-sm" />
+              ) : (
+                <div className="h-20 w-20 rounded-full flex items-center justify-center text-white font-semibold" style={{ backgroundColor: 'var(--brand-primary)' }}>
+                  {(settings.basicInfo.name || 'Işletme').slice(0,1)}
+                </div>
+              )}
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">{restaurant?.name || 'Menü'}</h1>
-            <div className="mt-4 mx-auto h-1 w-40 bg-gray-200 rounded overflow-hidden">
-              <div className="h-full bg-blue-600 animate-progress" />
+            <div className="text-dynamic-xl font-bold text-gray-900">{settings.basicInfo.name || 'İşletme'}</div>
+            {settings.branding.showSloganOnLoading !== false && settings.basicInfo.slogan && (
+              <div className="text-dynamic-sm text-gray-600 mt-1">{settings.basicInfo.slogan}</div>
+            )}
+            <div className="mt-4 mx-auto h-[1px] w-40 bg-gray-200" />
+            <div className="mt-3 w-40 h-1 bg-gray-100 rounded overflow-hidden mx-auto">
+              <div className="h-full bg-brand animate-progress" />
             </div>
           </div>
           <style jsx>{`
@@ -202,236 +201,311 @@ function CustomerMenuContent() {
           `}</style>
         </div>
       )}
-
-      {/* Toast Notification */}
-      {toastVisible && (
-        <div className="fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
-          <FaCheck className="mr-2" />
-          {toastMessage}
-        </div>
-      )}
-
-      <div className="min-h-screen bg-gray-50 pb-20">
+      <Toast message="Ürün sepete eklendi!" visible={toastVisible} onClose={() => setToastVisible(false)} />
+      <AnnouncementPopup />
+      <main className="min-h-screen pb-20">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b fixed top-0 left-0 right-0 z-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center">
-                <h1 className="text-xl font-bold text-gray-900">{restaurant?.name || 'Menü'}</h1>
-                {tableNumber && (
-                  <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                    Masa #{tableNumber}
-                  </span>
-                )}
+        <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
+          <div className="container mx-auto px-3 py-3 flex justify-between items-center">
+            <div className="flex items-center">
+              <Link href="/" className="mr-2">
+                <FaArrowLeft size={16} />
+              </Link>
+              <h1 className="text-dynamic-lg font-bold text-primary">
+                <TranslatedText>Menü</TranslatedText>
+              </h1>
+              <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
+                <TranslatedText>Masa</TranslatedText> #{tableNumber}
               </div>
-              
-              {/* Sepet */}
-              <button
-                onClick={() => setShowCart(true)}
-                className="relative bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-              >
-                <FaShoppingCart className="mr-2" />
-                Sepet
-                {cart.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                  </span>
-                )}
-              </button>
+            </div>
+          </div>
+          {/* Dil seçici sağ üstte, arama ve diğer içerikten tamamen ayrı */}
+          <div className="fixed top-4 right-4 z-30">
+            <div className="bg-white rounded-xl shadow border border-gray-200 p-1">
+              <LanguageSelector />
+            </div>
+          </div>
+        </header>
+
+        {/* Search */}
+        <div className="pt-16 px-3 flex items-center mb-4">
+          <input
+            type="text"
+            className="border rounded p-2 w-full mr-2"
+            placeholder={searchPlaceholder}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        {/* Anlık Duyurular Slider */}
+        <div className="px-3 mb-4">
+          <div className="relative overflow-hidden rounded-lg shadow-lg">
+            <div className="flex animate-slide">
+              <div className="min-w-full text-white p-3 bg-brand-gradient">
+                <div className="flex items-center">
+                  <span className="text-lg mr-2">🎉</span>
+                  <div>
+                    <div className="font-semibold text-sm">
+                      <TranslatedText>Bugüne Özel!</TranslatedText>
+                    </div>
+                    <div className="text-xs opacity-90">
+                      <TranslatedText>Tüm tatlılarda %20 indirim - Sadece bugün geçerli</TranslatedText>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="min-w-full text-white p-3 bg-brand-gradient">
+                <div className="flex items-center">
+                  <span className="text-lg mr-2">🍲</span>
+                  <div>
+                    <div className="font-semibold text-sm">
+                      <TranslatedText>Günün Çorbası</TranslatedText>
+                    </div>
+                    <div className="text-xs opacity-90">
+                      <TranslatedText>Ezogelin çorbası - Ev yapımı lezzet</TranslatedText>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Ana İçerik */}
-        <div className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Arama */}
-          <div className="mb-6">
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Menüde ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
+        <style jsx>{`
+          @keyframes slide {
+            0%, 45% { transform: translateX(0); }
+            50%, 95% { transform: translateX(-100%); }
+            100% { transform: translateX(0); }
+          }
+          .animate-slide {
+            animation: slide 8s infinite;
+          }
+        `}</style>
 
-          {/* Kategori Tabs */}
-          <div className="mb-6 overflow-x-auto">
-            <div className="flex space-x-2 pb-2">
+        {/* Categories */}
+        <div className="pb-2 overflow-x-auto">
+          <div className="flex px-3 space-x-2 min-w-max">
+            {menuCategories.map((category) => (
               <button
-                onClick={() => setActiveCategory('all')}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                  activeCategory === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                key={category.id}
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap text-dynamic-sm ${
+                  activeCategory === category.id
+                    ? 'btn-gradient'
+                    : 'bg-brand-surface text-gray-700'
                 }`}
+                onClick={() => handleCategoryChange(category.id)}
               >
-                Tümü
+                {category.name}
               </button>
-              {popularItems.length > 0 && (
+            ))}
+          </div>
+        </div>
+        
+        {/* Subcategories */}
+        {activeCategory !== 'popular' && activeSubcategories.length > 0 && (
+          <div className="overflow-x-auto bg-gray-50 py-2 mb-4">
+            <div className="flex px-3 space-x-2 min-w-max">
+              <button
+                className={`px-3 py-1 rounded-full whitespace-nowrap text-xs flex items-center ${
+                  activeSubcategory === null
+                    ? 'text-white'
+                    : 'bg-white border text-gray-700'
+                }`}
+                onClick={() => handleSubcategoryChange(null)}
+                style={activeSubcategory === null ? { backgroundColor: primary, borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
+              >
+                <FaFilter className="mr-1" size={10} />
+                <TranslatedText>Tümü</TranslatedText>
+              </button>
+              
+              {activeSubcategories.map((subcategory) => (
                 <button
-                  onClick={() => setActiveCategory('popular')}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors flex items-center ${
-                    activeCategory === 'popular'
-                      ? 'bg-orange-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  key={subcategory.id}
+                  className={`px-3 py-1 rounded-full whitespace-nowrap text-xs ${
+                    activeSubcategory === subcategory.id
+                      ? 'btn-gradient'
+                      : 'bg-white border text-gray-700'
                   }`}
+                  onClick={() => handleSubcategoryChange(subcategory.id)}
+                  style={activeSubcategory === subcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
                 >
-                  <FaFire className="mr-1" />
-                  Popüler
-                </button>
-              )}
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                    activeCategory === category.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {category.name}
+                  {subcategory.name[language as keyof typeof subcategory.name]}
                 </button>
               ))}
             </div>
           </div>
+        )}
 
-          {/* Menü İçeriği */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <FaUtensils className="text-6xl text-gray-300 mx-auto mb-4" />
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Ürün bulunamadı</h2>
-                <p className="text-gray-600">Arama kriterlerinize uygun ürün bulunamadı.</p>
-              </div>
-            ) : (
-              filteredItems.map((item: any) => (
-                <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow">
-                  {item.image && (
-                    <img src={item.image} alt={item.name} className="w-full h-40 object-cover rounded-lg mb-3" />
-                  )}
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900 text-lg flex-1">{item.name}</h3>
-                    {item.isPopular && (
-                      <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full flex items-center ml-2">
-                        <FaFire className="mr-1" />
-                        Popüler
-                      </span>
-                    )}
-                  </div>
-                  {item.description && (
-                    <p className="text-gray-600 text-sm mb-3">{item.description}</p>
-                  )}
-                  {item.ingredients && (
-                    <p className="text-gray-500 text-xs mb-2">🥗 {item.ingredients}</p>
-                  )}
-                  {item.allergens && item.allergens.length > 0 && (
-                    <p className="text-red-500 text-xs mb-2">⚠️ {item.allergens.join(', ')}</p>
-                  )}
-                  <div className="flex items-center justify-between mt-3">
-                    <div>
-                      <span className="text-2xl font-bold text-blue-600">₺{item.price}</span>
-                      {item.calories && (
-                        <span className="text-xs text-gray-500 ml-2">({item.calories} kcal)</span>
-                      )}
+        {/* Menu Items */}
+        <div className="container mx-auto px-3 py-2">
+          <div className="grid grid-cols-1 gap-3">
+            {filteredItems.map((item) => (
+              <div key={item.id} className="bg-white rounded-lg shadow-sm border p-3 flex">
+                <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                  <Image 
+                    src={item.image || '/placeholder-food.jpg'} 
+                    alt={item.name[language as keyof typeof item.name] || 'Menu item'} 
+                    width={80} 
+                    height={80} 
+                    className="object-cover w-full h-full rounded-lg"
+                  />
+                  {item.popular && (
+                    <div className="absolute top-0 left-0 text-white text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--brand-strong)' }}>
+                      <FaStar className="inline-block mr-1" size={8} />
+                      <TranslatedText>Popüler</TranslatedText>
                     </div>
-                    <button
-                      onClick={() => addToCart(item)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                  )}
+                </div>
+                <div className="ml-3 flex-grow">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-semibold text-dynamic-sm">{item.name[language as keyof typeof item.name] || item.name.tr || item.name.en}</h3>
+                    <span className="font-semibold text-dynamic-sm" style={{ color: primary }}>{item.price} ₺</span>
+                  </div>
+                  <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                    {item.description[language as keyof typeof item.description] || item.description.tr || item.description.en}
+                  </p>
+                  
+                  {/* Allergens */}
+                  {item.allergens && item.allergens.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {item.allergens.slice(0, 3).map((allergen, i) => (
+                        <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
+                          {allergen[language as keyof typeof allergen] || allergen.tr || allergen.en}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center">
+                    <button 
+                      onClick={() => openModal(item)}
+                      className="text-xs flex items-center"
+                      style={{ color: primary }}
                     >
-                      <FaPlus className="mr-1" />
-                      Ekle
+                      <FaInfo className="mr-1" size={10} />
+                      <TranslatedText>Detayları Gör</TranslatedText>
+                    </button>
+                    <button 
+                      className="btn btn-secondary py-1 px-3 text-xs rounded flex items-center"
+                      onClick={() => addToCart(item)}
+                    >
+                      <FaPlus className="mr-1" size={10} />
+                      <TranslatedText>Sepete Ekle</TranslatedText>
                     </button>
                   </div>
                 </div>
-              ))
-            )}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Sepet Modal */}
-      {showCart && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">Sepetim</h2>
-                <button
-                  onClick={() => setShowCart(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <FaTimes size={20} />
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6 overflow-y-auto max-h-96">
-              {cart.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">Sepetiniz boş</p>
-              ) : (
-                <div className="space-y-4">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between border-b pb-4">
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{item.name}</h3>
-                        <p className="text-gray-600">₺{item.price}</p>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300"
-                        >
-                          <FaMinus />
-                        </button>
-                        <span className="font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => addToCart(item)}
-                          className="bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300"
-                        >
-                          <FaPlus />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+        {/* Sabit Duyurular */}
+        <div className="container mx-auto px-3 py-4 mb-20">
+          <div className="rounded-xl p-5 shadow-lg border bg-tone1">
+            <div className="grid grid-cols-1 gap-3">
+              {/* WiFi Info */}
+              <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">📶</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    <TranslatedText>WiFi Şifresi</TranslatedText>
+                  </span>
                 </div>
-              )}
-            </div>
-            
-            {cart.length > 0 && (
-              <div className="p-6 border-t bg-gray-50">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-lg font-semibold">Toplam:</span>
-                  <span className="text-2xl font-bold text-blue-600">₺{getTotalPrice().toFixed(2)}</span>
-                </div>
-                <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
-                  <FaCheck className="mr-2" />
-                  Siparişi Tamamla
-                </button>
+                <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>restoran2024</span>
               </div>
-            )}
+              {/* Google Review Button */}
+              <a
+                href="https://www.google.com/maps/place/restoranadi/reviews" // Change to actual Google review URL
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone2"
+                style={{ textDecoration: 'none' }}
+              >
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">⭐</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    <TranslatedText>Google'da Değerlendir</TranslatedText>
+                  </span>
+                </div>
+                <button className="text-xs font-semibold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-secondary">
+                  <TranslatedText>Yorum Yap</TranslatedText>
+                </button>
+              </a>
+              {/* Working Hours */}
+              <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">🕒</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    <TranslatedText>Çalışma Saatleri</TranslatedText>
+                  </span>
+                </div>
+                <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>09:00 - 23:00</span>
+              </div>
+              {/* Instagram Button */}
+              <a
+                href="https://instagram.com/restoranadi" // Change to actual Instagram URL
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone3"
+                style={{ textDecoration: 'none' }}
+              >
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">📱</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    <TranslatedText>Instagram'da Takip Et</TranslatedText>
+                  </span>
+                </div>
+                <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
+                  @restoranadi
+                </button>
+              </a>
+            </div>
           </div>
         </div>
+
+        {/* Bottom Navigation */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
+          <div className="container mx-auto flex justify-around">
+            <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
+              <FaUtensils className="mb-0.5" size={16} />
+              <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
+            </Link>
+            <Link href="/demo/cart" className="flex flex-col items-center" style={{ color: primary }}>
+              <div className="relative">
+                <FaShoppingCart className="mb-0.5" size={16} />
+                {isClient && cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-[9px] w-4 h-4 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
+            </Link>
+            <Link href="/demo/waiter" className="flex flex-col items-center" style={{ color: primary }}>
+              <FaBell className="mb-0.5" size={16} />
+              <span className="text-[10px]"><TranslatedText>Garson Çağır</TranslatedText></span>
+            </Link>
+          </div>
+        </nav>
+      </main>
+
+      {/* Menu Item Modal */}
+      {selectedItem && (
+        <MenuItemModal
+          item={selectedItem}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
       )}
     </>
   );
 }
 
-export default function CustomerMenuPage() {
+export default function MenuPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yükleniyor...</p>
-        </div>
-      </div>
-    }>
-      <CustomerMenuContent />
-    </Suspense>
+    <LanguageProvider>
+      <MenuPageContent />
+    </LanguageProvider>
   );
 }
