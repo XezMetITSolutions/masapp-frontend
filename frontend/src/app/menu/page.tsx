@@ -8,15 +8,11 @@ import { useMenuStore, useCartStore } from '@/store';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
-import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
-import LanguageSelector from '@/components/LanguageSelector';
-import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 
 function MenuPageContent() {
   // Store states
-  const { currentLanguage, translate } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
@@ -35,7 +31,6 @@ function MenuPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
   const { settings } = useBusinessSettingsStore();
   const [showSplash, setShowSplash] = useState(false);
   const primary = settings.branding.primaryColor;
@@ -55,23 +50,6 @@ function MenuPageContent() {
     } catch {}
   }, []);
   
-  // Update search placeholder based on language
-  useEffect(() => {
-    if (currentLanguage === 'Turkish') {
-      setSearchPlaceholder('Menüde ara...');
-    } else {
-      // For other languages, we'll translate this
-      const translatePlaceholder = async () => {
-        try {
-          const translated = await translate('Menüde ara...');
-          setSearchPlaceholder(translated);
-        } catch (error) {
-          setSearchPlaceholder('Search menu...');
-        }
-      };
-      translatePlaceholder();
-    }
-  }, [currentLanguage, translate]);
   
   // Helper functions - defined inside component to avoid dependency issues
   const getPopularItems = () => {
@@ -99,15 +77,12 @@ function MenuPageContent() {
     }
   }, [isClient, cartItems]);
   
-  // Get language code for menu data
-  const language = currentLanguage === 'Turkish' ? 'tr' : 'en';
-
   // Get menu categories
   const menuCategories = [
-    { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
+    { id: 'popular', name: 'Popüler' },
     ...categories.map(cat => ({
       id: cat.id,
-      name: cat.name[language as keyof typeof cat.name]
+      name: typeof cat.name === 'string' ? cat.name : (cat.name?.tr || '')
     }))
   ];
 
@@ -122,10 +97,12 @@ function MenuPageContent() {
       : getItemsByCategory(activeCategory);
       
   if (search.trim() !== '') {
-    filteredItems = filteredItems.filter(item =>
-      item.name[language as keyof typeof item.name].toLowerCase().includes(search.toLowerCase()) ||
-      (item.description[language as keyof typeof item.description] && item.description[language as keyof typeof item.description].toLowerCase().includes(search.toLowerCase()))
-    );
+    filteredItems = filteredItems.filter(item => {
+      const name = typeof item.name === 'string' ? item.name : (item.name?.tr || '');
+      const description = typeof item.description === 'string' ? item.description : (item.description?.tr || '');
+      return name.toLowerCase().includes(search.toLowerCase()) ||
+             description.toLowerCase().includes(search.toLowerCase());
+    });
   }
 
   // Event handlers
@@ -212,17 +189,11 @@ function MenuPageContent() {
                 <FaArrowLeft size={16} />
               </Link>
               <h1 className="text-dynamic-lg font-bold text-primary">
-                <TranslatedText>Menü</TranslatedText>
+                Menü
               </h1>
               <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
-                <TranslatedText>Masa</TranslatedText> #{tableNumber}
+                Masa #{tableNumber}
               </div>
-            </div>
-          </div>
-          {/* Dil seçici sağ üstte, arama ve diğer içerikten tamamen ayrı */}
-          <div className="fixed top-4 right-4 z-30">
-            <div className="bg-white rounded-xl shadow border border-gray-200 p-1">
-              <LanguageSelector />
             </div>
           </div>
         </header>
@@ -232,7 +203,7 @@ function MenuPageContent() {
           <input
             type="text"
             className="border rounded p-2 w-full mr-2"
-            placeholder={searchPlaceholder}
+            placeholder="Menüde ara..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -247,10 +218,10 @@ function MenuPageContent() {
                   <span className="text-lg mr-2">🎉</span>
                   <div>
                     <div className="font-semibold text-sm">
-                      <TranslatedText>Bugüne Özel!</TranslatedText>
+                      Bugüne Özel!
                     </div>
                     <div className="text-xs opacity-90">
-                      <TranslatedText>Tüm tatlılarda %20 indirim - Sadece bugün geçerli</TranslatedText>
+                      Tüm tatlılarda %20 indirim - Sadece bugün geçerli
                     </div>
                   </div>
                 </div>
@@ -260,10 +231,10 @@ function MenuPageContent() {
                   <span className="text-lg mr-2">🍲</span>
                   <div>
                     <div className="font-semibold text-sm">
-                      <TranslatedText>Günün Çorbası</TranslatedText>
+                      Günün Çorbası
                     </div>
                     <div className="text-xs opacity-90">
-                      <TranslatedText>Ezogelin çorbası - Ev yapımı lezzet</TranslatedText>
+                      Ezogelin çorbası - Ev yapımı lezzet
                     </div>
                   </div>
                 </div>
@@ -316,7 +287,7 @@ function MenuPageContent() {
                 style={activeSubcategory === null ? { backgroundColor: primary, borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
               >
                 <FaFilter className="mr-1" size={10} />
-                <TranslatedText>Tümü</TranslatedText>
+                Tümü
               </button>
               
               {activeSubcategories.map((subcategory) => (
@@ -328,9 +299,9 @@ function MenuPageContent() {
                       : 'bg-white border text-gray-700'
                   }`}
                   onClick={() => handleSubcategoryChange(subcategory.id)}
-                  style={activeSubcategory === subcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
+                  style={activeSubcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
                 >
-                  {subcategory.name[language as keyof typeof subcategory.name]}
+                  {subcategory.name?.tr || subcategory.name}
                 </button>
               ))}
             </div>
@@ -345,7 +316,7 @@ function MenuPageContent() {
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image 
                     src={item.image || '/placeholder-food.jpg'} 
-                    alt={item.name[language as keyof typeof item.name] || 'Menu item'} 
+                    alt={item.name?.tr || item.name || 'Menu item'} 
                     width={80} 
                     height={80} 
                     className="object-cover w-full h-full rounded-lg"
@@ -353,17 +324,17 @@ function MenuPageContent() {
                   {item.popular && (
                     <div className="absolute top-0 left-0 text-white text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--brand-strong)' }}>
                       <FaStar className="inline-block mr-1" size={8} />
-                      <TranslatedText>Popüler</TranslatedText>
+                      Popüler
                     </div>
                   )}
                 </div>
                 <div className="ml-3 flex-grow">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-dynamic-sm">{item.name[language as keyof typeof item.name] || item.name.tr || item.name.en}</h3>
+                    <h3 className="font-semibold text-dynamic-sm">{item.name?.tr || item.name}</h3>
                     <span className="font-semibold text-dynamic-sm" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                    {item.description[language as keyof typeof item.description] || item.description.tr || item.description.en}
+                    {item.description?.tr || item.description}
                   </p>
                   
                   {/* Allergens */}
@@ -371,7 +342,7 @@ function MenuPageContent() {
                     <div className="flex flex-wrap gap-1 mb-2">
                       {item.allergens.slice(0, 3).map((allergen, i) => (
                         <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
-                          {allergen[language as keyof typeof allergen] || allergen.tr || allergen.en}
+                          {allergen?.tr || allergen}
                         </span>
                       ))}
                     </div>
@@ -384,14 +355,14 @@ function MenuPageContent() {
                       style={{ color: primary }}
                     >
                       <FaInfo className="mr-1" size={10} />
-                      <TranslatedText>Detayları Gör</TranslatedText>
+                      Detayları Gör
                     </button>
                     <button 
                       className="btn btn-secondary py-1 px-3 text-xs rounded flex items-center"
                       onClick={() => addToCart(item)}
                     >
                       <FaPlus className="mr-1" size={10} />
-                      <TranslatedText>Sepete Ekle</TranslatedText>
+                      Sepete Ekle
                     </button>
                   </div>
                 </div>
@@ -409,7 +380,7 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">📶</span>
                   <span className="text-sm font-medium text-gray-700">
-                    <TranslatedText>WiFi Şifresi</TranslatedText>
+                    WiFi Şifresi
                   </span>
                 </div>
                 <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>restoran2024</span>
@@ -425,11 +396,11 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">⭐</span>
                   <span className="text-sm font-medium text-gray-800">
-                    <TranslatedText>Google'da Değerlendir</TranslatedText>
+                    Google'da Değerlendir
                   </span>
                 </div>
                 <button className="text-xs font-semibold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-secondary">
-                  <TranslatedText>Yorum Yap</TranslatedText>
+                  Yorum Yap
                 </button>
               </a>
               {/* Working Hours */}
@@ -437,7 +408,7 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">🕒</span>
                   <span className="text-sm font-medium text-gray-700">
-                    <TranslatedText>Çalışma Saatleri</TranslatedText>
+                    Çalışma Saatleri
                   </span>
                 </div>
                 <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>09:00 - 23:00</span>
@@ -453,7 +424,7 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">📱</span>
                   <span className="text-sm font-medium text-gray-800">
-                    <TranslatedText>Instagram'da Takip Et</TranslatedText>
+                    Instagram'da Takip Et
                   </span>
                 </div>
                 <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
@@ -469,7 +440,7 @@ function MenuPageContent() {
           <div className="container mx-auto flex justify-around">
             <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <FaUtensils className="mb-0.5" size={20} />
-              <span className="text-xs font-medium"><TranslatedText>Menü</TranslatedText></span>
+              <span className="text-xs font-medium">Menü</span>
             </Link>
             <button 
               onClick={() => {
@@ -487,7 +458,7 @@ function MenuPageContent() {
                   </span>
                 )}
               </div>
-              <span className="text-xs font-medium"><TranslatedText>Sepet</TranslatedText></span>
+              <span className="text-xs font-medium">Sepet</span>
             </button>
             <button 
               onClick={() => {
@@ -498,7 +469,7 @@ function MenuPageContent() {
               style={{ color: primary }}
             >
               <FaBell className="mb-0.5" size={20} />
-              <span className="text-xs font-medium"><TranslatedText>Garson Çağır</TranslatedText></span>
+              <span className="text-xs font-medium">Garson Çağır</span>
             </button>
           </div>
         </nav>
@@ -517,9 +488,5 @@ function MenuPageContent() {
 }
 
 export default function MenuPage() {
-  return (
-    <LanguageProvider>
-      <MenuPageContent />
-    </LanguageProvider>
-  );
+  return <MenuPageContent />;
 }
