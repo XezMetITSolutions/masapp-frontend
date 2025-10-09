@@ -4,24 +4,35 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter } from 'react-icons/fa';
-import { useMenuStore, useCartStore } from '@/store';
+import { useCartStore } from '@/store';
+import useRestaurantStore from '@/store/useRestaurantStore';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
+import { useSearchParams } from 'next/navigation';
 
 function MenuPageContent() {
   // Store states
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
+  const searchParams = useSearchParams();
   
-  // Menu store
-  const items = useMenuStore(state => state.items);
-  const categories = useMenuStore(state => state.categories);
-  const subcategories = useMenuStore(state => state.subcategories);
-  const fetchMenu = useMenuStore(state => state.fetchMenu);
+  // Restaurant store (BACKEND DATA)
+  const { 
+    restaurants, 
+    categories: allCategories, 
+    menuItems: allMenuItems,
+    fetchRestaurantByUsername,
+    loading 
+  } = useRestaurantStore();
+
+  const [restaurant, setRestaurant] = useState<any>(null);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
+  const subcategories: any[] = []; // Not used in this page
   
   // Local states
   const [activeCategory, setActiveCategory] = useState('popular');
@@ -36,10 +47,11 @@ function MenuPageContent() {
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
   
-  // Fetch menu on mount
+  // Fetch restaurant and menu on mount
   useEffect(() => {
-    fetchMenu();
     setIsClient(true);
+    
+    // Splash screen
     try {
       const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('menuVisitedOnce');
       if (!hasVisited) {
@@ -48,7 +60,71 @@ function MenuPageContent() {
         setTimeout(() => setShowSplash(false), 1600);
       }
     } catch {}
-  }, []);
+
+    // Get restaurant from subdomain
+    const getRestaurantFromSubdomain = () => {
+      if (typeof window !== 'undefined') {
+        const hostname = window.location.hostname;
+        const subdomain = hostname.split('.')[0];
+        const mainDomains = ['localhost', 'www', 'guzellestir'];
+        
+        if (!mainDomains.includes(subdomain) && hostname.includes('.')) {
+          return subdomain;
+        }
+      }
+      return null;
+    };
+
+    const subdomain = getRestaurantFromSubdomain();
+    const restaurantParam = searchParams.get('restaurant');
+    const targetRestaurant = subdomain || restaurantParam || 'aksaray'; // Default to aksaray for testing
+
+    console.log('[MENU] Target restaurant:', targetRestaurant);
+    console.log('[MENU] Restaurants in store:', restaurants.length);
+
+    if (targetRestaurant) {
+      // Find restaurant in store
+      const foundRestaurant = restaurants.find(r => 
+        r.username === targetRestaurant || 
+        r.name.toLowerCase().replace(/\s+/g, '-') === targetRestaurant ||
+        r.name.toLowerCase().includes(targetRestaurant)
+      );
+
+      if (foundRestaurant) {
+        console.log('[MENU] Found restaurant in store:', foundRestaurant.name);
+        setRestaurant(foundRestaurant);
+        
+        // Filter categories and items for this restaurant
+        const restaurantCategories = allCategories.filter(c => c.restaurantId === foundRestaurant.id);
+        const restaurantItems = allMenuItems.filter(i => i.restaurantId === foundRestaurant.id);
+        
+        console.log('[MENU] Categories:', restaurantCategories.length);
+        console.log('[MENU] Menu items:', restaurantItems.length);
+        
+        setCategories(restaurantCategories);
+        setItems(restaurantItems);
+      } else if (!loading) {
+        // Fetch from backend
+        console.log('[MENU] Fetching from backend:', targetRestaurant);
+        fetchRestaurantByUsername(targetRestaurant).then((res) => {
+          if (res) {
+            console.log('[MENU] Fetched restaurant:', res.name);
+            setRestaurant(res);
+            
+            // Get updated data from store
+            const restaurantCategories = allCategories.filter(c => c.restaurantId === res.id);
+            const restaurantItems = allMenuItems.filter(i => i.restaurantId === res.id);
+            
+            console.log('[MENU] After fetch - Categories:', restaurantCategories.length);
+            console.log('[MENU] After fetch - Items:', restaurantItems.length);
+            
+            setCategories(restaurantCategories);
+            setItems(restaurantItems);
+          }
+        });
+      }
+    }
+  }, [restaurants, allCategories, allMenuItems, searchParams, fetchRestaurantByUsername, loading]);
   
   
   // Helper functions - defined inside component to avoid dependency issues
