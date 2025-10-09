@@ -405,11 +405,18 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
         console.log('✅ Transformed items:', transformedItems.length);
         console.log('✅ First transformed item:', transformedItems[0]);
         
-        set({
-          categories: transformedCategories,
-          menuItems: transformedItems,
+        // Mevcut verileri koruyarak güncelle
+        set((state) => ({
+          categories: [
+            ...state.categories.filter(c => c.restaurantId !== restaurantId),
+            ...transformedCategories
+          ],
+          menuItems: [
+            ...state.menuItems.filter(i => i.restaurantId !== restaurantId),
+            ...transformedItems
+          ],
           loading: false
-        });
+        }));
         
         console.log('💾 State updated successfully');
         return response.data;
