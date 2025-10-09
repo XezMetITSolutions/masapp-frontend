@@ -111,19 +111,23 @@ export default function DebugPage() {
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Test 4: Check currentRestaurant in store (after delay)
-      addTestResult('Store: currentRestaurant (after delay)', currentRestaurant ? 'success' : 'error',
-        currentRestaurant ? `Current restaurant: ${currentRestaurant.name}` : 'No current restaurant in store',
-        currentRestaurant);
+      // Test 4: Check currentRestaurant in store (after delay) - Get fresh state
+      const freshState = useRestaurantStore.getState();
+      addTestResult('Store: currentRestaurant (after delay)', freshState.currentRestaurant ? 'success' : 'error',
+        freshState.currentRestaurant ? `Current restaurant: ${freshState.currentRestaurant.name}` : 'No current restaurant in store',
+        freshState.currentRestaurant);
 
-      // Test 5: Fetch menu for current restaurant
-      if (currentRestaurant?.id) {
-        addTestResult('API: fetchRestaurantMenu', 'info', `Fetching menu for restaurant ID: ${currentRestaurant.id}...`, null);
+      // Test 5: Fetch menu for current restaurant - Use fresh state
+      if (freshState.currentRestaurant?.id) {
+        addTestResult('API: fetchRestaurantMenu', 'info', `Fetching menu for restaurant ID: ${freshState.currentRestaurant.id}...`, null);
         try {
-          const menuData = await fetchRestaurantMenu(currentRestaurant.id);
+          const menuData = await fetchRestaurantMenu(freshState.currentRestaurant.id);
+          
+          // Get fresh state again after menu fetch
+          const afterMenuState = useRestaurantStore.getState();
           addTestResult('API: fetchRestaurantMenu', 'success', 
-            `Menu fetched: ${allCategories.length} categories, ${allMenuItems.length} items`, 
-            { categories: allCategories.length, items: allMenuItems.length, menuData });
+            `Menu fetched: ${afterMenuState.categories.length} categories, ${afterMenuState.menuItems.length} items`, 
+            { categories: afterMenuState.categories.length, items: afterMenuState.menuItems.length, menuData });
         } catch (err: any) {
           addTestResult('API: fetchRestaurantMenu', 'error', `Error: ${err.message}`, err);
         }
