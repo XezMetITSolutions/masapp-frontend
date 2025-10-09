@@ -225,6 +225,24 @@ export default function MenuManagement() {
 
   const handleEditItem = (item: any) => {
     setEditingItem(item);
+    
+    // Alerjen array'ini düzgün parse et
+    let allergenArray: string[] = [];
+    if (item.allergens) {
+      if (Array.isArray(item.allergens)) {
+        allergenArray = item.allergens;
+      } else if (typeof item.allergens === 'string') {
+        try {
+          allergenArray = JSON.parse(item.allergens);
+        } catch {
+          allergenArray = [];
+        }
+      }
+    }
+    
+    console.log('📝 Editing item:', item);
+    console.log('🏷️ Allergens:', allergenArray);
+    
     setFormData({
       name: item.name || '',
       description: item.description || '',
@@ -233,7 +251,7 @@ export default function MenuManagement() {
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
       ingredients: item.ingredients || '',
-      allergens: item.allergens || [],
+      allergens: allergenArray,
       portionSize: item.portionSize || '',
       isAvailable: item.isAvailable !== false,
       isPopular: item.isPopular || false
@@ -1002,6 +1020,12 @@ export default function MenuManagement() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Alerjenler
                       </label>
+                      {/* Debug: Seçili alerjenler */}
+                      {formData.allergens.length > 0 && (
+                        <div className="mb-2 text-xs text-purple-600">
+                          Seçili: {formData.allergens.join(', ')}
+                        </div>
+                      )}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[
                           { value: 'gluten', label: 'Gluten' },
@@ -1012,23 +1036,36 @@ export default function MenuManagement() {
                           { value: 'soy', label: 'Soya' },
                           { value: 'fish', label: 'Balık' },
                           { value: 'shellfish', label: 'Kabuklu Deniz Ürünleri' }
-                        ].map((allergen) => (
-                          <label key={allergen.value} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={formData.allergens.includes(allergen.value)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setFormData({...formData, allergens: [...formData.allergens, allergen.value]});
-                                } else {
-                                  setFormData({...formData, allergens: formData.allergens.filter(a => a !== allergen.value)});
-                                }
-                              }}
-                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                            />
-                            <span className="ml-2 text-sm text-gray-700">{allergen.label}</span>
-                          </label>
-                        ))}
+                        ].map((allergen) => {
+                          const isChecked = formData.allergens.includes(allergen.value);
+                          return (
+                            <label 
+                              key={allergen.value} 
+                              className={`flex items-center p-2 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
+                                isChecked ? 'border-purple-500 bg-purple-50' : 'border-gray-200'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  console.log('Checkbox changed:', allergen.value, e.target.checked);
+                                  if (e.target.checked) {
+                                    const newAllergens = [...formData.allergens, allergen.value];
+                                    console.log('New allergens:', newAllergens);
+                                    setFormData({...formData, allergens: newAllergens});
+                                  } else {
+                                    const newAllergens = formData.allergens.filter(a => a !== allergen.value);
+                                    console.log('Filtered allergens:', newAllergens);
+                                    setFormData({...formData, allergens: newAllergens});
+                                  }
+                                }}
+                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">{allergen.label}</span>
+                            </label>
+                          );
+                        })}
                       </div>
                     </div>
 
