@@ -1,288 +1,342 @@
 'use client';
 
-import { useState } from 'react';
-import { FaCamera, FaUpload, FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
+import { useState, useRef } from 'react';
+import { FaCamera, FaUpload, FaTrash, FaCheck } from 'react-icons/fa';
 
 export default function DebugPage() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: 'Debug Test Ürün',
-    description: 'Debug test açıklaması',
-    price: '25.00',
-    category: '07c1ceaa-a3d9-40a7-91b7-e99b0e00c29a'
-  });
+  const [fileImage, setFileImage] = useState<string | null>(null);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [testResults, setTestResults] = useState<any>(null);
+  
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const restaurantId = 'f6811f51-c0b4-4a81-bbb9-6d1a1da3803f';
+  const addLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs(prev => [...prev, `[${timestamp}] ${message}`]);
+    console.log(message);
+  };
+
+  const startCamera = async () => {
+    try {
+      addLog('Kamera başlatılıyor...');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 800 },
+          height: { ideal: 600 },
+          facingMode: 'environment' // Arka kamera
+        } 
+      });
+      
+      setCameraStream(stream);
+      setIsCameraOpen(true);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      
+      addLog('Kamera başarıyla başlatıldı');
+    } catch (error) {
+      addLog(`Kamera hatası: ${error}`);
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+      setIsCameraOpen(false);
+      addLog('Kamera durduruldu');
+    }
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    if (video && context) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0);
+      
+      const imageData = canvas.toDataURL('image/jpeg', 0.9);
+      setCapturedImage(imageData);
+      addLog(`Kamera ile çekilen resim: ${imageData.length} karakter`);
+      addLog(`Resim boyutu: ${canvas.width}x${canvas.height}`);
+      stopCamera();
+    }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log('Seçilen dosya:', file.name, 'Boyut:', file.size, 'Tip:', file.type);
+      addLog(`Seçilen dosya: ${file.name}`);
+      addLog(`Dosya boyutu: ${file.size} bytes`);
+      addLog(`Dosya tipi: ${file.type}`);
       
       if (file.size > 5 * 1024 * 1024) {
-        alert('Dosya boyutu çok büyük. Maksimum 5MB olmalıdır.');
+        addLog('HATA: Dosya boyutu çok büyük (max 5MB)');
         return;
       }
       
       if (!file.type.startsWith('image/')) {
-        alert('Lütfen sadece resim dosyası seçin.');
+        addLog('HATA: Sadece resim dosyası seçin');
         return;
       }
       
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result as string;
-        console.log('Yüklenen resim boyutu:', result.length);
-        setCapturedImage(result);
+        setFileImage(result);
+        addLog(`Dosya yüklendi: ${result.length} karakter`);
       };
       reader.readAsDataURL(file);
     }
   };
 
   const testImageUpload = async () => {
-    if (!capturedImage) {
-      alert('Önce bir resim yükleyin!');
+    const imageToTest = capturedImage || fileImage;
+    if (!imageToTest) {
+      addLog('HATA: Test edilecek resim yok');
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
     try {
-      console.log('=== DEBUG TEST BAŞLADI ===');
-      console.log('Form Data:', formData);
-      console.log('Captured Image:', capturedImage ? 'VAR (' + capturedImage.length + ' karakter)' : 'YOK');
-      console.log('Restaurant ID:', restaurantId);
+      addLog('Test başlatılıyor...');
+      
+      // Backend API test
+      const response = await fetch('https://masapp-backend.onrender.com/api/test-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: imageToTest,
+          testData: {
+            filename: 'debug-test.jpg',
+            size: imageToTest.length,
+            timestamp: new Date().toISOString()
+          }
+        }),
+      });
 
-      const createData = {
-        categoryId: formData.category,
-        name: formData.name,
-        description: formData.description,
-        price: Number(formData.price),
-        imageUrl: capturedImage,
+      const result = await response.json();
+      setTestResults(result);
+      
+      if (response.ok) {
+        addLog('✅ Backend test başarılı');
+        addLog(`Backend yanıtı: ${JSON.stringify(result)}`);
+      } else {
+        addLog(`❌ Backend test hatası: ${response.status}`);
+        addLog(`Hata detayı: ${JSON.stringify(result)}`);
+      }
+    } catch (error) {
+      addLog(`❌ Test hatası: ${error}`);
+    }
+  };
+
+  const testMenuAPI = async () => {
+    try {
+      addLog('Menü API test ediliyor...');
+      
+      // Restaurant ID'yi test için kullan
+      const restaurantId = 'f6811f51-c0b4-4a81-bbb9-6d1a1da3803f';
+      const imageToTest = capturedImage || fileImage || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A';
+      
+      const menuItemData = {
+        categoryId: 'test-category',
+        name: 'Debug Test Ürün',
+        description: 'Test için oluşturulan ürün',
+        price: 25.50,
+        imageUrl: imageToTest,
         order: 1,
         isAvailable: true,
         isPopular: false
       };
-
-      console.log('Create Data gönderiliyor:', createData);
-      console.log('Resim URL uzunluğu:', createData.imageUrl.length);
 
       const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(createData),
+        body: JSON.stringify(menuItemData),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      const responseData = await response.json();
-      console.log('Response data:', responseData);
-
-      if (response.ok) {
-        setResult({
-          success: true,
-          data: responseData,
-          message: 'Ürün başarıyla oluşturuldu!'
-        });
-      } else {
-        setError(`Hata: ${response.status} - ${responseData.message || 'Bilinmeyen hata'}`);
-      }
-    } catch (err: any) {
-      console.error('Test hatası:', err);
-      setError(`Network hatası: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const testGetItems = async () => {
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`);
-      const data = await response.json();
+      const result = await response.json();
       
-      console.log('Mevcut ürünler:', data);
-      setResult({
-        success: true,
-        data: data,
-        message: `Toplam ${data.data?.length || 0} ürün bulundu`
-      });
-    } catch (err: any) {
-      setError(`Get items hatası: ${err.message}`);
-    } finally {
-      setLoading(false);
+      if (response.ok) {
+        addLog('✅ Menü ürünü başarıyla oluşturuldu');
+        addLog(`Oluşturulan ürün ID: ${result.data?.id}`);
+        addLog(`Resim URL uzunluğu: ${result.data?.imageUrl?.length || 0}`);
+      } else {
+        addLog(`❌ Menü API hatası: ${response.status}`);
+        addLog(`Hata detayı: ${JSON.stringify(result)}`);
+      }
+    } catch (error) {
+      addLog(`❌ Menü API test hatası: ${error}`);
     }
   };
+
+  const clearAll = () => {
+    setCapturedImage(null);
+    setFileImage(null);
+    setTestResults(null);
+    setLogs([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    addLog('Tüm veriler temizlendi');
+  };
+
+  const currentImage = capturedImage || fileImage;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">🔍 Resim Yükleme Debug Sayfası</h1>
+        <h1 className="text-3xl font-bold mb-6">🔍 Resim Yükleme Debug Sayfası</h1>
         
-        {/* Form */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Ürün Bilgileri</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ürün Adı</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        {/* Image Display */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Resim Önizleme</h2>
+          {currentImage ? (
+            <div className="space-y-4">
+              <img 
+                src={currentImage} 
+                alt="Yüklenen resim" 
+                className="max-w-md h-64 object-cover rounded-lg border"
+                onLoad={() => addLog('Resim başarıyla yüklendi')}
+                onError={() => addLog('❌ Resim yüklenirken hata oluştu')}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Fiyat</label>
-              <input
-                type="text"
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Açıklama</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Resim Yükleme */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Resim Yükleme</h2>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {/* Dosya Yükleme */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <FaUpload className="mx-auto text-4xl text-gray-400 mb-2" />
-                <p className="text-sm font-medium text-gray-600">Dosyadan Yükle</p>
-                <p className="text-xs text-gray-500">PNG, JPG, GIF (Max 5MB)</p>
-              </label>
-            </div>
-
-            {/* Resim Önizleme */}
-            <div className="border-2 border-gray-300 rounded-lg p-6 text-center">
-              {capturedImage ? (
-                <div className="relative">
-                  <img
-                    src={capturedImage}
-                    alt="Önizleme"
-                    className="max-w-full max-h-48 mx-auto rounded-lg"
-                  />
-                  <button
-                    onClick={() => setCapturedImage(null)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
-                  >
-                    ×
-                  </button>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Boyut: {capturedImage.length} karakter
-                  </p>
-                </div>
-              ) : (
-                <div className="text-gray-400">
-                  <FaCamera className="mx-auto text-4xl mb-2" />
-                  <p className="text-sm">Resim önizlemesi</p>
-            </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Test Butonları */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Test İşlemleri</h2>
-          <div className="flex gap-4">
-            <button
-              onClick={testImageUpload}
-              disabled={loading || !capturedImage}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {loading ? <FaSpinner className="animate-spin" /> : <FaCheck />}
-              Resim ile Ürün Oluştur
-            </button>
-            <button
-              onClick={testGetItems}
-              disabled={loading}
-              className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {loading ? <FaSpinner className="animate-spin" /> : <FaCheck />}
-              Mevcut Ürünleri Getir
-            </button>
-          </div>
-        </div>
-
-        {/* Sonuçlar */}
-        {(result || error) && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Sonuçlar</h2>
-            
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center gap-2 text-red-800">
-                  <FaTimes />
-                  <span className="font-medium">Hata:</span>
-                </div>
-                <p className="text-red-700 mt-1">{error}</p>
+              <div className="text-sm text-gray-600">
+                <p>Resim boyutu: {currentImage.length} karakter</p>
+                <p>Resim tipi: {currentImage.substring(0, 50)}...</p>
               </div>
-            )}
-
-            {result && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                <div className="flex items-center gap-2 text-green-800">
-                  <FaCheck />
-                  <span className="font-medium">Başarılı:</span>
-                </div>
-                <p className="text-green-700 mt-1">{result.message}</p>
+            </div>
+          ) : (
+            <div className="text-gray-500 text-center py-8">
+              Henüz resim yüklenmedi
             </div>
           )}
+        </div>
 
-            {(result || error) && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h3 className="font-medium text-gray-800 mb-2">Detaylı Sonuç:</h3>
-                <pre className="text-xs text-gray-600 overflow-auto max-h-96 bg-white p-3 rounded border">
-                  {JSON.stringify(result || error, null, 2)}
-                </pre>
+        {/* Camera Section */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">📷 Kamera ile Çek</h2>
+          
+          {!isCameraOpen ? (
+            <button
+              onClick={startCamera}
+              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              <FaCamera />
+              Kamerayı Aç
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="w-full max-w-md h-64 object-cover rounded-lg border"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={capturePhoto}
+                  className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                >
+                  <FaCheck />
+                  Fotoğraf Çek
+                </button>
+                <button
+                  onClick={stopCamera}
+                  className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                >
+                  <FaTrash />
+                  Kamerayı Kapat
+                </button>
               </div>
-            )}
+            </div>
+          )}
+        </div>
+
+        {/* File Upload Section */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">📁 Dosya Yükle</h2>
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600"
+          >
+            <FaUpload />
+            Dosya Seç
+          </button>
+        </div>
+
+        {/* Test Buttons */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">🧪 Test İşlemleri</h2>
+          
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={testImageUpload}
+              disabled={!currentImage}
+              className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Test Backend API
+            </button>
+            
+            <button
+              onClick={testMenuAPI}
+              className="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600"
+            >
+              Test Menü API
+            </button>
+            
+            <button
+              onClick={clearAll}
+              className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+            >
+              <FaTrash />
+              Temizle
+            </button>
+          </div>
+        </div>
+
+        {/* Test Results */}
+        {testResults && (
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">📊 Test Sonuçları</h2>
+            <pre className="bg-gray-100 p-4 rounded-lg overflow-auto text-sm">
+              {JSON.stringify(testResults, null, 2)}
+            </pre>
           </div>
         )}
 
-        {/* Console Logları */}
-        <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-          <h2 className="text-xl font-semibold mb-4">Console Logları</h2>
-          <p className="text-sm text-gray-600 mb-2">
-            F12 tuşuna basın ve Console sekmesini açın. Tüm debug logları orada görünecek.
-          </p>
-          <div className="bg-black text-green-400 p-4 rounded-lg font-mono text-sm">
-            <div>🔍 Debug logları console'da görünecek</div>
-            <div>📊 Resim boyutu ve veri kontrolü</div>
-            <div>🌐 API request/response detayları</div>
-            <div>✅ Başarı/hata durumları</div>
+        {/* Logs */}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-xl font-semibold mb-4">📝 Loglar</h2>
+          <div className="bg-black text-green-400 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm">
+            {logs.length === 0 ? (
+              <div className="text-gray-500">Henüz log yok...</div>
+            ) : (
+              logs.map((log, index) => (
+                <div key={index} className="mb-1">
+                  {log}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
