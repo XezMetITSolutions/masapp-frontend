@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter } from 'react-icons/fa';
-import { useRestaurantStore } from '@/store/useRestaurantStore';
+import useRestaurantStore from '@/store/useRestaurantStore';
 import { useCartStore } from '@/store';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
@@ -25,10 +25,10 @@ function MenuPageContent() {
   // Restaurant store - backend'den gerçek veriler
   const { 
     restaurants, 
-    allCategories, 
-    allMenuItems, 
+    categories, 
+    menuItems, 
     fetchRestaurants, 
-    fetchMenu,
+    fetchRestaurantMenu,
     loading 
   } = useRestaurantStore();
   
@@ -54,17 +54,17 @@ function MenuPageContent() {
     const mainDomains = ['localhost', 'www', 'guzellestir'];
     
     if (mainDomains.includes(subdomain)) return null;
-    return restaurants.find(r => r.username === subdomain);
+    return restaurants.find((r: any) => r.username === subdomain);
   };
 
   const currentRestaurant = getCurrentRestaurant();
 
   // Restaurant'a göre kategoriler ve ürünler filtreleme
   const items = currentRestaurant 
-    ? allMenuItems.filter(item => item.restaurantId === currentRestaurant.id)
+    ? menuItems.filter((item: any) => item.restaurantId === currentRestaurant.id)
     : [];
-  const categories = currentRestaurant 
-    ? allCategories.filter(cat => cat.restaurantId === currentRestaurant.id)
+  const filteredCategories = currentRestaurant 
+    ? categories.filter((cat: any) => cat.restaurantId === currentRestaurant.id)
     : [];
 
   // Fetch data on mount
@@ -76,7 +76,7 @@ function MenuPageContent() {
     }
     // Restaurant varsa menüyü fetch et
     if (currentRestaurant) {
-      fetchMenu(currentRestaurant.id);
+      fetchRestaurantMenu(currentRestaurant.id);
     }
     try {
       const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('menuVisitedOnce');
@@ -86,7 +86,7 @@ function MenuPageContent() {
         setTimeout(() => setShowSplash(false), 1600);
       }
     } catch {}
-  }, [restaurants.length, currentRestaurant?.id, fetchRestaurants, fetchMenu]);
+  }, [restaurants.length, currentRestaurant?.id, fetchRestaurants, fetchRestaurantMenu]);
   
   // Update search placeholder based on language
   useEffect(() => {
@@ -108,15 +108,15 @@ function MenuPageContent() {
   
   // Helper functions - defined inside component to avoid dependency issues
   const getPopularItems = () => {
-    return items.filter(item => item.isPopular);
+    return items.filter((item: any) => item.isPopular);
   };
   
   const getItemsByCategory = (categoryId: string) => {
-    return items.filter(item => item.categoryId === categoryId);
+    return items.filter((item: any) => item.categoryId === categoryId);
   };
   
   const getItemsBySubcategory = (subcategoryId: string) => {
-    return items.filter(item => item.subcategory === subcategoryId);
+    return items.filter((item: any) => item.subcategory === subcategoryId);
   };
   
   const getSubcategoriesByParent = (parentId: string) => {
@@ -138,7 +138,7 @@ function MenuPageContent() {
   // Get menu categories (backend format)
   const menuCategories = [
     { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
-    ...categories.map(cat => ({
+    ...filteredCategories.map((cat: any) => ({
       id: cat.id,
       name: typeof cat.name === 'string' ? cat.name : (cat.name?.tr || cat.name?.en || 'Kategori')
     }))
@@ -155,7 +155,7 @@ function MenuPageContent() {
       : getItemsByCategory(activeCategory);
       
   if (search.trim() !== '') {
-    filteredItems = filteredItems.filter(item => {
+    filteredItems = filteredItems.filter((item: any) => {
       const itemName = typeof item.name === 'string' ? item.name : (item.name?.tr || item.name?.en || '');
       const itemDesc = typeof item.description === 'string' ? item.description : (item.description?.tr || item.description?.en || '');
       return itemName.toLowerCase().includes(search.toLowerCase()) ||
@@ -337,45 +337,12 @@ function MenuPageContent() {
           </div>
         </div>
         
-        {/* Subcategories */}
-        {activeCategory !== 'popular' && activeSubcategories.length > 0 && (
-          <div className="overflow-x-auto bg-gray-50 py-2 mb-4">
-            <div className="flex px-3 space-x-2 min-w-max">
-              <button
-                className={`px-3 py-1 rounded-full whitespace-nowrap text-xs flex items-center ${
-                  activeSubcategory === null
-                    ? 'text-white'
-                    : 'bg-white border text-gray-700'
-                }`}
-                onClick={() => handleSubcategoryChange(null)}
-                style={activeSubcategory === null ? { backgroundColor: primary, borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
-              >
-                <FaFilter className="mr-1" size={10} />
-                <TranslatedText>Tümü</TranslatedText>
-              </button>
-              
-              {activeSubcategories.map((subcategory) => (
-                <button
-                  key={subcategory.id}
-                  className={`px-3 py-1 rounded-full whitespace-nowrap text-xs ${
-                    activeSubcategory === subcategory.id
-                      ? 'btn-gradient'
-                      : 'bg-white border text-gray-700'
-                  }`}
-                  onClick={() => handleSubcategoryChange(subcategory.id)}
-                  style={activeSubcategory === subcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
-                >
-                  {subcategory.name[language as keyof typeof subcategory.name]}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Subcategories - Backend'de subcategory yok, bu kısım kaldırıldı */}
 
         {/* Menu Items */}
         <div className="container mx-auto px-3 py-2">
           <div className="grid grid-cols-1 gap-3">
-            {filteredItems.map((item) => (
+            {filteredItems.map((item: any) => (
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-3 flex">
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image 
@@ -404,7 +371,7 @@ function MenuPageContent() {
                   {/* Allergens */}
                   {item.allergens && item.allergens.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-2">
-                      {item.allergens.slice(0, 3).map((allergen, i) => (
+                      {item.allergens.slice(0, 3).map((allergen: any, i: number) => (
                         <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
                           {allergen[language as keyof typeof allergen] || allergen.tr || allergen.en}
                         </span>
