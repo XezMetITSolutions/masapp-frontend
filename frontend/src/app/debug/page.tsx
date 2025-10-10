@@ -222,6 +222,26 @@ export default function DebugPage() {
         const simpleResult = await simpleResponse.json();
         addLog(`Basit test sonucu: ${simpleResponse.status}`);
         addLog(`Basit test detayı: ${JSON.stringify(simpleResult)}`);
+        
+        // Yeni test endpoint'ini dene
+        addLog('Yeni test endpoint deneniyor...');
+        const newTestResponse = await fetch('https://masapp-backend.onrender.com/api/test-menu-item', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            restaurantId,
+            categoryId: firstCategory.id,
+            name: 'Test Ürün',
+            price: 15.50,
+            imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD'
+          }),
+        });
+        
+        const newTestResult = await newTestResponse.json();
+        addLog(`Yeni test endpoint sonucu: ${newTestResponse.status}`);
+        addLog(`Yeni test endpoint detayı: ${JSON.stringify(newTestResult)}`);
       }
     } catch (error) {
       addLog(`❌ Menü API test hatası: ${error}`);
