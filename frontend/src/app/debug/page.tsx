@@ -104,7 +104,7 @@ export default function DebugPage() {
       addLog('HATA: Test edilecek resim yok');
       return;
     }
-
+    
     try {
       addLog('Test başlatılıyor...');
       
@@ -155,9 +155,9 @@ export default function DebugPage() {
       if (!categoriesResponse.ok || !categoriesResult.success) {
         addLog(`❌ Kategori çekme hatası: ${categoriesResponse.status}`);
         addLog(`Hata detayı: ${JSON.stringify(categoriesResult)}`);
-        return;
-      }
-      
+      return;
+    }
+    
       const categories = categoriesResult.data || [];
       if (categories.length === 0) {
         addLog('❌ Hiç kategori bulunamadı');
@@ -178,6 +178,8 @@ export default function DebugPage() {
         isPopular: false
       };
 
+      addLog(`Gönderilen veri: ${JSON.stringify(menuItemData, null, 2)}`);
+
       const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`, {
         method: 'POST',
         headers: {
@@ -188,6 +190,10 @@ export default function DebugPage() {
 
       const result = await response.json();
       
+      addLog(`Response status: ${response.status}`);
+      addLog(`Response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+      addLog(`Response body: ${JSON.stringify(result, null, 2)}`);
+      
       if (response.ok) {
         addLog('✅ Menü ürünü başarıyla oluşturuldu');
         addLog(`Oluşturulan ürün ID: ${result.data?.id}`);
@@ -195,6 +201,27 @@ export default function DebugPage() {
       } else {
         addLog(`❌ Menü API hatası: ${response.status}`);
         addLog(`Hata detayı: ${JSON.stringify(result)}`);
+        
+        // Daha basit bir test yapalım
+        addLog('Basit test yapılıyor...');
+        const simpleData = {
+          categoryId: firstCategory.id,
+          name: 'Basit Test',
+          price: 10.00,
+          imageUrl: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD'
+        };
+        
+        const simpleResponse = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(simpleData),
+        });
+        
+        const simpleResult = await simpleResponse.json();
+        addLog(`Basit test sonucu: ${simpleResponse.status}`);
+        addLog(`Basit test detayı: ${JSON.stringify(simpleResult)}`);
       }
     } catch (error) {
       addLog(`❌ Menü API test hatası: ${error}`);
@@ -302,7 +329,7 @@ export default function DebugPage() {
             <FaUpload />
             Dosya Seç
           </button>
-        </div>
+                  </div>
 
         {/* Test Buttons */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
@@ -331,8 +358,8 @@ export default function DebugPage() {
               <FaTrash />
               Temizle
             </button>
-          </div>
-        </div>
+            </div>
+              </div>
 
         {/* Test Results */}
         {testResults && (
