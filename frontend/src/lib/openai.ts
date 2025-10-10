@@ -1,24 +1,10 @@
 // Translation service using OpenAI API
 
 export async function translateText(text: string, targetLanguage: string): Promise<string> {
-  try {
-    const response = await fetch('/api/translate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        text,
-        targetLanguage,
-      }),
-    });
-
-    const data = await response.json();
-    return data.translatedText || text;
-  } catch (error) {
-    console.error('Translation error:', error);
-    return text; // Fallback to original text
-  }
+  // Geçici olarak çeviri API'sini devre dışı bırakıyoruz
+  // API endpoint'i henüz oluşturulmadı
+  console.log('Translation disabled - API endpoint not available');
+  return text; // Orijinal metni döndür
 }
 
 export async function detectLanguageFromLocation(countryCode: string): Promise<string> {
