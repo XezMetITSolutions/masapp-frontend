@@ -8,21 +8,25 @@ import { useMenuStore, useCartStore } from '@/store';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
+import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
+import LanguageSelector from '@/components/LanguageSelector';
+import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
 
 function MenuPageContent() {
   // Store states
+  const { currentLanguage, translate } = useLanguage();
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
-    
+  
   // Menu store
   const items = useMenuStore(state => state.items);
   const categories = useMenuStore(state => state.categories);
   const subcategories = useMenuStore(state => state.subcategories);
   const fetchMenu = useMenuStore(state => state.fetchMenu);
-    
+  
   // Local states
   const [activeCategory, setActiveCategory] = useState('popular');
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
@@ -31,12 +35,12 @@ function MenuPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [searchPlaceholder, setSearchPlaceholder] = useState('Search menu...'); // Default to English
+  const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
   const { settings } = useBusinessSettingsStore();
   const [showSplash, setShowSplash] = useState(false);
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
-    
+  
   // Fetch menu on mount
   useEffect(() => {
     fetchMenu();
@@ -50,41 +54,60 @@ function MenuPageContent() {
       }
     } catch {}
   }, []);
-    
+  
+  // Update search placeholder based on language
+  useEffect(() => {
+    if (currentLanguage === 'Turkish') {
+      setSearchPlaceholder('Menüde ara...');
+    } else {
+      // For other languages, we'll translate this
+      const translatePlaceholder = async () => {
+        try {
+          const translated = await translate('Menüde ara...');
+          setSearchPlaceholder(translated);
+        } catch (error) {
+          setSearchPlaceholder('Search menu...');
+        }
+      };
+      translatePlaceholder();
+    }
+  }, [currentLanguage, translate]);
+  
   // Helper functions - defined inside component to avoid dependency issues
   const getPopularItems = () => {
     return items.filter(item => item.popular);
   };
-    
+  
   const getItemsByCategory = (categoryId: string) => {
     return items.filter(item => item.category === categoryId);
   };
-    
+  
   const getItemsBySubcategory = (subcategoryId: string) => {
     return items.filter(item => item.subcategory === subcategoryId);
   };
-    
+  
   const getSubcategoriesByParent = (parentId: string) => {
     return subcategories.filter(subcategory => subcategory.parentId === parentId);
   };
-    
+  
   // Get cart count - only calculate on client side to avoid hydration mismatch
   const [cartCount, setCartCount] = useState(0);
-    
+  
   useEffect(() => {
     if (isClient) {
       setCartCount(cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0));
     }
   }, [isClient, cartItems]);
-    
-  const language = 'en'; // Fixed to 'en' or any default key you prefer
+  
+  // Get language code for menu data
+  const language = currentLanguage === 'Turkish' ? 'tr' : 'en';
 
-  // Get menu categories (simplified, defaulting to 'en' key or static English for 'popular')
+  // Get menu categories
   const menuCategories = [
-    { id: 'popular', name: 'Popular' }, // Replaced Turkish with English string
+    { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
     ...categories.map(cat => ({
       id: cat.id,
-      name: cat.name[language as keyof typeof cat.name] || cat.name.en || cat.name.tr // Use default key
+      name: cat.name[language as keyof typeof cat.name]
     }))
   ];
 
@@ -97,11 +120,11 @@ function MenuPageContent() {
     : activeSubcategory 
       ? getItemsBySubcategory(activeSubcategory)
       : getItemsByCategory(activeCategory);
-        
+      
   if (search.trim() !== '') {
     filteredItems = filteredItems.filter(item =>
-      (item.name[language as keyof typeof item.name] || item.name.en || item.name.tr).toLowerCase().includes(search.toLowerCase()) ||
-      ((item.description[language as keyof typeof item.description] || item.description.en || item.description.tr) && (item.description[language as keyof typeof item.description] || item.description.en || item.description.tr).toLowerCase().includes(search.toLowerCase()))
+      item.name[language as keyof typeof item.name].toLowerCase().includes(search.toLowerCase()) ||
+      (item.description[language as keyof typeof item.description] && item.description[language as keyof typeof item.description].toLowerCase().includes(search.toLowerCase()))
     );
   }
 
@@ -155,11 +178,11 @@ function MenuPageContent() {
                 <img src={settings.branding.logo} alt="Logo" className="h-20 w-20 object-contain rounded-md shadow-sm" />
               ) : (
                 <div className="h-20 w-20 rounded-full flex items-center justify-center text-white font-semibold" style={{ backgroundColor: 'var(--brand-primary)' }}>
-                  {(settings.basicInfo.name || 'Business').slice(0,1)}
+                  {(settings.basicInfo.name || 'Işletme').slice(0,1)}
                 </div>
               )}
             </div>
-            <div className="text-dynamic-xl font-bold text-gray-900">{settings.basicInfo.name || 'Business'}</div>
+            <div className="text-dynamic-xl font-bold text-gray-900">{settings.basicInfo.name || 'İşletme'}</div>
             {settings.branding.showSloganOnLoading !== false && settings.basicInfo.slogan && (
               <div className="text-dynamic-sm text-gray-600 mt-1">{settings.basicInfo.slogan}</div>
             )}
@@ -178,7 +201,7 @@ function MenuPageContent() {
           `}</style>
         </div>
       )}
-      <Toast message="Item added to cart!" visible={toastVisible} onClose={() => setToastVisible(false)} />
+      <Toast message="Ürün sepete eklendi!" visible={toastVisible} onClose={() => setToastVisible(false)} />
       <AnnouncementPopup />
       <main className="min-h-screen pb-20">
         {/* Header */}
@@ -189,15 +212,19 @@ function MenuPageContent() {
                 <FaArrowLeft size={16} />
               </Link>
               <h1 className="text-dynamic-lg font-bold text-primary">
-                Menu
+                <TranslatedText>Menü</TranslatedText>
               </h1>
               <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
-                Table #{tableNumber}
+                <TranslatedText>Masa</TranslatedText> #{tableNumber}
               </div>
             </div>
           </div>
           {/* Dil seçici sağ üstte, arama ve diğer içerikten tamamen ayrı */}
-          
+          <div className="fixed top-4 right-4 z-30">
+            <div className="bg-white rounded-xl shadow border border-gray-200 p-1">
+              <LanguageSelector />
+            </div>
+          </div>
         </header>
 
         {/* Search */}
@@ -220,10 +247,10 @@ function MenuPageContent() {
                   <span className="text-lg mr-2">🎉</span>
                   <div>
                     <div className="font-semibold text-sm">
-                      Special Today!
+                      <TranslatedText>Bugüne Özel!</TranslatedText>
                     </div>
                     <div className="text-xs opacity-90">
-                      20% off all desserts - only valid today
+                      <TranslatedText>Tüm tatlılarda %20 indirim - Sadece bugün geçerli</TranslatedText>
                     </div>
                   </div>
                 </div>
@@ -233,10 +260,10 @@ function MenuPageContent() {
                   <span className="text-lg mr-2">🍲</span>
                   <div>
                     <div className="font-semibold text-sm">
-                      Soup of the Day
+                      <TranslatedText>Günün Çorbası</TranslatedText>
                     </div>
                     <div className="text-xs opacity-90">
-                      Lentil Soup - Homemade Taste
+                      <TranslatedText>Ezogelin çorbası - Ev yapımı lezzet</TranslatedText>
                     </div>
                   </div>
                 </div>
@@ -289,7 +316,7 @@ function MenuPageContent() {
                 style={activeSubcategory === null ? { backgroundColor: primary, borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
               >
                 <FaFilter className="mr-1" size={10} />
-                All
+                <TranslatedText>Tümü</TranslatedText>
               </button>
               
               {activeSubcategories.map((subcategory) => (
@@ -303,7 +330,7 @@ function MenuPageContent() {
                   onClick={() => handleSubcategoryChange(subcategory.id)}
                   style={activeSubcategory === subcategory.id ? { borderColor: 'transparent' } : { borderColor: 'var(--brand-subtle)' }}
                 >
-                  {subcategory.name[language as keyof typeof subcategory.name] || subcategory.name.en || subcategory.name.tr}
+                  {subcategory.name[language as keyof typeof subcategory.name]}
                 </button>
               ))}
             </div>
@@ -326,17 +353,17 @@ function MenuPageContent() {
                   {item.popular && (
                     <div className="absolute top-0 left-0 text-white text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--brand-strong)' }}>
                       <FaStar className="inline-block mr-1" size={8} />
-                      Popular
+                      <TranslatedText>Popüler</TranslatedText>
                     </div>
                   )}
                 </div>
                 <div className="ml-3 flex-grow">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-dynamic-sm">{item.name[language as keyof typeof item.name] || item.name.en || item.name.tr}</h3>
+                    <h3 className="font-semibold text-dynamic-sm">{item.name[language as keyof typeof item.name] || item.name.tr || item.name.en}</h3>
                     <span className="font-semibold text-dynamic-sm" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                    {item.description[language as keyof typeof item.description] || item.description.en || item.description.tr}
+                    {item.description[language as keyof typeof item.description] || item.description.tr || item.description.en}
                   </p>
                   
                   {/* Allergens */}
@@ -344,7 +371,7 @@ function MenuPageContent() {
                     <div className="flex flex-wrap gap-1 mb-2">
                       {item.allergens.slice(0, 3).map((allergen, i) => (
                         <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
-                          {allergen[language as keyof typeof allergen] || allergen.en || allergen.tr}
+                          {allergen[language as keyof typeof allergen] || allergen.tr || allergen.en}
                         </span>
                       ))}
                     </div>
@@ -357,14 +384,14 @@ function MenuPageContent() {
                       style={{ color: primary }}
                     >
                       <FaInfo className="mr-1" size={10} />
-                      View Details
+                      <TranslatedText>Detayları Gör</TranslatedText>
                     </button>
                     <button 
                       className="btn btn-secondary py-1 px-3 text-xs rounded flex items-center"
                       onClick={() => addToCart(item)}
                     >
                       <FaPlus className="mr-1" size={10} />
-                      Add to Cart
+                      <TranslatedText>Sepete Ekle</TranslatedText>
                     </button>
                   </div>
                 </div>
@@ -382,7 +409,7 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">📶</span>
                   <span className="text-sm font-medium text-gray-700">
-                    WiFi Password
+                    <TranslatedText>WiFi Şifresi</TranslatedText>
                   </span>
                 </div>
                 <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>restoran2024</span>
@@ -398,11 +425,11 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">⭐</span>
                   <span className="text-sm font-medium text-gray-800">
-                    Review on Google
+                    <TranslatedText>Google'da Değerlendir</TranslatedText>
                   </span>
                 </div>
                 <button className="text-xs font-semibold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-secondary">
-                  Comment
+                  <TranslatedText>Yorum Yap</TranslatedText>
                 </button>
               </a>
               {/* Working Hours */}
@@ -410,7 +437,7 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">🕒</span>
                   <span className="text-sm font-medium text-gray-700">
-                    Working Hours
+                    <TranslatedText>Çalışma Saatleri</TranslatedText>
                   </span>
                 </div>
                 <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>09:00 - 23:00</span>
@@ -426,7 +453,7 @@ function MenuPageContent() {
                 <div className="flex items-center">
                   <span className="text-lg mr-3">📱</span>
                   <span className="text-sm font-medium text-gray-800">
-                    Follow on Instagram
+                    <TranslatedText>Instagram'da Takip Et</TranslatedText>
                   </span>
                 </div>
                 <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
@@ -440,11 +467,11 @@ function MenuPageContent() {
         {/* Bottom Navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
           <div className="container mx-auto flex justify-around">
-            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/demo/menu" className="flex flex-col items-center" style={{ color: primary }}>
               <FaUtensils className="mb-0.5" size={16} />
-              <span className="text-[10px]">Menu</span>
+              <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
             </Link>
-            <Link href="/cart" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/demo/cart" className="flex flex-col items-center" style={{ color: primary }}>
               <div className="relative">
                 <FaShoppingCart className="mb-0.5" size={16} />
                 {isClient && cartCount > 0 && (
@@ -453,11 +480,11 @@ function MenuPageContent() {
                   </span>
                 )}
               </div>
-              <span className="text-[10px]">Cart</span>
+              <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
             </Link>
-            <Link href="/waiter" className="flex flex-col items-center" style={{ color: primary }}>
+            <Link href="/demo/waiter" className="flex flex-col items-center" style={{ color: primary }}>
               <FaBell className="mb-0.5" size={16} />
-              <span className="text-[10px]">Call Waiter</span>
+              <span className="text-[10px]"><TranslatedText>Garson Çağır</TranslatedText></span>
             </Link>
           </div>
         </nav>
@@ -477,6 +504,8 @@ function MenuPageContent() {
 
 export default function MenuPage() {
   return (
-    <MenuPageContent />
+    <LanguageProvider>
+      <MenuPageContent />
+    </LanguageProvider>
   );
 }
