@@ -1166,7 +1166,7 @@ export default function MenuManagement() {
                                 ingredients: formData.ingredients,
                                 allergens: formData.allergens,
                                 portion: formData.portion,
-                                image: capturedImage || editingItem.imageUrl
+                                imageUrl: capturedImage || editingItem.imageUrl
                               });
                           console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
@@ -1190,7 +1190,7 @@ export default function MenuManagement() {
                                 name: formData.name,
                                 description: formData.description,
                                 price: Number(formData.price),
-                                image: capturedImage || '/placeholder-food.jpg',
+                                imageUrl: capturedImage || '/placeholder-food.jpg',
                                 order: items.length + 1,
                                 isAvailable: formData.isAvailable,
                                 isPopular: formData.isPopular,
