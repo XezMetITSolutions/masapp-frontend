@@ -172,14 +172,10 @@ export default function DebugPage() {
       addLog(`Resim küçültüldü: ${imageToTest.length} -> ${smallImageToTest.length} karakter`);
       
       const menuItemData = {
-        categoryId: firstCategory.id, // Geçerli kategori ID'si kullan
+        categoryId: firstCategory.id,
         name: 'Debug Test Ürün',
-        // description: 'Test için oluşturulan ürün', // Description'ı kaldırdık
         price: 25.50,
-        imageUrl: smallImageToTest,
-        order: 1,
-        isAvailable: true,
-        isPopular: false
+        imageUrl: smallImageToTest
       };
 
       addLog(`Gönderilen veri: ${JSON.stringify(menuItemData, null, 2)}`);
