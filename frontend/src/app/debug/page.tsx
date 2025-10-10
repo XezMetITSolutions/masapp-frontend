@@ -167,12 +167,16 @@ export default function DebugPage() {
       const firstCategory = categories[0];
       addLog(`✅ İlk kategori bulundu: ${firstCategory.name} (ID: ${firstCategory.id})`);
       
+      // Resmi küçült (ilk 1000 karakter)
+      const smallImageToTest = imageToTest.substring(0, 1000);
+      addLog(`Resim küçültüldü: ${imageToTest.length} -> ${smallImageToTest.length} karakter`);
+      
       const menuItemData = {
         categoryId: firstCategory.id, // Geçerli kategori ID'si kullan
         name: 'Debug Test Ürün',
         description: 'Test için oluşturulan ürün',
         price: 25.50,
-        imageUrl: imageToTest,
+        imageUrl: smallImageToTest,
         order: 1,
         isAvailable: true,
         isPopular: false
@@ -180,13 +184,19 @@ export default function DebugPage() {
 
       addLog(`Gönderilen veri: ${JSON.stringify(menuItemData, null, 2)}`);
 
-      const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(menuItemData),
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 saniye timeout
+
+      try {
+        const response = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/items`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(menuItemData),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
 
       const result = await response.json();
       
@@ -242,6 +252,14 @@ export default function DebugPage() {
         const newTestResult = await newTestResponse.json();
         addLog(`Yeni test endpoint sonucu: ${newTestResponse.status}`);
         addLog(`Yeni test endpoint detayı: ${JSON.stringify(newTestResult)}`);
+      }
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        if (fetchError.name === 'AbortError') {
+          addLog(`❌ Timeout: İstek 10 saniyede tamamlanmadı`);
+        } else {
+          addLog(`❌ Fetch hatası: ${fetchError.message}`);
+        }
       }
     } catch (error) {
       addLog(`❌ Menü API test hatası: ${error}`);

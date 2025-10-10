@@ -245,7 +245,7 @@ export default function MenuManagement() {
       try {
         if (currentRestaurantId) {
           await deleteMenuItem(currentRestaurantId, itemId);
-          console.log('Ürün silindi:', itemId);
+      console.log('Ürün silindi:', itemId);
           // Menüyü yeniden yükle
           await fetchRestaurantMenu(currentRestaurantId);
         }
@@ -446,22 +446,22 @@ export default function MenuManagement() {
             <FaChartBar className="inline mr-2" />
             İstatistikler
           </button>
-        </div>
+      </div>
 
         {/* Action Buttons */}
         <div className="flex gap-4 mt-6">
           {/* Toplu Fiyat Düzenle */}
-          <button
-            onClick={() => setShowBulkPriceModal(true)}
+              <button 
+                onClick={() => setShowBulkPriceModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
-          >
+              >
             <span className="text-white text-lg">%</span>
             <span className="font-medium">Toplu Fiyat Düzenle</span>
-          </button>
+              </button>
 
           {/* Toplu İçe Aktar (AI) */}
-          <button
-            onClick={() => setShowBulkImport(true)}
+              <button 
+                onClick={() => setShowBulkImport(true)}
             className="relative flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
           >
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -471,7 +471,7 @@ export default function MenuManagement() {
             <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-300 rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">AI</span>
             </div>
-          </button>
+              </button>
 
           {/* Yeni Ürün Ekle */}
           <button
@@ -941,31 +941,31 @@ export default function MenuManagement() {
                     </div>
 
                     {/* Alt Kategori */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                         Alt Kategori
-                      </label>
+                        </label>
                       <input
                         type="text"
                         value={formData.subcategory}
                         onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="Örn: Sıcak İçecekler, Ana Yemekler"
-                      />
-                    </div>
+                        />
+                      </div>
 
                     {/* Malzemeler */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                         Malzemeler
-                      </label>
-                      <textarea
+                        </label>
+                        <textarea
                         value={formData.ingredients}
                         onChange={(e) => setFormData({...formData, ingredients: e.target.value})}
                         rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         placeholder="Malzemeleri virgülle ayırarak yazın (Örn: Domates, Mozzarella, Fesleğen)"
-                      />
+                        />
                     </div>
 
                     {/* Alerjenler */}
@@ -1204,10 +1204,10 @@ export default function MenuManagement() {
                               const updateData = {
                                 name: formData.name,
                                 description: formData.description,
-                                price: Number(formData.price),
-                                categoryId: formData.category,
-                                isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular,
+                            price: Number(formData.price),
+                            categoryId: formData.category,
+                            isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
                                 imageUrl: capturedImage || editingItem.imageUrl
                                 // Yeni alanları geçici olarak kaldırdık
                                 // preparationTime: Number(formData.preparationTime) || 0,
@@ -1222,7 +1222,7 @@ export default function MenuManagement() {
                               console.log('Resim URL uzunluğu:', updateData.imageUrl.length);
                               
                               await updateMenuItem(currentRestaurantId, editingItem.id, updateData);
-                              console.log('Ürün güncellendi:', formData);
+                          console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
                               alert('Ürün başarıyla güncellendi!');
@@ -1241,13 +1241,13 @@ export default function MenuManagement() {
                           try {
                             if (currentRestaurantId) {
                               const createData = {
-                                categoryId: formData.category,
+                            categoryId: formData.category,
                                 name: formData.name,
                                 description: formData.description,
-                                price: Number(formData.price),
+                            price: Number(formData.price),
                                 imageUrl: capturedImage || '/placeholder-food.jpg',
-                                order: items.length + 1,
-                                isAvailable: formData.isAvailable,
+                            order: items.length + 1,
+                            isAvailable: formData.isAvailable,
                                 isPopular: formData.isPopular
                                 // Yeni alanları geçici olarak kaldırdık
                                 // preparationTime: Number(formData.preparationTime) || 0,
@@ -1443,22 +1443,22 @@ export default function MenuManagement() {
                     <div className="absolute inset-0 border-2 border-white rounded-lg pointer-events-none">
                       <div className="absolute top-2 left-2 right-2 h-8 bg-black bg-opacity-50 rounded flex items-center justify-center">
                         <span className="text-white text-sm">Ürünü çerçeve içine alın</span>
-                      </div>
-                    </div>
-                  </div>
+                </div>
+              </div>
+                </div>
                   <div className="flex gap-3">
                     <button
                       onClick={stopCamera}
                       className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                    >
-                      İptal
-                    </button>
-                    <button
+                  >
+                    İptal
+                  </button>
+                  <button
                       onClick={capturePhoto}
                       className="flex-1 py-2 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                     >
                       Fotoğraf Çek
-                    </button>
+                  </button>
                   </div>
                 </div>
               </div>
