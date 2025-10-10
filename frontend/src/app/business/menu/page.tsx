@@ -1192,6 +1192,7 @@ export default function MenuManagement() {
                         console.log('=== FORM SUBMIT BAŞLADI ===');
                         console.log('Form Data:', formData);
                         console.log('Captured Image:', capturedImage ? 'VAR (' + capturedImage.length + ' karakter)' : 'YOK');
+                        console.log('Captured Image Preview:', capturedImage ? capturedImage.substring(0, 100) + '...' : 'null');
                         console.log('Editing Item:', editingItem);
                         console.log('Current Restaurant ID:', currentRestaurantId);
                         
@@ -1224,6 +1225,7 @@ export default function MenuManagement() {
                               console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
+                              alert('Ürün başarıyla güncellendi!');
                             }
                           } catch (error) {
                             console.error('Ürün güncellenirken hata:', error);
@@ -1263,12 +1265,15 @@ export default function MenuManagement() {
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
+                              alert('Ürün başarıyla eklendi!');
                             }
                           } catch (error) {
                             console.error('Ürün eklenirken hata:', error);
                             alert('Ürün eklenirken bir hata oluştu: ' + error.message);
                           }
                         }
+                        
+                        // Başarılı işlem sonrası temizlik
                         setShowItemForm(false);
                         setEditingItem(null);
                         setCapturedImage(null);

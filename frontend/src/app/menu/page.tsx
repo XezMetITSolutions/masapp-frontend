@@ -60,10 +60,10 @@ function MenuPageContent() {
   const currentRestaurant = getCurrentRestaurant();
 
   // Restaurant'a göre kategoriler ve ürünler filtreleme
-  const items = currentRestaurant 
+  const items = currentRestaurant?.id 
     ? menuItems.filter((item: any) => item.restaurantId === currentRestaurant.id)
     : [];
-  const filteredCategories = currentRestaurant 
+  const filteredCategories = currentRestaurant?.id 
     ? categories.filter((cat: any) => cat.restaurantId === currentRestaurant.id)
     : [];
 
@@ -75,7 +75,7 @@ function MenuPageContent() {
       fetchRestaurants();
     }
     // Restaurant varsa menüyü fetch et
-    if (currentRestaurant) {
+    if (currentRestaurant?.id) {
       fetchRestaurantMenu(currentRestaurant.id);
     }
     try {
