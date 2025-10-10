@@ -167,8 +167,15 @@ export default function DebugPage() {
       const firstCategory = categories[0];
       addLog(`✅ İlk kategori bulundu: ${firstCategory.name} (ID: ${firstCategory.id})`);
       
-      // Resmi küçült (ilk 1000 karakter)
-      const smallImageToTest = imageToTest.substring(0, 1000);
+      // Resmi küçült (ilk 1000 karakter) ve JPEG formatına çevir
+      let smallImageToTest = imageToTest.substring(0, 1000);
+      
+      // PNG'yi JPEG'e çevir
+      if (smallImageToTest.startsWith('data:image/png')) {
+        smallImageToTest = smallImageToTest.replace('data:image/png', 'data:image/jpeg');
+        addLog(`PNG -> JPEG dönüştürüldü`);
+      }
+      
       addLog(`Resim küçültüldü: ${imageToTest.length} -> ${smallImageToTest.length} karakter`);
       
       const menuItemData = {
