@@ -234,8 +234,8 @@ export default function MenuManagement() {
       isPopular: item.isPopular || false
     });
     // Resmi de yükle
-    if (item.image) {
-      setCapturedImage(item.image);
+    if (item.imageUrl) {
+      setCapturedImage(item.imageUrl);
     }
     setShowItemForm(true);
   };
@@ -437,6 +437,41 @@ export default function MenuManagement() {
             İstatistikler
           </button>
         </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 mt-6">
+          {/* Toplu Fiyat Düzenle */}
+          <button
+            onClick={() => setShowBulkPriceModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
+          >
+            <span className="text-white text-lg">%</span>
+            <span className="font-medium">Toplu Fiyat Düzenle</span>
+          </button>
+
+          {/* Toplu İçe Aktar (AI) */}
+          <button
+            onClick={() => setShowBulkImport(true)}
+            className="relative flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-md"
+          >
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <span className="font-medium">Toplu İçe Aktar</span>
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-purple-300 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">AI</span>
+            </div>
+          </button>
+
+          {/* Yeni Ürün Ekle */}
+          <button
+            onClick={handleAddItem}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all shadow-md"
+          >
+            <FaPlus className="text-white" />
+            <span className="font-medium">Yeni Ürün Ekle</span>
+          </button>
+        </div>
       </div>
 
       {/* Loading State */}
@@ -533,7 +568,7 @@ export default function MenuManagement() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <img
-                            src={item.image || '/placeholder-food.jpg'}
+                            src={item.imageUrl || '/placeholder-food.jpg'}
                             alt={item.name}
                             className="h-12 w-12 rounded-lg object-cover mr-4"
                           />
@@ -600,7 +635,7 @@ export default function MenuManagement() {
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex items-start gap-3">
                   <img
-                    src={item.image || '/placeholder-food.jpg'}
+                    src={item.imageUrl || '/placeholder-food.jpg'}
                     alt={item.name}
                     className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
                   />
@@ -1131,7 +1166,7 @@ export default function MenuManagement() {
                                 ingredients: formData.ingredients,
                                 allergens: formData.allergens,
                                 portion: formData.portion,
-                                image: capturedImage || editingItem.image
+                                image: capturedImage || editingItem.imageUrl
                               });
                           console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
