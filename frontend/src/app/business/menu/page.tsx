@@ -1175,6 +1175,8 @@ export default function MenuManagement() {
                           // Ürün güncelleme
                           try {
                             if (currentRestaurantId) {
+                              console.log('Update - Resim verisi gönderiliyor:', capturedImage);
+                              console.log('Update - Mevcut resim:', editingItem.imageUrl);
                               await updateMenuItem(currentRestaurantId, editingItem.id, {
                                 name: formData.name,
                                 description: formData.description,
@@ -1207,6 +1209,7 @@ export default function MenuManagement() {
                           
                           try {
                             if (currentRestaurantId) {
+                              console.log('Resim verisi gönderiliyor:', capturedImage);
                               await createMenuItem(currentRestaurantId, {
                                 categoryId: formData.category,
                                 name: formData.name,
