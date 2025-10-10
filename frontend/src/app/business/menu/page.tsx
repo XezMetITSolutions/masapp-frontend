@@ -228,7 +228,7 @@ export default function MenuManagement() {
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
       ingredients: item.ingredients || '',
-      allergens: item.allergens || [],
+      allergens: Array.isArray(item.allergens) ? item.allergens : [],
       portion: item.portion || '',
       isAvailable: item.isAvailable !== false,
       isPopular: item.isPopular || false
@@ -978,12 +978,13 @@ export default function MenuManagement() {
                           <label key={allergen} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
                             <input
                               type="checkbox"
-                              checked={formData.allergens.includes(allergen)}
+                              checked={Array.isArray(formData.allergens) && formData.allergens.includes(allergen)}
                               onChange={(e) => {
+                                const currentAllergens = Array.isArray(formData.allergens) ? formData.allergens : [];
                                 if (e.target.checked) {
-                                  setFormData({...formData, allergens: [...formData.allergens, allergen]});
+                                  setFormData({...formData, allergens: [...currentAllergens, allergen]});
                                 } else {
-                                  setFormData({...formData, allergens: formData.allergens.filter(a => a !== allergen)});
+                                  setFormData({...formData, allergens: currentAllergens.filter(a => a !== allergen)});
                                 }
                               }}
                               className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
