@@ -167,22 +167,15 @@ export default function DebugPage() {
       const firstCategory = categories[0];
       addLog(`✅ İlk kategori bulundu: ${firstCategory.name} (ID: ${firstCategory.id})`);
       
-      // Resmi küçült (ilk 1000 karakter) ve JPEG formatına çevir
-      let smallImageToTest = imageToTest.substring(0, 1000);
-      
-      // PNG'yi JPEG'e çevir
-      if (smallImageToTest.startsWith('data:image/png')) {
-        smallImageToTest = smallImageToTest.replace('data:image/png', 'data:image/jpeg');
-        addLog(`PNG -> JPEG dönüştürüldü`);
-      }
-      
-      addLog(`Resim küçültüldü: ${imageToTest.length} -> ${smallImageToTest.length} karakter`);
+      // Basit testteki aynı resmi kullanalım (geçerli JPEG)
+      const validJpegImage = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD';
+      addLog(`Geçerli JPEG base64 kullanılıyor (${validJpegImage.length} karakter)`);
       
       const menuItemData = {
         categoryId: firstCategory.id,
-        name: 'Debug Test Urun', // Türkçe karakter kaldırıldı
-        price: 10.00, // Basit test ile aynı fiyat
-        imageUrl: smallImageToTest
+        name: 'Debug Test Urun',
+        price: 10.00,
+        imageUrl: validJpegImage // Basit testteki gibi geçerli JPEG
       };
 
       addLog(`Gönderilen veri: ${JSON.stringify(menuItemData, null, 2)}`);
