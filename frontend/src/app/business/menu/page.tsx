@@ -292,7 +292,9 @@ export default function MenuManagement() {
       canvas.height = video.videoHeight;
       context.drawImage(video, 0, 0);
       
-      const imageData = canvas.toDataURL('image/jpeg', 0.8);
+      // Daha yüksek kalite ile kaydet
+      const imageData = canvas.toDataURL('image/jpeg', 0.9);
+      console.log('Kamera ile çekilen resim boyutu:', imageData.length);
       setCapturedImage(imageData);
       stopCamera();
     }
@@ -1024,9 +1026,25 @@ export default function MenuManagement() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
+                                console.log('Seçilen dosya:', file.name, 'Boyut:', file.size, 'Tip:', file.type);
+                                
+                                // Dosya boyutunu kontrol et (max 5MB)
+                                if (file.size > 5 * 1024 * 1024) {
+                                  alert('Dosya boyutu çok büyük. Maksimum 5MB olmalıdır.');
+                                  return;
+                                }
+                                
+                                // Dosya tipini kontrol et
+                                if (!file.type.startsWith('image/')) {
+                                  alert('Lütfen sadece resim dosyası seçin.');
+                                  return;
+                                }
+                                
                                 const reader = new FileReader();
                                 reader.onload = (event) => {
-                                  setCapturedImage(event.target?.result as string);
+                                  const result = event.target?.result as string;
+                                  console.log('Yüklenen resim boyutu:', result.length);
+                                  setCapturedImage(result);
                                 };
                                 reader.readAsDataURL(file);
                               }
