@@ -62,8 +62,7 @@ export default function MenuManagement() {
     error
   } = useRestaurantStore();
   
-  // Feature kontrolü
-  const hasQrMenu = useFeature('qr_menu');
+  // Feature kontrolü kaldırıldı - herkes menü yönetimine erişebilir
   
   // Restoran ID'sini al
   const getRestaurantId = useCallback(() => {
@@ -180,32 +179,7 @@ export default function MenuManagement() {
     router.push('/business/login');
   };
 
-  // Feature kontrolü - erişim yok sayfası göster
-  if (!hasQrMenu) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <BusinessSidebar 
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-          onLogout={handleLogout}
-        />
-        <div className="ml-0 lg:ml-64 flex items-center justify-center min-h-screen">
-          <div className="text-center p-8">
-            <div className="text-6xl mb-4">🔒</div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Erişim Yok</h1>
-            <p className="text-gray-600 mb-6">Bu sayfaya erişim yetkiniz bulunmamaktadır.</p>
-            <p className="text-sm text-gray-500 mb-6">Menü Yönetimi özelliğine erişmek için lütfen yöneticinizle iletişime geçin.</p>
-            <button
-              onClick={() => router.push('/business/dashboard')}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Kontrol Paneline Dön
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Feature kontrolü kaldırıldı - herkes menü yönetimine erişebilir
 
   const handleAddItem = () => {
     setEditingItem(null);
