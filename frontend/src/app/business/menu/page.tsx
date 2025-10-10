@@ -233,9 +233,16 @@ export default function MenuManagement() {
       isAvailable: item.isAvailable !== false,
       isPopular: item.isPopular || false
     });
-    // Resmi de yükle
-    if (item.imageUrl) {
-      setCapturedImage(item.imageUrl);
+    // Resmi de yükle (imageUrl veya image field'ını kontrol et)
+    const imageToLoad = item.imageUrl || item.image;
+    if (imageToLoad) {
+      console.log('Düzenleme için resim yükleniyor:', {
+        imageUrlLength: imageToLoad?.length,
+        imageUrlStart: imageToLoad?.substring(0, 50)
+      });
+      setCapturedImage(imageToLoad);
+    } else {
+      console.warn('Üründe resim bulunamadı!');
     }
     setShowItemForm(true);
   };
