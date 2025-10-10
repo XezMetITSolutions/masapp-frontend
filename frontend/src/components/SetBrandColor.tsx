@@ -7,7 +7,7 @@ export default function SetBrandColor() {
   const { settings } = useBusinessSettingsStore();
 
   useEffect(() => {
-    if (typeof document !== 'undefined') {
+    if (typeof document !== 'undefined' && settings?.branding) {
       console.log('SetBrandColor: Updating styles...', {
         primaryColor: settings?.branding?.primaryColor,
         fontFamily: settings?.branding?.fontFamily,
