@@ -1205,15 +1205,16 @@ export default function MenuManagement() {
                                 description: formData.description,
                                 price: Number(formData.price),
                                 categoryId: formData.category,
-                                preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0,
                                 isAvailable: formData.isAvailable,
                                 isPopular: formData.isPopular,
-                                subcategory: formData.subcategory,
-                                ingredients: formData.ingredients,
-                                allergens: formData.allergens,
-                                portion: formData.portion,
                                 imageUrl: capturedImage || editingItem.imageUrl
+                                // Yeni alanları geçici olarak kaldırdık
+                                // preparationTime: Number(formData.preparationTime) || 0,
+                                // calories: Number(formData.calories) || 0,
+                                // subcategory: formData.subcategory,
+                                // ingredients: formData.ingredients,
+                                // allergens: formData.allergens,
+                                // portion: formData.portion
                               };
                               
                               console.log('Update Data gönderiliyor:', updateData);
@@ -1245,13 +1246,14 @@ export default function MenuManagement() {
                                 imageUrl: capturedImage || '/placeholder-food.jpg',
                                 order: items.length + 1,
                                 isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular,
-                                preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0,
-                                subcategory: formData.subcategory,
-                                ingredients: formData.ingredients,
-                                allergens: formData.allergens,
-                                portion: formData.portion
+                                isPopular: formData.isPopular
+                                // Yeni alanları geçici olarak kaldırdık
+                                // preparationTime: Number(formData.preparationTime) || 0,
+                                // calories: Number(formData.calories) || 0,
+                                // subcategory: formData.subcategory,
+                                // ingredients: formData.ingredients,
+                                // allergens: formData.allergens,
+                                // portion: formData.portion
                               };
                               
                               console.log('Create Data gönderiliyor:', createData);
