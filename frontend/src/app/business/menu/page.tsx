@@ -292,12 +292,30 @@ export default function MenuManagement() {
       canvas.height = video.videoHeight;
       context.drawImage(video, 0, 0);
       
-      // Daha yüksek kalite ile kaydet
+      // JPEG formatında, yüksek kalite ile kaydet
       const imageData = canvas.toDataURL('image/jpeg', 0.9);
       console.log('Kamera ile çekilen resim boyutu:', imageData.length);
       setCapturedImage(imageData);
       stopCamera();
     }
+  };
+  
+  // PNG'yi JPEG'e çevir
+  const convertToJpeg = (base64: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/jpeg', 0.9));
+        }
+      };
+      img.src = base64;
+    });
   };
 
   const handleAddCategory = () => {
@@ -1021,37 +1039,45 @@ export default function MenuManagement() {
 
                         {/* Dosyadan Yükle */}
                         <label className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors text-center cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                console.log('Seçilen dosya:', file.name, 'Boyut:', file.size, 'Tip:', file.type);
-                                
-                                // Dosya boyutunu kontrol et (max 5MB)
-                                if (file.size > 5 * 1024 * 1024) {
-                                  alert('Dosya boyutu çok büyük. Maksimum 5MB olmalıdır.');
-                                  return;
-                                }
-                                
-                                // Dosya tipini kontrol et
-                                if (!file.type.startsWith('image/')) {
-                                  alert('Lütfen sadece resim dosyası seçin.');
-                                  return;
-                                }
-                                
-                                const reader = new FileReader();
-                                reader.onload = (event) => {
-                                  const result = event.target?.result as string;
-                                  console.log('Yüklenen resim boyutu:', result.length);
-                                  setCapturedImage(result);
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                            className="hidden"
-                          />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        console.log('Seçilen dosya:', file.name, 'Boyut:', file.size, 'Tip:', file.type);
+                        
+                        // Dosya boyutunu kontrol et (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert('Dosya boyutu çok büyük. Maksimum 5MB olmalıdır.');
+                          return;
+                        }
+                        
+                        // Dosya tipini kontrol et
+                        if (!file.type.startsWith('image/')) {
+                          alert('Lütfen sadece resim dosyası seçin.');
+                          return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = async (event) => {
+                          let result = event.target?.result as string;
+                          console.log('Yüklenen resim boyutu:', result.length);
+                          
+                          // PNG ise JPEG'e çevir
+                          if (result.startsWith('data:image/png')) {
+                            console.log('PNG tespit edildi, JPEG\'e çevriliyor...');
+                            result = await convertToJpeg(result);
+                            console.log('JPEG\'e çevrildi, yeni boyut:', result.length);
+                          }
+                          
+                          setCapturedImage(result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="hidden"
+                  />
                           <div className="w-12 h-12 mx-auto mb-2 flex items-center justify-center">
                             <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
