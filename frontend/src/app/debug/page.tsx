@@ -152,7 +152,7 @@ export default function DebugPage() {
         name: 'Debug Test Ürün',
         description: 'Test için oluşturulan ürün',
         price: 25.50,
-        imageUrl: imageToTest,
+        imageUrl: imageToTest, // imageUrl field'ını kullan
         order: 1,
         isAvailable: true,
         isPopular: false
