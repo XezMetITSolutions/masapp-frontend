@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaShoppingCart, FaBell, FaArrowLeft, FaStar, FaPlus, FaInfo, FaUtensils, FaFilter } from 'react-icons/fa';
-import { useMenuStore, useCartStore } from '@/store';
+import { useRestaurantStore } from '@/store/useRestaurantStore';
+import { useCartStore } from '@/store';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
@@ -21,11 +22,15 @@ function MenuPageContent() {
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
   
-  // Menu store
-  const items = useMenuStore(state => state.items);
-  const categories = useMenuStore(state => state.categories);
-  const subcategories = useMenuStore(state => state.subcategories);
-  const fetchMenu = useMenuStore(state => state.fetchMenu);
+  // Restaurant store - backend'den gerçek veriler
+  const { 
+    restaurants, 
+    allCategories, 
+    allMenuItems, 
+    fetchRestaurants, 
+    fetchMenu,
+    loading 
+  } = useRestaurantStore();
   
   // Local states
   const [activeCategory, setActiveCategory] = useState('popular');
@@ -41,10 +46,38 @@ function MenuPageContent() {
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
   
-  // Fetch menu on mount
+  // Subdomain'den restaurant bulma
+  const getCurrentRestaurant = () => {
+    if (typeof window === 'undefined') return null;
+    const hostname = window.location.hostname;
+    const subdomain = hostname.split('.')[0];
+    const mainDomains = ['localhost', 'www', 'guzellestir'];
+    
+    if (mainDomains.includes(subdomain)) return null;
+    return restaurants.find(r => r.username === subdomain);
+  };
+
+  const currentRestaurant = getCurrentRestaurant();
+
+  // Restaurant'a göre kategoriler ve ürünler filtreleme
+  const items = currentRestaurant 
+    ? allMenuItems.filter(item => item.restaurantId === currentRestaurant.id)
+    : [];
+  const categories = currentRestaurant 
+    ? allCategories.filter(cat => cat.restaurantId === currentRestaurant.id)
+    : [];
+
+  // Fetch data on mount
   useEffect(() => {
-    fetchMenu();
     setIsClient(true);
+    // Restaurants yoksa fetch et
+    if (restaurants.length === 0) {
+      fetchRestaurants();
+    }
+    // Restaurant varsa menüyü fetch et
+    if (currentRestaurant) {
+      fetchMenu(currentRestaurant.id);
+    }
     try {
       const hasVisited = typeof window !== 'undefined' && sessionStorage.getItem('menuVisitedOnce');
       if (!hasVisited) {
@@ -53,7 +86,7 @@ function MenuPageContent() {
         setTimeout(() => setShowSplash(false), 1600);
       }
     } catch {}
-  }, []);
+  }, [restaurants.length, currentRestaurant?.id, fetchRestaurants, fetchMenu]);
   
   // Update search placeholder based on language
   useEffect(() => {
@@ -75,11 +108,11 @@ function MenuPageContent() {
   
   // Helper functions - defined inside component to avoid dependency issues
   const getPopularItems = () => {
-    return items.filter(item => item.popular);
+    return items.filter(item => item.isPopular);
   };
   
   const getItemsByCategory = (categoryId: string) => {
-    return items.filter(item => item.category === categoryId);
+    return items.filter(item => item.categoryId === categoryId);
   };
   
   const getItemsBySubcategory = (subcategoryId: string) => {
@@ -87,7 +120,7 @@ function MenuPageContent() {
   };
   
   const getSubcategoriesByParent = (parentId: string) => {
-    return subcategories.filter(subcategory => subcategory.parentId === parentId);
+    return []; // Backend'de subcategory yok
   };
   
   // Get cart count - only calculate on client side to avoid hydration mismatch
@@ -102,12 +135,12 @@ function MenuPageContent() {
   // Get language code for menu data
   const language = currentLanguage === 'Turkish' ? 'tr' : 'en';
 
-  // Get menu categories
+  // Get menu categories (backend format)
   const menuCategories = [
     { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
     ...categories.map(cat => ({
       id: cat.id,
-      name: cat.name[language as keyof typeof cat.name]
+      name: typeof cat.name === 'string' ? cat.name : (cat.name?.tr || cat.name?.en || 'Kategori')
     }))
   ];
 
@@ -122,10 +155,12 @@ function MenuPageContent() {
       : getItemsByCategory(activeCategory);
       
   if (search.trim() !== '') {
-    filteredItems = filteredItems.filter(item =>
-      item.name[language as keyof typeof item.name].toLowerCase().includes(search.toLowerCase()) ||
-      (item.description[language as keyof typeof item.description] && item.description[language as keyof typeof item.description].toLowerCase().includes(search.toLowerCase()))
-    );
+    filteredItems = filteredItems.filter(item => {
+      const itemName = typeof item.name === 'string' ? item.name : (item.name?.tr || item.name?.en || '');
+      const itemDesc = typeof item.description === 'string' ? item.description : (item.description?.tr || item.description?.en || '');
+      return itemName.toLowerCase().includes(search.toLowerCase()) ||
+             itemDesc.toLowerCase().includes(search.toLowerCase());
+    });
   }
 
   // Event handlers
@@ -344,13 +379,13 @@ function MenuPageContent() {
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-3 flex">
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
                   <Image 
-                    src={item.image || '/placeholder-food.jpg'} 
-                    alt={item.name[language as keyof typeof item.name] || 'Menu item'} 
+                    src={item.imageUrl || '/placeholder-food.jpg'} 
+                    alt={typeof item.name === 'string' ? item.name : (item.name?.tr || item.name?.en || 'Menu item')} 
                     width={80} 
                     height={80} 
                     className="object-cover w-full h-full rounded-lg"
                   />
-                  {item.popular && (
+                  {item.isPopular && (
                     <div className="absolute top-0 left-0 text-white text-xs px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--brand-strong)' }}>
                       <FaStar className="inline-block mr-1" size={8} />
                       <TranslatedText>Popüler</TranslatedText>
@@ -359,11 +394,11 @@ function MenuPageContent() {
                 </div>
                 <div className="ml-3 flex-grow">
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-dynamic-sm">{item.name[language as keyof typeof item.name] || item.name.tr || item.name.en}</h3>
+                    <h3 className="font-semibold text-dynamic-sm">{typeof item.name === 'string' ? item.name : (item.name?.tr || item.name?.en || 'Ürün')}</h3>
                     <span className="font-semibold text-dynamic-sm" style={{ color: primary }}>{item.price} ₺</span>
                   </div>
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                    {item.description[language as keyof typeof item.description] || item.description.tr || item.description.en}
+                    {typeof item.description === 'string' ? item.description : (item.description?.tr || item.description?.en || '')}
                   </p>
                   
                   {/* Allergens */}
