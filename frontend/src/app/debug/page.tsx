@@ -173,8 +173,8 @@ export default function DebugPage() {
       
       const menuItemData = {
         categoryId: firstCategory.id,
-        name: 'Debug Test Ürün',
-        price: 25.50,
+        name: 'Debug Test Urun', // Türkçe karakter kaldırıldı
+        price: 10.00, // Basit test ile aynı fiyat
         imageUrl: smallImageToTest
       };
 
