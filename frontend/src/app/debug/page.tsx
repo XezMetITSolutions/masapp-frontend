@@ -147,12 +147,32 @@ export default function DebugPage() {
       const restaurantId = 'f6811f51-c0b4-4a81-bbb9-6d1a1da3803f';
       const imageToTest = capturedImage || fileImage || 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A';
       
+      // Önce kategorileri çek
+      addLog('Kategoriler çekiliyor...');
+      const categoriesResponse = await fetch(`https://masapp-backend.onrender.com/api/restaurants/${restaurantId}/menu/categories`);
+      const categoriesResult = await categoriesResponse.json();
+      
+      if (!categoriesResponse.ok || !categoriesResult.success) {
+        addLog(`❌ Kategori çekme hatası: ${categoriesResponse.status}`);
+        addLog(`Hata detayı: ${JSON.stringify(categoriesResult)}`);
+        return;
+      }
+      
+      const categories = categoriesResult.data || [];
+      if (categories.length === 0) {
+        addLog('❌ Hiç kategori bulunamadı');
+        return;
+      }
+      
+      const firstCategory = categories[0];
+      addLog(`✅ İlk kategori bulundu: ${firstCategory.name} (ID: ${firstCategory.id})`);
+      
       const menuItemData = {
-        categoryId: 'test-category',
+        categoryId: firstCategory.id, // Geçerli kategori ID'si kullan
         name: 'Debug Test Ürün',
         description: 'Test için oluşturulan ürün',
         price: 25.50,
-        imageUrl: imageToTest, // imageUrl field'ını kullan
+        imageUrl: imageToTest,
         order: 1,
         isAvailable: true,
         isPopular: false
