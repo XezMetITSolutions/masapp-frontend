@@ -134,8 +134,12 @@ export default function MenuManagement() {
     description: '',
     price: '',
     category: '',
+    subcategory: '',
     preparationTime: '',
     calories: '',
+    ingredients: '',
+    allergens: [],
+    portion: '',
     isAvailable: true,
     isPopular: false
   });
@@ -189,8 +193,12 @@ export default function MenuManagement() {
       description: '',
       price: '',
       category: '',
+      subcategory: '',
       preparationTime: '',
       calories: '',
+      ingredients: '',
+      allergens: [],
+      portion: '',
       isAvailable: true,
       isPopular: false
     });
@@ -204,8 +212,12 @@ export default function MenuManagement() {
       description: item.description || '',
       price: item.price.toString(),
       category: item.categoryId || '',
+      subcategory: item.subcategory || '',
       preparationTime: item.preparationTime?.toString() || '',
       calories: item.calories?.toString() || '',
+      ingredients: item.ingredients || '',
+      allergens: item.allergens || [],
+      portion: item.portion || '',
       isAvailable: item.isAvailable !== false,
       isPopular: item.isPopular || false
     });
@@ -815,6 +827,74 @@ export default function MenuManagement() {
                       </div>
                     </div>
 
+                    {/* Alt Kategori */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Alt Kategori
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.subcategory}
+                        onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Örn: Sıcak İçecekler, Ana Yemekler"
+                      />
+                    </div>
+
+                    {/* Malzemeler */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Malzemeler
+                      </label>
+                      <textarea
+                        value={formData.ingredients}
+                        onChange={(e) => setFormData({...formData, ingredients: e.target.value})}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Malzemeleri virgülle ayırarak yazın (Örn: Domates, Mozzarella, Fesleğen)"
+                      />
+                    </div>
+
+                    {/* Alerjenler */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Alerjenler
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Gluten', 'Süt', 'Yumurta', 'Fındık', 'Fıstık', 'Soya', 'Balık', 'Kabuklu Deniz Ürünleri'].map((allergen) => (
+                          <label key={allergen} className="flex items-center p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+                            <input
+                              type="checkbox"
+                              checked={formData.allergens.includes(allergen)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({...formData, allergens: [...formData.allergens, allergen]});
+                                } else {
+                                  setFormData({...formData, allergens: formData.allergens.filter(a => a !== allergen)});
+                                }
+                              }}
+                              className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">{allergen}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Porsiyon */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Porsiyon
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.portion}
+                        onChange={(e) => setFormData({...formData, portion: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Örn: 1 Porsiyon, 250g, Büyük Boy"
+                      />
+                    </div>
+
                     {/* Durum ve Popüler */}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-3">
@@ -888,14 +968,18 @@ export default function MenuManagement() {
                               await updateMenuItem(currentRestaurantId, editingItem.id, {
                                 name: formData.name,
                                 description: formData.description,
-                            price: Number(formData.price),
-                            categoryId: formData.category,
-                            preparationTime: Number(formData.preparationTime) || 0,
-                            calories: Number(formData.calories) || 0,
-                            isAvailable: formData.isAvailable,
-                            isPopular: formData.isPopular,
-                            image: capturedImage || editingItem.image
-                          });
+                                price: Number(formData.price),
+                                categoryId: formData.category,
+                                preparationTime: Number(formData.preparationTime) || 0,
+                                calories: Number(formData.calories) || 0,
+                                isAvailable: formData.isAvailable,
+                                isPopular: formData.isPopular,
+                                subcategory: formData.subcategory,
+                                ingredients: formData.ingredients,
+                                allergens: formData.allergens,
+                                portion: formData.portion,
+                                image: capturedImage || editingItem.image
+                              });
                           console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
@@ -914,16 +998,20 @@ export default function MenuManagement() {
                           try {
                             if (currentRestaurantId) {
                               await createMenuItem(currentRestaurantId, {
-                            categoryId: formData.category,
+                                categoryId: formData.category,
                                 name: formData.name,
                                 description: formData.description,
-                            price: Number(formData.price),
-                            image: capturedImage || '/placeholder-food.jpg',
-                            order: items.length + 1,
-                            isAvailable: formData.isAvailable,
-                            isPopular: formData.isPopular,
-                            preparationTime: Number(formData.preparationTime) || 0,
-                                calories: Number(formData.calories) || 0
+                                price: Number(formData.price),
+                                image: capturedImage || '/placeholder-food.jpg',
+                                order: items.length + 1,
+                                isAvailable: formData.isAvailable,
+                                isPopular: formData.isPopular,
+                                preparationTime: Number(formData.preparationTime) || 0,
+                                calories: Number(formData.calories) || 0,
+                                subcategory: formData.subcategory,
+                                ingredients: formData.ingredients,
+                                allergens: formData.allergens,
+                                portion: formData.portion
                               });
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
                               // Menüyü yeniden yükle
@@ -943,8 +1031,12 @@ export default function MenuManagement() {
                           description: '',
                           price: '',
                           category: '',
+                          subcategory: '',
                           preparationTime: '',
                           calories: '',
+                          ingredients: '',
+                          allergens: [],
+                          portion: '',
                           isAvailable: true,
                           isPopular: false
                         });
