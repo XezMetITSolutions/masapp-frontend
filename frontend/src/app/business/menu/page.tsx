@@ -1188,14 +1188,18 @@ export default function MenuManagement() {
                     </button>
                     <button
                       onClick={async () => {
+                        console.log('=== FORM SUBMIT BAŞLADI ===');
+                        console.log('Form Data:', formData);
+                        console.log('Captured Image:', capturedImage ? 'VAR (' + capturedImage.length + ' karakter)' : 'YOK');
+                        console.log('Editing Item:', editingItem);
+                        console.log('Current Restaurant ID:', currentRestaurantId);
+                        
                         // Gerçek güncelleme işlemi
                         if (editingItem) {
                           // Ürün güncelleme
                           try {
                             if (currentRestaurantId) {
-                              console.log('Update - Resim verisi gönderiliyor:', capturedImage);
-                              console.log('Update - Mevcut resim:', editingItem.imageUrl);
-                              await updateMenuItem(currentRestaurantId, editingItem.id, {
+                              const updateData = {
                                 name: formData.name,
                                 description: formData.description,
                                 price: Number(formData.price),
@@ -1209,14 +1213,19 @@ export default function MenuManagement() {
                                 allergens: formData.allergens,
                                 portion: formData.portion,
                                 imageUrl: capturedImage || editingItem.imageUrl
-                              });
-                          console.log('Ürün güncellendi:', formData);
+                              };
+                              
+                              console.log('Update Data gönderiliyor:', updateData);
+                              console.log('Resim URL uzunluğu:', updateData.imageUrl.length);
+                              
+                              await updateMenuItem(currentRestaurantId, editingItem.id, updateData);
+                              console.log('Ürün güncellendi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
                             }
                           } catch (error) {
                             console.error('Ürün güncellenirken hata:', error);
-                            alert('Ürün güncellenirken bir hata oluştu');
+                            alert('Ürün güncellenirken bir hata oluştu: ' + error.message);
                           }
                         } else {
                           // Yeni ürün ekleme
@@ -1227,8 +1236,7 @@ export default function MenuManagement() {
                           
                           try {
                             if (currentRestaurantId) {
-                              console.log('Resim verisi gönderiliyor:', capturedImage);
-                              await createMenuItem(currentRestaurantId, {
+                              const createData = {
                                 categoryId: formData.category,
                                 name: formData.name,
                                 description: formData.description,
@@ -1243,14 +1251,19 @@ export default function MenuManagement() {
                                 ingredients: formData.ingredients,
                                 allergens: formData.allergens,
                                 portion: formData.portion
-                              });
+                              };
+                              
+                              console.log('Create Data gönderiliyor:', createData);
+                              console.log('Resim URL uzunluğu:', createData.imageUrl.length);
+                              
+                              await createMenuItem(currentRestaurantId, createData);
                               console.log('Yeni ürün backend\'e kaydedildi:', formData);
                               // Menüyü yeniden yükle
                               await fetchRestaurantMenu(currentRestaurantId);
                             }
                           } catch (error) {
                             console.error('Ürün eklenirken hata:', error);
-                            alert('Ürün eklenirken bir hata oluştu');
+                            alert('Ürün eklenirken bir hata oluştu: ' + error.message);
                           }
                         }
                         setShowItemForm(false);

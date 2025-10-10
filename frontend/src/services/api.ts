@@ -99,6 +99,8 @@ class ApiService {
   }
 
   async createMenuItem(restaurantId: string, data: any) {
+    console.log('API - createMenuItem çağrıldı:', { restaurantId, data });
+    console.log('API - Gönderilen resim URL uzunluğu:', data.imageUrl?.length || 0);
     return this.request<any>(`/restaurants/${restaurantId}/menu/items`, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -106,6 +108,8 @@ class ApiService {
   }
 
   async updateMenuItem(restaurantId: string, itemId: string, data: any) {
+    console.log('API - updateMenuItem çağrıldı:', { restaurantId, itemId, data });
+    console.log('API - Gönderilen resim URL uzunluğu:', data.imageUrl?.length || 0);
     return this.request<any>(`/restaurants/${restaurantId}/menu/items/${itemId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
