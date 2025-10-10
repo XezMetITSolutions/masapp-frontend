@@ -174,7 +174,7 @@ export default function DebugPage() {
       const menuItemData = {
         categoryId: firstCategory.id, // Geçerli kategori ID'si kullan
         name: 'Debug Test Ürün',
-        description: 'Test için oluşturulan ürün',
+        // description: 'Test için oluşturulan ürün', // Description'ı kaldırdık
         price: 25.50,
         imageUrl: smallImageToTest,
         order: 1,
