@@ -339,6 +339,14 @@ export default function MenuManagement() {
 
   // Filtrelenmiş ürünler
   const filteredItems = items.filter(item => {
+    // Debug: Ürün verilerini console'a yazdır
+    console.log('Ürün verisi:', {
+      id: item.id,
+      name: item.name,
+      imageUrl: item.imageUrl,
+      image: item.image
+    });
+    
     // Güvenlik kontrolü - item.name ve item.description undefined olabilir
     const itemName = item.name || '';
     const itemDescription = item.description || '';
@@ -568,9 +576,16 @@ export default function MenuManagement() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <img
-                            src={item.imageUrl || '/placeholder-food.jpg'}
+                            src={item.imageUrl || item.image || '/placeholder-food.jpg'}
                             alt={item.name}
                             className="h-12 w-12 rounded-lg object-cover mr-4"
+                            onError={(e) => {
+                              console.log('Resim yüklenemedi:', item.imageUrl || item.image);
+                              e.currentTarget.src = '/placeholder-food.jpg';
+                            }}
+                            onLoad={() => {
+                              console.log('Resim yüklendi:', item.imageUrl || item.image);
+                            }}
                           />
                           <div>
                             <div className="text-sm font-medium text-gray-900">
@@ -635,9 +650,16 @@ export default function MenuManagement() {
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex items-start gap-3">
                   <img
-                    src={item.imageUrl || '/placeholder-food.jpg'}
+                    src={item.imageUrl || item.image || '/placeholder-food.jpg'}
                     alt={item.name}
                     className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
+                    onError={(e) => {
+                      console.log('Mobile - Resim yüklenemedi:', item.imageUrl || item.image);
+                      e.currentTarget.src = '/placeholder-food.jpg';
+                    }}
+                    onLoad={() => {
+                      console.log('Mobile - Resim yüklendi:', item.imageUrl || item.image);
+                    }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
