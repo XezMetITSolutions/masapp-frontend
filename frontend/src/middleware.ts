@@ -29,6 +29,9 @@ export function middleware(request: NextRequest) {
   // Eğer subdomain varsa ve ana domain değilse VEYA query parameter varsa
   if ((!mainDomains.includes(subdomain) && hostname.includes('.')) || querySubdomain) {
     // Subdomain-based routing
+    if (pathname === '/login') {
+      return NextResponse.rewrite(new URL('/business/login', request.url));
+    }
     if (pathname === '/mutfak') {
       return NextResponse.rewrite(new URL('/business/kitchen', request.url));
     }
