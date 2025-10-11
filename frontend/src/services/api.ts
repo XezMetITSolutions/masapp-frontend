@@ -24,14 +24,18 @@ class ApiService {
         ? window.location.hostname.split('.')[0]
         : null;
       
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(subdomain && subdomain !== 'localhost' && subdomain !== 'www' && subdomain !== 'guzellestir' 
+          ? { 'X-Subdomain': subdomain }
+          : {}),
+        ...options.headers,
+      };
+      
+      console.log('🌐 API Request:', { url, subdomain, headers });
+      
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(subdomain && subdomain !== 'localhost' && subdomain !== 'www' && subdomain !== 'guzellestir' 
-            ? { 'X-Subdomain': subdomain }
-            : {}),
-          ...options.headers,
-        },
+        headers,
         ...options,
       });
 
@@ -156,6 +160,12 @@ class ApiService {
 
   // Authentication endpoints
   async login(credentials: { username: string; password: string }) {
+    console.log('🔐 Login attempt:', { 
+      username: credentials.username, 
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+      subdomain: typeof window !== 'undefined' ? window.location.hostname.split('.')[0] : 'server'
+    });
+    
     return this.request<any>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
