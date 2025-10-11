@@ -27,6 +27,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import BusinessSidebar from '@/components/BusinessSidebar';
 import { useFeature } from '@/hooks/useFeature';
+import apiService from '@/services/api';
 
 export default function QRCodesPage() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function QRCodesPage() {
     setTimeout(() => setToast({ message: '', visible: false }), 3000);
   };
 
-  // Toplu QR kod oluşturma
+  // Toplu QR kod oluşturma - Sabit QR kodları (basılabilir)
   const handleCreateBulkQRCodes = () => {
     if (!authenticatedRestaurant) {
       showToast('Restoran bilgisi bulunamadı!');
@@ -92,7 +93,7 @@ export default function QRCodesPage() {
 
     setQrCodes(prev => [...prev, ...newQRCodes]);
     setShowCreateModal(false);
-    showToast(`${bulkCount} adet QR kod oluşturuldu!`);
+    showToast(`${bulkCount} adet kalıcı QR kod oluşturuldu! (Basılabilir)`);
   };
 
   // Tek QR kod oluşturma
@@ -113,10 +114,10 @@ export default function QRCodesPage() {
     showToast(`Masa ${tableNumber} QR kodu oluşturuldu!`);
   };
 
-  // QR kod silme
+  // QR kod silme (sadece listeden)
   const handleDeleteQRCode = (id: string) => {
     setQrCodes(prev => prev.filter(qr => qr.id !== id));
-    showToast('QR kod silindi!');
+    showToast('QR kod listeden kaldırıldı!');
   };
 
   // URL kopyalama
@@ -262,14 +263,21 @@ export default function QRCodesPage() {
                           className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded hover:bg-green-100"
                         >
                           <FaDownload />
-                          İndir
+                          QR Kodunu İndir
+                        </button>
+                        <button
+                          onClick={() => window.print()}
+                          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 text-purple-600 rounded hover:bg-purple-100"
+                        >
+                          <FaPrint />
+                          Yazdır
                         </button>
                         <button
                           onClick={() => handleDeleteQRCode(qrCode.id)}
                           className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100"
                         >
                           <FaTrash />
-                          Sil
+                          Listeden Kaldır
                         </button>
                       </div>
                     </div>

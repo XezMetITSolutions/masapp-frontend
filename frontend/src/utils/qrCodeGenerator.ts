@@ -73,14 +73,14 @@ export const getRestaurantSlug = (authenticatedRestaurant?: any): string => {
   return 'lezzet'; // Default olarak lezzet kullan (demo yerine)
 };
 
-// QR kod URL'i oluştur
-export const createQRCodeURL = (restaurantSlug: string, tableNumber?: number, token?: string): string => {
+// QR kod URL'i oluştur - Sabit URL (masa numarası ile)
+export const createQRCodeURL = (restaurantSlug: string, tableNumber?: number): string => {
   const baseUrl = `https://${restaurantSlug}.guzellestir.com`;
   
   if (tableNumber) {
-    return `${baseUrl}/menu/masa/${tableNumber}${token ? `?token=${token}` : ''}`;
+    return `${baseUrl}/menu?table=${tableNumber}`;
   } else {
-    return `${baseUrl}/menu${token ? `?token=${token}` : ''}`;
+    return `${baseUrl}/menu`;
   }
 };
 
@@ -104,7 +104,7 @@ export const createQRCodeImageURL = (dataUrl: string, theme: string = 'default')
   }
 };
 
-// Masa QR kodu oluştur
+// Masa QR kodu oluştur - Sabit QR (token yok)
 export const createTableQRCode = (
   tableNumber: number, 
   restaurantId: string,
@@ -112,24 +112,23 @@ export const createTableQRCode = (
   authenticatedRestaurant?: any
 ): QRCodeData => {
   const restaurantSlug = getRestaurantSlug(authenticatedRestaurant);
-  const token = generateToken();
-  const url = createQRCodeURL(restaurantSlug, tableNumber, token);
+  const url = createQRCodeURL(restaurantSlug, tableNumber); // Token olmadan
   const qrCodeImage = createQRCodeImageURL(url, theme);
   
   return {
-    id: `table-${tableNumber}-${Date.now()}`,
+    id: `table-${tableNumber}`,
     name: `Masa ${tableNumber} - QR Menü`,
     type: 'table',
     tableNumber,
     restaurantId,
     qrCode: qrCodeImage,
     url,
-    description: `Masa ${tableNumber} için QR kod menü`,
+    description: `Masa ${tableNumber} için kalıcı QR kod (Basılabilir)`,
     theme,
     isActive: true,
     scanCount: 0,
     createdAt: new Date().toISOString(),
-    token
+    token: '' // Token yok, dinamik olarak oluşturulacak
   };
 };
 
@@ -141,23 +140,22 @@ export const createGeneralQRCode = (
   authenticatedRestaurant?: any
 ): QRCodeData => {
   const restaurantSlug = getRestaurantSlug(authenticatedRestaurant);
-  const token = generateToken();
-  const url = createQRCodeURL(restaurantSlug, undefined, token);
+  const url = createQRCodeURL(restaurantSlug); // Token olmadan
   const qrCodeImage = createQRCodeImageURL(url, theme);
   
   return {
-    id: `general-${Date.now()}`,
+    id: `general`,
     name,
     type: 'general',
     restaurantId,
     qrCode: qrCodeImage,
     url,
-    description: `Genel menü QR kodu`,
+    description: `Genel menü QR kodu (Basılabilir)`,
     theme,
     isActive: true,
     scanCount: 0,
     createdAt: new Date().toISOString(),
-    token
+    token: '' // Token yok
   };
 };
 

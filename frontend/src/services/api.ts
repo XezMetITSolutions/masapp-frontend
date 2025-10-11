@@ -18,9 +18,18 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${API_BASE_URL}${endpoint}`;
+      
+      // Subdomain bilgisini header'a ekle (güvenlik için)
+      const subdomain = typeof window !== 'undefined' 
+        ? window.location.hostname.split('.')[0]
+        : null;
+      
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
+          ...(subdomain && subdomain !== 'localhost' && subdomain !== 'www' && subdomain !== 'guzellestir' 
+            ? { 'X-Subdomain': subdomain }
+            : {}),
           ...options.headers,
         },
         ...options,
@@ -165,6 +174,41 @@ class ApiService {
 
   async refreshToken() {
     return this.request<any>('/auth/refresh', {
+      method: 'POST',
+    });
+  }
+
+  // QR Token Management
+  async generateQRToken(restaurantId: string, tableNumber: number, duration: number = 2) {
+    return this.request<any>(`/qr/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ restaurantId, tableNumber, duration, createdBy: 'waiter' }),
+    });
+  }
+
+  async verifyQRToken(token: string) {
+    return this.request<any>(`/qr/verify/${token}`);
+  }
+
+  async refreshQRToken(token: string, duration: number = 2) {
+    return this.request<any>(`/qr/refresh/${token}`, {
+      method: 'POST',
+      body: JSON.stringify({ duration }),
+    });
+  }
+
+  async getRestaurantQRTokens(restaurantId: string) {
+    return this.request<any>(`/qr/restaurant/${restaurantId}/tables`);
+  }
+
+  async deactivateQRToken(token: string) {
+    return this.request<any>(`/qr/deactivate/${token}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async cleanupExpiredTokens() {
+    return this.request<any>(`/qr/cleanup`, {
       method: 'POST',
     });
   }

@@ -21,6 +21,7 @@ function MenuPageContent() {
   const addItem = useCartStore(state => state.addItem);
   const cartItems = useCartStore(state => state.items);
   const tableNumber = useCartStore(state => state.tableNumber);
+  const setTableNumber = useCartStore(state => state.setTableNumber);
   
   // Restaurant store - backend'den gerçek veriler
   const { 
@@ -66,6 +67,57 @@ function MenuPageContent() {
   const filteredCategories = currentRestaurant?.id 
     ? categories.filter((cat: any) => cat.restaurantId === currentRestaurant.id)
     : [];
+
+  // QR Table Number Detection - Sabit QR ile çalışır
+  useEffect(() => {
+    const detectTableNumber = async () => {
+      if (typeof window === 'undefined') return;
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const tableParam = urlParams.get('table');
+      
+      if (tableParam) {
+        const tableNum = parseInt(tableParam);
+        
+        if (!isNaN(tableNum) && tableNum > 0) {
+          // Masa numarasını ayarla
+          setTableNumber(tableNum);
+          
+          // Backend'de bu masa için session token oluştur
+          try {
+            if (currentRestaurant?.id) {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/qr/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  restaurantId: currentRestaurant.id,
+                  tableNumber: tableNum,
+                  duration: 2 // 2 saat
+                })
+              });
+              
+              const data = await response.json();
+              
+              if (data.success) {
+                console.log('Masa oturumu başlatıldı:', {
+                  masa: tableNum,
+                  token: data.data.token,
+                  süre: '2 saat'
+                });
+                
+                // Token'ı sessionStorage'a kaydet (sayfa yenilenirse tekrar oluşturma)
+                sessionStorage.setItem('qr-session-token', data.data.token);
+              }
+            }
+          } catch (error) {
+            console.error('Session token oluşturma hatası:', error);
+          }
+        }
+      }
+    };
+    
+    detectTableNumber();
+  }, [setTableNumber, currentRestaurant?.id]);
 
   // Fetch data on mount
   useEffect(() => {
