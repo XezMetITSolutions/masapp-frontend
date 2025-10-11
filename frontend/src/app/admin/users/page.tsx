@@ -48,44 +48,41 @@ export default function UsersManagement() {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
+        // Önce /users/all endpoint'ini dene
         const response = await apiService.getAllRestaurantUsers();
         if (response.success) {
           setUsers(response.data);
         } else {
-          console.error('API response failed:', response);
-          // Fallback data for development
-          setUsers([
-            {
-              id: 'demo-1',
-              name: 'Demo Restoran',
-              email: 'demo@restoran.com',
-              phone: '+90 555 123 4567',
-              role: 'restaurant_owner',
-              status: 'active',
-              restaurant: 'Demo Restoran',
-              lastLogin: new Date().toISOString(),
-              createdAt: new Date().toISOString(),
-              username: 'demo-restoran'
-            }
-          ]);
+          throw new Error('Users endpoint failed');
         }
       } catch (error) {
         console.error('Kullanıcıları çekme hatası:', error);
-        // Fallback data for development
-        setUsers([
-          {
-            id: 'demo-1',
-            name: 'Demo Restoran',
-            email: 'demo@restoran.com',
-            phone: '+90 555 123 4567',
-            role: 'restaurant_owner',
-            status: 'active',
-            restaurant: 'Demo Restoran',
-            lastLogin: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-            username: 'demo-restoran'
+        
+        // Fallback: Direkt restaurants endpoint'ini kullan
+        try {
+          const restaurantsResponse = await apiService.getRestaurants();
+          if (restaurantsResponse.success) {
+            // Restaurant verilerini kullanıcı formatına çevir
+            const users = restaurantsResponse.data.map((restaurant: any) => ({
+              id: restaurant.id,
+              name: restaurant.name,
+              email: restaurant.email,
+              phone: restaurant.phone || '-',
+              role: 'restaurant_owner',
+              status: 'active',
+              restaurant: restaurant.name,
+              lastLogin: restaurant.updatedAt,
+              createdAt: restaurant.createdAt,
+              username: restaurant.username
+            }));
+            setUsers(users);
+          } else {
+            setUsers([]);
           }
-        ]);
+        } catch (restaurantsError) {
+          console.error('Restaurants endpoint de başarısız:', restaurantsError);
+          setUsers([]);
+        }
       } finally {
         setIsLoading(false);
       }
