@@ -182,11 +182,29 @@ export default function RestaurantsManagement() {
           }, 100);
           break;
         case 'delete':
-          // Restoranı kalıcı olarak kaldır (Zustand store + persist)
-          deleteRestaurant(restaurant.id);
-          
-          // Kullanıcıya subdomain'i JSON dosyasından kaldırması gerektiği konusunda bilgi ver
-          alert('Restoran başarıyla silindi!');
+          if (confirm('Bu restoranı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
+            try {
+              // Backend'den sil
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/restaurants/${restaurant.id}`, {
+                method: 'DELETE',
+              });
+              
+              if (!response.ok) {
+                throw new Error('Restoran silinemedi');
+              }
+              
+              // Zustand store'dan da sil
+              deleteRestaurant(restaurant.id);
+              
+              alert('Restoran başarıyla silindi!');
+              
+              // Listeyi yenile
+              await fetchRestaurants();
+            } catch (error) {
+              console.error('Silme hatası:', error);
+              alert('Restoran silinirken bir hata oluştu!');
+            }
+          }
           
           // Görünümü güncelle
             router.refresh();
