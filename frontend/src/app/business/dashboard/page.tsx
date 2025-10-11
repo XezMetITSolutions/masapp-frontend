@@ -34,11 +34,26 @@ import { useFeature } from '@/hooks/useFeature';
 export default function BusinessDashboard() {
   const router = useRouter();
   const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
+  const { 
+    categories, 
+    menuItems, 
+    orders, 
+    activeOrders, 
+    fetchRestaurantMenu,
+    loading: restaurantLoading 
+  } = useRestaurantStore();
   
   // Sayfa yüklendiginde auth'u initialize et
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
+  
+  // Restaurant menüsünü yükle
+  useEffect(() => {
+    if (authenticatedRestaurant?.id) {
+      fetchRestaurantMenu(authenticatedRestaurant.id);
+    }
+  }, [authenticatedRestaurant?.id, fetchRestaurantMenu]);
   
   // Giriş yapan kişinin adını al
   const displayName = authenticatedRestaurant?.name || authenticatedStaff?.name || 'Kullanıcı';
@@ -244,22 +259,43 @@ export default function BusinessDashboard() {
   const hasStockManagement = useFeature('stock_management');
   const hasAdvancedAnalytics = useFeature('advanced_analytics');
 
-  // Gerçek verileri (veya şimdilik varsayılanları) kullan
+  // Gerçek verileri kullan
+  const today = new Date();
+  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+  
+  // Bugünkü siparişler
+  const todayOrders = orders.filter(order => {
+    const orderDate = new Date(order.createdAt);
+    return orderDate >= startOfDay && orderDate <= endOfDay;
+  });
+  
+  // Bugünkü ciro
+  const todayRevenue = todayOrders.reduce((total, order) => total + (order.totalAmount || 0), 0);
+  
+  // Bu ayki siparişler
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthlyOrders = orders.filter(order => {
+    const orderDate = new Date(order.createdAt);
+    return orderDate >= startOfMonth;
+  });
+  
+  // Aylık ciro
+  const monthlyRevenue = monthlyOrders.reduce((total, order) => total + (order.totalAmount || 0), 0);
+  
   const stats = {
-    todayOrders: 0, // Bu veriler daha sonra sipariş sisteminden gelecek
-    activeOrders: 0,
-    todayRevenue: 0,
-    monthlyRevenue: 0,
-    monthlyOrders: 0, // Aylık toplam sipariş
-    averageRating: 0, // Ortalama puan
-    customerSatisfaction: 0, // Müşteri memnuniyeti
-    totalMenuItems: 0, // Bu veriler menü sisteminden gelecek
-    activeCategories: 0,
-    totalWaiters: 0, // Bu veriler personel sisteminden gelecek
-    activeTables: 0
+    todayOrders: todayOrders.length,
+    activeOrders: activeOrders.length,
+    todayRevenue,
+    monthlyRevenue,
+    monthlyOrders: monthlyOrders.length,
+    averageRating: 0, // TODO: Rating sistemi eklendiğinde
+    customerSatisfaction: 0, // TODO: Memnuniyet sistemi eklendiğinde
+    totalMenuItems: menuItems.length,
+    activeCategories: categories.length,
+    totalWaiters: 0, // TODO: Personel sistemi eklendiğinde
+    activeTables: 0 // TODO: Masa sistemi eklendiğinde
   };
-
-  const activeOrders: any[] = []; // Bu veriler sipariş sisteminden gelecek
 
   return (
     <div className="min-h-screen bg-gray-50">
