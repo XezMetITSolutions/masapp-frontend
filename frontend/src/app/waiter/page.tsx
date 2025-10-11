@@ -12,7 +12,7 @@ import {
   FaShoppingCart,
   FaUser,
   FaCheckCircle,
-  FaMessage
+  FaComment
 } from 'react-icons/fa';
 import { useCartStore } from '@/store';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
@@ -67,7 +67,7 @@ function WaiterPageContent() {
     },
     {
       id: 'custom',
-      icon: FaMessage,
+      icon: FaComment,
       title: 'Kişisel Mesaj',
       description: 'Özel istek gönder',
       color: 'bg-gray-500'
