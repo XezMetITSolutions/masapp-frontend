@@ -245,6 +245,41 @@ export default function UsersManagement() {
           }
           break;
           
+        case 'changePassword':
+          // Şifre değiştirme
+          const currentPassword = prompt('Mevcut şifreyi girin:');
+          if (!currentPassword) {
+            break;
+          }
+          
+          const newPassword = prompt('Yeni şifreyi girin (en az 6 karakter):');
+          if (!newPassword || newPassword.length < 6) {
+            alert('Şifre en az 6 karakter olmalıdır!');
+            break;
+          }
+          
+          const confirmPassword = prompt('Yeni şifreyi tekrar girin:');
+          if (newPassword !== confirmPassword) {
+            alert('Şifreler eşleşmiyor!');
+            break;
+          }
+          
+          if (confirm(`"${user.name}" kullanıcısının şifresini değiştirmek istediğinizden emin misiniz?`)) {
+            try {
+              const response = await apiService.changeRestaurantPassword(user.id, currentPassword, newPassword);
+              if (response.success) {
+                alert(`"${user.name}" kullanıcısının şifresi başarıyla değiştirildi!`);
+                // Refresh data
+                window.location.reload();
+              } else {
+                alert(`Şifre değiştirme hatası: ${response.message || 'Bilinmeyen hata'}`);
+              }
+            } catch (error) {
+              alert(`Şifre değiştirme hatası: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
+            }
+          }
+          break;
+          
         default:
           console.log('Bilinmeyen işlem:', action);
       }

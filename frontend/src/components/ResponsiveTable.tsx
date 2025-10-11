@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaChevronDown, FaChevronUp, FaEye, FaEdit, FaTrash, FaLock } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp, FaEye, FaEdit, FaTrash, FaLock, FaKey } from 'react-icons/fa';
 
 interface Column {
   key: string;
@@ -148,6 +148,17 @@ export default function ResponsiveTable({
                     className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded hover:bg-purple-50 transition-colors"
                     title="Şifre Değiştir"
                   >
+                    <FaKey className="text-sm" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAction?.('lock', row);
+                    }}
+                    disabled={isLoading}
+                    className="text-orange-600 hover:text-orange-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded hover:bg-orange-50 transition-colors"
+                    title="Kilitle/Kilit Aç"
+                  >
                     <FaLock className="text-sm" />
                   </button>
                   <button
@@ -231,6 +242,17 @@ export default function ResponsiveTable({
                       disabled={isLoading}
                       className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded hover:bg-purple-50 transition-colors"
                       title="Şifre Değiştir"
+                    >
+                      <FaKey className="text-sm" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAction?.('lock', row);
+                      }}
+                      disabled={isLoading}
+                      className="text-orange-600 hover:text-orange-800 disabled:opacity-50 disabled:cursor-not-allowed p-1 rounded hover:bg-orange-50 transition-colors"
+                      title="Kilitle/Kilit Aç"
                     >
                       <FaLock className="text-sm" />
                     </button>

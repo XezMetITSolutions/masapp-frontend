@@ -221,6 +221,16 @@ class ApiService {
   async getRestaurantUsers(restaurantId: string) {
     return this.request<any>(`/restaurants/${restaurantId}/users`);
   }
+
+  async changeRestaurantPassword(restaurantId: string, currentPassword: string, newPassword: string) {
+    return this.request<any>(`/restaurants/${restaurantId}/change-password`, {
+      method: 'POST',
+      body: JSON.stringify({
+        currentPassword,
+        newPassword
+      })
+    });
+  }
 }
 
 export const apiService = new ApiService();
