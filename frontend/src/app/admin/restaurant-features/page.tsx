@@ -135,7 +135,7 @@ export default function RestaurantFeaturesManagement() {
           <option value="">-- Restoran Seçin --</option>
           {restaurants.map(restaurant => (
             <option key={restaurant.id} value={restaurant.id}>
-              {restaurant.name} ({restaurant.subscription.plan.toUpperCase()}) - {restaurant.features?.length || 0} özellik
+              {restaurant.name} ({restaurant.subscription?.plan?.toUpperCase() || 'BASIC'}) - {restaurant.features?.length || 0} özellik
             </option>
           ))}
         </select>
@@ -149,7 +149,7 @@ export default function RestaurantFeaturesManagement() {
               <div className="text-2xl">ℹ️</div>
               <div>
                 <h3 className="font-semibold text-blue-900 mb-2">
-                  {selectedRestaurant.name} - {selectedRestaurant.subscription.plan.toUpperCase()} Plan
+                  {selectedRestaurant.name} - {(selectedRestaurant.subscription?.plan || 'basic').toUpperCase()} Plan
                 </h3>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• <strong>Aktif Özellikler:</strong> {selectedFeatures.length}</li>

@@ -75,8 +75,21 @@ const useRestaurantStore = create<RestaurantState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const response = await apiService.getRestaurants();
-      if (response.success) {
-        set({ restaurants: response.data || [], loading: false });
+      if (response.success && response.data) {
+        // Backend'den gelen veriyi frontend formatına çevir
+        const restaurants = response.data.map((restaurant: any) => ({
+          ...restaurant,
+          subscription: {
+            plan: restaurant.subscriptionPlan || 'basic',
+            status: restaurant.subscriptionStatus || 'active',
+            startDate: new Date(restaurant.created_at),
+            endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 yıl sonra
+          },
+          createdAt: new Date(restaurant.created_at),
+          updatedAt: new Date(restaurant.updated_at),
+          status: restaurant.isActive ? 'active' : 'inactive'
+        }));
+        set({ restaurants, loading: false });
       }
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to fetch restaurants', loading: false });
