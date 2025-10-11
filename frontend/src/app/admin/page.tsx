@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   FaChartBar, 
   FaUsers, 
@@ -11,7 +10,6 @@ import {
   FaCreditCard,
   FaExclamationTriangle,
   FaUserCheck,
-  FaSignOutAlt,
   FaShieldAlt,
   FaChartLine,
   FaCog,
@@ -20,138 +18,55 @@ import {
   FaCogs,
   FaDatabase,
   FaLock,
-  FaChartPie
+  FaChartPie,
+  FaGlobe
 } from 'react-icons/fa';
+import useRestaurantStore from '@/store/useRestaurantStore';
 
 export default function SuperAdminDashboard() {
-  const router = useRouter();
+  const { restaurants, fetchRestaurants } = useRestaurantStore();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuth');
-    localStorage.removeItem('adminUser');
-    // Çıkış yapıldığında ana sayfaya yönlendir
-    router.push('/');
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        await fetchRestaurants();
+      } catch (error) {
+        console.error('Dashboard data loading error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [fetchRestaurants]);
+
+  const totalRestaurants = restaurants.length;
+  const activeRestaurants = restaurants.filter(r => r.status === 'active').length;
+  const totalUsers = restaurants.length; // Restaurant owners as users
+  const monthlyRevenue = 0; // TODO: Calculate from orders
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-80 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-700">
-          <div className="flex items-center">
-            <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white mr-3">
-              <FaShieldAlt className="text-xl" />
-            </div>
-          <div>
-              <h1 className="text-xl font-bold">MASAPP</h1>
-              <p className="text-sm text-gray-300">Süper Yönetici</p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Sidebar Navigation */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <nav className="space-y-2">
-            {/* Ana Menü */}
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Ana Menü</h3>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/admin" className="flex items-center p-3 rounded-lg bg-blue-600 text-white">
-                    <FaChartBar className="mr-3" />
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/restaurants" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaBuilding className="mr-3" />
-                    Restoran Yönetimi
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/users" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaUsers className="mr-3" />
-                    Kullanıcı Yönetimi
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/notifications" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaBell className="mr-3" />
-                    Bildirimler
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Raporlar ve Analitik */}
-            <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Raporlar & Analitik</h3>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/admin/subscriptions" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaCreditCard className="mr-3" />
-                    Abonelik Yönetimi
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/payment-errors" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaExclamationTriangle className="mr-3" />
-                    Ödeme Hataları
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/admin/user-approvals" className="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 hover:text-white">
-                    <FaUserCheck className="mr-3" />
-                    Kullanıcı Onayları
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Çıkış */}
-            <div className="mt-8 pt-6 border-t border-gray-700">
-              <button 
-                onClick={handleLogout}
-                className="flex items-center p-3 rounded-lg hover:bg-red-600 text-gray-300 hover:text-white w-full"
-              >
-                <FaSignOutAlt className="mr-3" />
-                Çıkış Yap
-              </button>
-            </div>
-          </nav>
+    <AdminLayout title="Süper Yönetici Paneli" description="Sistem genel durumu ve yönetim paneli">
+      {/* System Status */}
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center">
+          <div className="h-3 w-3 bg-green-500 rounded-full mr-3"></div>
+          <span className="text-green-800 font-medium">Sistem: Online</span>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="ml-80">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="px-8 py-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Süper Yönetici Paneli</h1>
-                <p className="text-gray-600 mt-2">Sistem genel durumu ve yönetim paneli</p>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center bg-green-50 rounded-lg px-4 py-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                  <span className="text-sm text-green-700">Sistem: Online</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <main className="p-8">
+      {/* Dashboard Content */}
+      <main>
           {/* İstatistikler */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Toplam Restoran</p>
-                  <h3 className="text-3xl font-bold text-gray-900">0</h3>
-                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
+                  <h3 className="text-3xl font-bold text-gray-900">{isLoading ? '...' : totalRestaurants}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{totalRestaurants > 0 ? `${totalRestaurants} restoran kayıtlı` : 'Henüz veri yok'}</p>
                 </div>
                 <div className="h-16 w-16 bg-blue-100 rounded-xl flex items-center justify-center">
                   <FaBuilding className="text-2xl text-blue-600" />
@@ -163,8 +78,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Aktif Restoran</p>
-                  <h3 className="text-3xl font-bold text-gray-900">0</h3>
-                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
+                  <h3 className="text-3xl font-bold text-gray-900">{isLoading ? '...' : activeRestaurants}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{activeRestaurants > 0 ? `${activeRestaurants} aktif restoran` : 'Henüz veri yok'}</p>
                 </div>
                 <div className="h-16 w-16 bg-green-100 rounded-xl flex items-center justify-center">
                   <FaChartBar className="text-2xl text-green-600" />
@@ -176,8 +91,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Toplam Kullanıcı</p>
-                  <h3 className="text-3xl font-bold text-gray-900">0</h3>
-                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
+                  <h3 className="text-3xl font-bold text-gray-900">{isLoading ? '...' : totalUsers}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{totalUsers > 0 ? `${totalUsers} kullanıcı` : 'Henüz veri yok'}</p>
                 </div>
                 <div className="h-16 w-16 bg-purple-100 rounded-xl flex items-center justify-center">
                   <FaUsers className="text-2xl text-purple-600" />
@@ -189,8 +104,8 @@ export default function SuperAdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">Aylık Gelir</p>
-                  <h3 className="text-3xl font-bold text-gray-900">₺0</h3>
-                  <p className="text-sm text-gray-500 mt-1">Henüz veri yok</p>
+                  <h3 className="text-3xl font-bold text-gray-900">₺{isLoading ? '...' : monthlyRevenue.toLocaleString()}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{monthlyRevenue > 0 ? 'Bu ay toplam gelir' : 'Henüz veri yok'}</p>
                 </div>
                 <div className="h-16 w-16 bg-yellow-100 rounded-xl flex items-center justify-center">
                   <FaChartLine className="text-2xl text-yellow-600" />
@@ -262,7 +177,6 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
       </main>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
