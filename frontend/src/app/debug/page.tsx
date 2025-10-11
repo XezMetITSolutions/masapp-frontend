@@ -10,6 +10,7 @@ export default function DebugPage() {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [testResults, setTestResults] = useState<any>(null);
+  const [userList, setUserList] = useState<any[]>([]);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -136,6 +137,35 @@ export default function DebugPage() {
       }
     } catch (error) {
       addLog(`❌ Test hatası: ${error}`);
+    }
+  };
+
+  const testUserListAPI = async () => {
+    addLog('Kullanıcı listesi API test ediliyor...');
+    setUserList([]);
+    
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/restaurants/users/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      const data = await response.json();
+      
+      addLog(`API Response Status: ${response.status}`);
+      addLog(`API Response: ${JSON.stringify(data, null, 2)}`);
+      
+      if (response.ok && data.success) {
+        addLog(`✅ Kullanıcı listesi başarılı! ${data.data.length} kullanıcı bulundu`);
+        setUserList(data.data);
+      } else {
+        addLog(`❌ Kullanıcı listesi hatası: ${response.status}`);
+        addLog(`Hata detayı: ${JSON.stringify(data, null, 2)}`);
+      }
+    } catch (error: any) {
+      addLog(`❌ Kullanıcı listesi test hatası: ${error.message}`);
     }
   };
 
@@ -386,6 +416,13 @@ export default function DebugPage() {
             </button>
             
             <button
+              onClick={testUserListAPI}
+              className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+            >
+              Test Kullanıcı Listesi
+            </button>
+            
+            <button
               onClick={clearAll}
               className="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
             >
@@ -402,6 +439,38 @@ export default function DebugPage() {
             <pre className="bg-gray-100 p-4 rounded-lg overflow-auto text-sm">
               {JSON.stringify(testResults, null, 2)}
             </pre>
+          </div>
+        )}
+
+        {/* User List Results */}
+        {userList.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">👥 Kullanıcı Listesi ({userList.length} kullanıcı)</h2>
+            <div className="space-y-3">
+              {userList.map((user, index) => (
+                <div key={user.id || index} className="bg-gray-50 p-4 rounded-lg border">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-gray-900">{user.name}</p>
+                      <p className="text-sm text-gray-600">{user.email}</p>
+                      <p className="text-xs text-gray-500">@{user.username}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        user.role === 'restaurant_owner' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {user.role === 'restaurant_owner' ? 'İşletme Sahibi' : user.role}
+                      </span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(user.createdAt).toLocaleDateString('tr-TR')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
