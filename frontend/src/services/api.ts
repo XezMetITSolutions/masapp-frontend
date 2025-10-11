@@ -212,6 +212,15 @@ class ApiService {
       method: 'POST',
     });
   }
+
+  // Admin endpoints
+  async getAllRestaurantUsers() {
+    return this.request<any>(`/restaurants/users/all`);
+  }
+
+  async getRestaurantUsers(restaurantId: string) {
+    return this.request<any>(`/restaurants/${restaurantId}/users`);
+  }
 }
 
 export const apiService = new ApiService();

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import ResponsiveTable from '@/components/ResponsiveTable';
 import AdminLayout from '@/components/admin/AdminLayout';
+import apiService from '@/services/api';
 import { 
   FaUsers, 
   FaSearch, 
@@ -26,12 +27,13 @@ interface User {
   name: string;
   email: string;
   phone: string;
-  role: 'admin' | 'manager' | 'staff' | 'customer';
+  role: 'admin' | 'manager' | 'staff' | 'customer' | 'restaurant_owner';
   status: 'active' | 'inactive' | 'pending' | 'suspended';
   restaurant?: string;
   lastLogin: string;
   createdAt: string;
   avatar?: string;
+  username?: string;
 }
 
 export default function UsersManagement() {
@@ -39,10 +41,26 @@ export default function UsersManagement() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
 
-  const users: User[] = [
-    // Demo veriler temizlendi - boş başlangıç
-  ];
+  // Backend'den kullanıcıları çek
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      try {
+        const response = await apiService.getAllRestaurantUsers();
+        if (response.success) {
+          setUsers(response.data);
+        }
+      } catch (error) {
+        console.error('Kullanıcıları çekme hatası:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const getRoleClass = (role: string) => {
     switch(role) {
@@ -50,6 +68,7 @@ export default function UsersManagement() {
       case 'manager': return 'bg-blue-100 text-blue-800';
       case 'staff': return 'bg-green-100 text-green-800';
       case 'customer': return 'bg-gray-100 text-gray-800';
+      case 'restaurant_owner': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -60,6 +79,7 @@ export default function UsersManagement() {
       case 'manager': return 'Yönetici';
       case 'staff': return 'Personel';
       case 'customer': return 'Müşteri';
+      case 'restaurant_owner': return 'İşletme Sahibi';
       default: return role;
     }
   };
@@ -97,6 +117,9 @@ export default function UsersManagement() {
           <div>
             <div className="text-sm font-medium text-gray-900">{value}</div>
             <div className="text-sm text-gray-500">{row.email}</div>
+            {row.username && (
+              <div className="text-xs text-gray-400">@{row.username}</div>
+            )}
           </div>
         </div>
       )
@@ -219,6 +242,7 @@ export default function UsersManagement() {
                 <option value="manager">Yönetici</option>
                 <option value="staff">Personel</option>
                 <option value="customer">Müşteri</option>
+                <option value="restaurant_owner">İşletme Sahibi</option>
               </select>
             </div>
             
