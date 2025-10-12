@@ -74,8 +74,8 @@ export default function PanelsPage() {
                     <span>Masa yönetimi</span>
                   </li>
                 </ul>
-                <Link href="/business/waiter" className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition-colors inline-block">
-                  Paneli Görüntüle
+                <Link href="/panels/waiter" className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-blue-50 transition-colors inline-block">
+                  Demo Paneli Görüntüle
                 </Link>
               </div>
 
