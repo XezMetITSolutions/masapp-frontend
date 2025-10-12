@@ -108,8 +108,8 @@ export default function PanelsPage() {
                     <span>Otomatik bildirimler</span>
                   </li>
                 </ul>
-                <Link href="/business/kitchen" className="bg-white text-orange-600 px-6 py-3 rounded-xl font-bold hover:bg-orange-50 transition-colors inline-block">
-                  Paneli Görüntüle
+                <Link href="/panels/kitchen" className="bg-white text-orange-600 px-6 py-3 rounded-xl font-bold hover:bg-orange-50 transition-colors inline-block">
+                  Demo Paneli Görüntüle
                 </Link>
               </div>
 
@@ -142,8 +142,8 @@ export default function PanelsPage() {
                     <span>Ödeme yöntemi analizi</span>
                   </li>
                 </ul>
-                <Link href="/business/payment" className="bg-white text-green-600 px-6 py-3 rounded-xl font-bold hover:bg-green-50 transition-colors inline-block">
-                  Paneli Görüntüle
+                <Link href="/panels/cashier" className="bg-white text-green-600 px-6 py-3 rounded-xl font-bold hover:bg-green-50 transition-colors inline-block">
+                  Demo Paneli Görüntüle
                 </Link>
               </div>
 
@@ -176,8 +176,8 @@ export default function PanelsPage() {
                     <span>Müşteri analitikleri</span>
                   </li>
                 </ul>
-                <Link href="/business/dashboard" className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-purple-50 transition-colors inline-block">
-                  Paneli Görüntüle
+                <Link href="/panels/business" className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-purple-50 transition-colors inline-block">
+                  Demo Paneli Görüntüle
                 </Link>
               </div>
 
