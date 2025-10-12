@@ -539,14 +539,8 @@ export default function DemoWaiterPanel() {
                 
                 return (
                   <>
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="mb-4">
                       <h3 className="text-xl font-bold">Masa {order.tableNumber} - Sipariş Detayları</h3>
-                      <button
-                        onClick={() => setSelectedOrder(null)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <FaTimes size={20} />
-                      </button>
                     </div>
                     
                     <div className="space-y-4">
@@ -652,14 +646,8 @@ export default function DemoWaiterPanel() {
         {showTableTransfer && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-              <div className="flex justify-between items-center p-6 border-b">
+              <div className="p-6 border-b">
                 <h3 className="text-xl font-bold text-gray-800">Masa Değiştir</h3>
-                <button
-                  onClick={() => setShowTableTransfer(false)}
-                  className="text-gray-500 hover:text-gray-700 text-xl"
-                >
-                  <FaTimes />
-                </button>
               </div>
               
               <div className="p-6">

@@ -37,6 +37,28 @@ export default function DemoBusinessPanel() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('today');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  
+  // Modal states
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [showReportsModal, setShowReportsModal] = useState(false);
+  
+  // Form states
+  const [menuItem, setMenuItem] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    image: null as File | null
+  });
+  
+  const [staffMember, setStaffMember] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: 'waiter'
+  });
 
   // Demo işletme verileri - gerçekçi veriler
   const demoStats = {
@@ -305,19 +327,31 @@ export default function DemoBusinessPanel() {
                   </div>
                   <div className="p-6">
                     <div className="grid grid-cols-2 gap-4">
-                      <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <button 
+                        onClick={() => alert('Demo: Yeni ürün ekleme formu açılacak')}
+                        className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
                         <FaPlus className="text-blue-600" />
                         <span className="text-sm font-medium">Yeni Ürün</span>
                       </button>
-                      <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <button 
+                        onClick={() => alert('Demo: Siparişler sayfasına yönlendirilecek')}
+                        className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
                         <FaEye className="text-green-600" />
                         <span className="text-sm font-medium">Siparişleri Gör</span>
                       </button>
-                      <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <button 
+                        onClick={() => setActiveMenu('menu')}
+                        className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
                         <FaEdit className="text-orange-600" />
                         <span className="text-sm font-medium">Menüyü Düzenle</span>
                       </button>
-                      <button className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <button 
+                        onClick={() => alert('Demo: Duyuru oluşturma formu açılacak')}
+                        className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
                         <FaBullhorn className="text-purple-600" />
                         <span className="text-sm font-medium">Duyurular</span>
                       </button>
@@ -364,7 +398,10 @@ export default function DemoBusinessPanel() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">Menü Ürünleri</h2>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                <button 
+                  onClick={() => alert('Demo: Yeni ürün ekleme formu açılacak')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                >
                   <FaPlus />
                   Yeni Ürün Ekle
                 </button>
@@ -382,7 +419,10 @@ export default function DemoBusinessPanel() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">Personel Listesi</h2>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2">
+                <button 
+                  onClick={() => alert('Demo: Yeni personel ekleme formu açılacak')}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+                >
                   <FaPlus />
                   Yeni Personel Ekle
                 </button>
@@ -400,7 +440,10 @@ export default function DemoBusinessPanel() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">QR Kodlar</h2>
-                <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2">
+                <button 
+                  onClick={() => alert('Demo: QR kod oluşturma formu açılacak')}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2"
+                >
                   <FaPlus />
                   QR Kod Oluştur
                 </button>
@@ -418,7 +461,10 @@ export default function DemoBusinessPanel() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">Satış Raporları</h2>
-                <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 flex items-center gap-2">
+                <button 
+                  onClick={() => alert('Demo: Rapor oluşturma formu açılacak')}
+                  className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 flex items-center gap-2"
+                >
                   <FaChartBar />
                   Rapor Oluştur
                 </button>
@@ -471,7 +517,10 @@ export default function DemoBusinessPanel() {
                   <FaHeadset className="text-3xl text-blue-600 mb-4" />
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">Canlı Destek</h3>
                   <p className="text-gray-600 mb-4">7/24 canlı destek hattımızla iletişime geçin</p>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                  <button 
+                    onClick={() => alert('Demo: Canlı destek sohbeti başlatılacak')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  >
                     Sohbet Başlat
                   </button>
                 </div>
@@ -479,7 +528,10 @@ export default function DemoBusinessPanel() {
                   <FaBell className="text-3xl text-green-600 mb-4" />
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">Destek Talebi</h3>
                   <p className="text-gray-600 mb-4">Sorununuzu detaylı olarak bildirin</p>
-                  <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                  <button 
+                    onClick={() => alert('Demo: Destek talebi formu açılacak')}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  >
                     Talep Oluştur
                   </button>
                 </div>
