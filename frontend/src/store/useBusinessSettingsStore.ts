@@ -15,6 +15,7 @@ interface BusinessSettingsState {
   expandedSections: { [key: string]: boolean };
   
   // Actions
+  updateSettings: (updates: Partial<BusinessSettings>) => void;
   updateBasicInfo: (updates: Partial<BusinessSettings['basicInfo']>) => void;
   updateBranding: (updates: Partial<BusinessSettings['branding']>) => void;
   updateStaffCredentials: (staffId: string, credentials: Partial<BusinessSettings['staffCredentials'][keyof BusinessSettings['staffCredentials']]>) => void;
@@ -201,6 +202,14 @@ export const useBusinessSettingsStore = create<BusinessSettingsState>()((set, ge
         security: false,
         backup: false
       },
+
+      // General Settings Actions
+      updateSettings: (updates) => set((state) => ({
+        settings: {
+          ...state.settings,
+          ...updates
+        }
+      })),
 
       // Basic Info Actions
       updateBasicInfo: (updates) => set((state) => ({
