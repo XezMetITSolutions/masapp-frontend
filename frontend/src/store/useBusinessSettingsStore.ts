@@ -184,7 +184,9 @@ const defaultStats: BusinessStats = {
   customerSatisfaction: 4.8
 };
 
-export const useBusinessSettingsStore = create<BusinessSettingsState>()((set, get) => ({
+export const useBusinessSettingsStore = create<BusinessSettingsState>()(
+  persist(
+    (set, get) => ({
       settings: defaultSettings,
       accountInfo: defaultAccountInfo,
       stats: defaultStats,
@@ -544,6 +546,16 @@ export const useBusinessSettingsStore = create<BusinessSettingsState>()((set, ge
         
         return isValid && isAvailable;
       }
-}));
+    }),
+    {
+      name: 'business-settings-storage',
+      partialize: (state) => ({
+        settings: state.settings,
+        accountInfo: state.accountInfo,
+        stats: state.stats,
+      }),
+    }
+  )
+);
 
 export default useBusinessSettingsStore;

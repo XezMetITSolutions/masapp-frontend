@@ -311,11 +311,7 @@ export default function SettingsPage() {
     console.log(`💾 ${section} ayarları kaydediliyor...`);
     
     try {
-      // Gerçek kaydetme işlemi - localStorage'a kaydet
-      const currentSettings = JSON.parse(localStorage.getItem('business_settings') || '{}');
-      const updatedSettings = { ...currentSettings, ...settings };
-      localStorage.setItem('business_settings', JSON.stringify(updatedSettings));
-      
+      // Zustand persist otomatik olarak localStorage'a kaydedecek
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -332,16 +328,8 @@ export default function SettingsPage() {
     console.log(`💾 ${fieldName} alanı kaydediliyor:`, value);
     
     try {
-      // Store'u güncelle
+      // Store'u güncelle - persist otomatik olarak localStorage'a kaydedecek
       updateBasicInfo({ [fieldName]: value });
-      
-      // localStorage'a kaydet
-      const currentSettings = JSON.parse(localStorage.getItem('business_settings') || '{}');
-      const updatedSettings = { 
-        ...currentSettings, 
-        basicInfo: { ...currentSettings.basicInfo, [fieldName]: value }
-      };
-      localStorage.setItem('business_settings', JSON.stringify(updatedSettings));
       
       console.log(`✅ ${fieldName} alanı kaydedildi`);
     } catch (error) {
