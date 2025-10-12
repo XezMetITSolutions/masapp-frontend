@@ -12,8 +12,7 @@ import {
   FaArrowLeft,
   FaHome,
   FaExclamationCircle,
-  FaFire,
-  FaTimer
+  FaFire
 } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -416,7 +415,7 @@ export default function DemoKitchenPanel() {
                           {item.quantity}x {item.name}
                         </p>
                         <span className="text-xs text-gray-500">
-                          <FaTimer className="inline mr-1" />
+                          <FaClock className="inline mr-1" />
                           {item.prepTime}dk
                         </span>
                       </div>

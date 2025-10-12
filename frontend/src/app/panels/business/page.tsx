@@ -20,8 +20,8 @@ import {
   FaPlus,
   FaBell,
   FaCalendar,
-  FaTrendingUp,
-  FaTrendingDown,
+  FaArrowUp,
+  FaArrowDown,
   FaPercent
 } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -222,7 +222,7 @@ export default function DemoBusinessPanel() {
                       <p className="text-sm font-medium text-gray-600">Günlük Ciro</p>
                       <p className="text-2xl font-bold text-gray-900">₺{demoStats.totalRevenue}</p>
                       <p className="text-sm text-green-600 flex items-center">
-                        <FaTrendingUp className="mr-1" />
+                        <FaArrowUp className="mr-1" />
                         +12.5%
                       </p>
                     </div>
@@ -238,7 +238,7 @@ export default function DemoBusinessPanel() {
                       <p className="text-sm font-medium text-gray-600">Sipariş Sayısı</p>
                       <p className="text-2xl font-bold text-gray-900">{demoStats.totalOrders}</p>
                       <p className="text-sm text-green-600 flex items-center">
-                        <FaTrendingUp className="mr-1" />
+                        <FaArrowUp className="mr-1" />
                         +8.2%
                       </p>
                     </div>
@@ -254,7 +254,7 @@ export default function DemoBusinessPanel() {
                       <p className="text-sm font-medium text-gray-600">Ortalama Sepet</p>
                       <p className="text-2xl font-bold text-gray-900">₺{demoStats.averageOrderValue}</p>
                       <p className="text-sm text-red-600 flex items-center">
-                        <FaTrendingDown className="mr-1" />
+                        <FaArrowDown className="mr-1" />
                         -2.1%
                       </p>
                     </div>
@@ -270,7 +270,7 @@ export default function DemoBusinessPanel() {
                       <p className="text-sm font-medium text-gray-600">Aktif Masa</p>
                       <p className="text-2xl font-bold text-gray-900">{demoStats.activeTables}</p>
                       <p className="text-sm text-green-600 flex items-center">
-                        <FaTrendingUp className="mr-1" />
+                        <FaArrowUp className="mr-1" />
                         +3.0%
                       </p>
                     </div>
@@ -317,7 +317,7 @@ export default function DemoBusinessPanel() {
                 <div className="bg-white rounded-lg shadow-md">
                   <div className="p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                      <FaTrendingUp />
+                      <FaChartLine />
                       Popüler Ürünler
                     </h3>
                   </div>
