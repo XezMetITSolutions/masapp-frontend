@@ -28,7 +28,8 @@ import {
   FaCog,
   FaHeadset,
   FaBullhorn,
-  FaBars
+  FaBars,
+  FaChartBar
 } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -123,25 +124,40 @@ export default function DemoBusinessPanel() {
         {/* Sidebar ve Ana İçerik */}
         <div className="flex">
           {/* Sidebar */}
-          <div className="w-64 bg-white shadow-sm min-h-screen">
-            <div className="p-4">
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">Menü</h2>
-              <nav className="space-y-2">
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-lg">
-                  <FaStore className="text-blue-600" />
-                  Kontrol Paneli
+          <div className="w-64 bg-purple-800 min-h-screen">
+            <div className="p-6">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-1">Aksaray</h2>
+                <p className="text-purple-200 text-sm">Yönetim Paneli</p>
+              </div>
+              <nav className="space-y-3">
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaChartLine className="text-xl" />
+                  <span className="font-medium">Kontrol Paneli</span>
                 </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-lg">
-                  <FaUsers className="text-green-600" />
-                  Personel
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaUtensils className="text-xl" />
+                  <span className="font-medium">Menü Yönetimi</span>
                 </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-lg">
-                  <FaCog className="text-purple-600" />
-                  Ayarlar
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaUsers className="text-xl" />
+                  <span className="font-medium">Personel</span>
                 </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-lg">
-                  <FaHeadset className="text-orange-600" />
-                  Destek
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaQrcode className="text-xl" />
+                  <span className="font-medium">QR Kodlar</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaChartBar className="text-xl" />
+                  <span className="font-medium">Raporlar</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaCog className="text-xl" />
+                  <span className="font-medium">Ayarlar</span>
+                </button>
+                <button className="w-full flex items-center gap-3 px-3 py-3 text-left text-white hover:bg-purple-700 rounded-lg transition-colors">
+                  <FaHeadset className="text-xl" />
+                  <span className="font-medium">Destek</span>
                 </button>
               </nav>
             </div>
