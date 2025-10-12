@@ -372,11 +372,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">URL:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
-                        {settings.basicInfo.subdomain}.guzellestir.com/mutfak
+                        {authenticatedRestaurant?.username || settings.basicInfo.subdomain}.guzellestir.com/mutfak
                       </span>
                       <button
                         onClick={() => {
-                          const url = `https://${settings.basicInfo.subdomain}.guzellestir.com/mutfak`;
+                          const url = `https://${authenticatedRestaurant?.username || settings.basicInfo.subdomain}.guzellestir.com/mutfak`;
                           navigator.clipboard.writeText(url);
                           alert('URL kopyalandı!');
                         }}
@@ -391,11 +391,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">Geçici URL (DNS ayarları tamamlanana kadar):</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-yellow-50 px-2 py-1 rounded flex-1 truncate text-yellow-800">
-                        guzellestir.com/mutfak?subdomain={settings.basicInfo.subdomain}
+                        guzellestir.com/mutfak?subdomain={authenticatedRestaurant?.username || settings.basicInfo.subdomain}
                       </span>
                       <button
                         onClick={() => {
-                          const url = `https://guzellestir.com/mutfak?subdomain=${settings.basicInfo.subdomain}`;
+                          const url = `https://guzellestir.com/mutfak?subdomain=${authenticatedRestaurant?.username || settings.basicInfo.subdomain}`;
                           navigator.clipboard.writeText(url);
                           alert('Geçici URL kopyalandı!');
                         }}
@@ -482,11 +482,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">URL:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
-                        {settings.basicInfo.subdomain}.guzellestir.com/garson
+                        {authenticatedRestaurant?.username || settings.basicInfo.subdomain}.guzellestir.com/garson
                       </span>
                       <button
                         onClick={() => {
-                          const url = `https://${settings.basicInfo.subdomain}.guzellestir.com/garson`;
+                          const url = `https://${authenticatedRestaurant?.username || settings.basicInfo.subdomain}.guzellestir.com/garson`;
                           navigator.clipboard.writeText(url);
                           alert('URL kopyalandı!');
                         }}
@@ -573,11 +573,11 @@ export default function StaffPage() {
                     <span className="text-gray-600">URL:</span>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1">
                       <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded flex-1 truncate">
-                        {settings.basicInfo.subdomain}.guzellestir.com/kasa
+                        {authenticatedRestaurant?.username || settings.basicInfo.subdomain}.guzellestir.com/kasa
                       </span>
                       <button
                         onClick={() => {
-                          const url = `https://${settings.basicInfo.subdomain}.guzellestir.com/kasa`;
+                          const url = `https://${authenticatedRestaurant?.username || settings.basicInfo.subdomain}.guzellestir.com/kasa`;
                           navigator.clipboard.writeText(url);
                           alert('URL kopyalandı!');
                         }}
