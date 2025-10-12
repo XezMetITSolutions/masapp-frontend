@@ -309,11 +309,43 @@ export default function SettingsPage() {
     setLoading(true);
     console.log(`💾 ${section} ayarları kaydediliyor...`);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Gerçek kaydetme işlemi - localStorage'a kaydet
+      const currentSettings = JSON.parse(localStorage.getItem('business_settings') || '{}');
+      const updatedSettings = { ...currentSettings, ...settings };
+      localStorage.setItem('business_settings', JSON.stringify(updatedSettings));
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log(`✅ ${section} ayarları kaydedildi`);
+    } catch (error) {
+      console.error('❌ Kaydetme hatası:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Tek alan kaydetme fonksiyonu
+  const handleSaveField = async (fieldName: string, value: any) => {
+    console.log(`💾 ${fieldName} alanı kaydediliyor:`, value);
     
-    setLoading(false);
-    console.log(`✅ ${section} ayarları kaydedildi`);
+    try {
+      // Store'u güncelle
+      updateBasicInfo({ [fieldName]: value });
+      
+      // localStorage'a kaydet
+      const currentSettings = JSON.parse(localStorage.getItem('business_settings') || '{}');
+      const updatedSettings = { 
+        ...currentSettings, 
+        basicInfo: { ...currentSettings.basicInfo, [fieldName]: value }
+      };
+      localStorage.setItem('business_settings', JSON.stringify(updatedSettings));
+      
+      console.log(`✅ ${fieldName} alanı kaydedildi`);
+    } catch (error) {
+      console.error('❌ Alan kaydetme hatası:', error);
+    }
   };
 
   const handleSubdomainChange = async (subdomain: string) => {
@@ -665,12 +697,36 @@ export default function SettingsPage() {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           WiFi Şifresi
                         </label>
-                        <input
-                          type="text"
-                          value={settings.basicInfo.wifiPassword || ''}
-                          onChange={(e) => updateBasicInfo({ wifiPassword: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={settings.basicInfo.wifiPassword || ''}
+                            onChange={(e) => updateBasicInfo({ wifiPassword: e.target.value })}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                          <button
+                            onClick={() => handleSaveField('wifiPassword', settings.basicInfo.wifiPassword)}
+                            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            title="WiFi Şifresini Kaydet"
+                          >
+                            <FaSave size={14} />
+                          </button>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="showWifiInMenu"
+                            checked={settings.basicInfo.showWifiInMenu || false}
+                            onChange={(e) => {
+                              updateBasicInfo({ showWifiInMenu: e.target.checked });
+                              handleSaveField('showWifiInMenu', e.target.checked);
+                            }}
+                            className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                          />
+                          <label htmlFor="showWifiInMenu" className="text-sm text-gray-600">
+                            Menüde WiFi şifresini göster
+                          </label>
+                        </div>
                       </div>
 
                       {/* Çalışma Saatleri */}
@@ -678,13 +734,37 @@ export default function SettingsPage() {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Çalışma Saatleri
                         </label>
-                        <textarea
-                          value={settings.basicInfo.workingHours}
-                          onChange={(e) => updateBasicInfo({ workingHours: e.target.value })}
-                          rows={3}
-                          placeholder="Pazartesi - Cuma: 08:00 - 22:00&#10;Cumartesi - Pazar: 09:00 - 23:00"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
+                        <div className="flex gap-2">
+                          <textarea
+                            value={settings.basicInfo.workingHours}
+                            onChange={(e) => updateBasicInfo({ workingHours: e.target.value })}
+                            rows={3}
+                            placeholder="Pazartesi - Cuma: 08:00 - 22:00&#10;Cumartesi - Pazar: 09:00 - 23:00"
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                          <button
+                            onClick={() => handleSaveField('workingHours', settings.basicInfo.workingHours)}
+                            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            title="Çalışma Saatlerini Kaydet"
+                          >
+                            <FaSave size={14} />
+                          </button>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="showHoursInMenu"
+                            checked={settings.basicInfo.showHoursInMenu || false}
+                            onChange={(e) => {
+                              updateBasicInfo({ showHoursInMenu: e.target.checked });
+                              handleSaveField('showHoursInMenu', e.target.checked);
+                            }}
+                            className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                          />
+                          <label htmlFor="showHoursInMenu" className="text-sm text-gray-600">
+                            Menüde çalışma saatlerini göster
+                          </label>
+                        </div>
                         <p className="text-sm text-gray-500 mt-1">
                           Çalışma saatleri menünün alt kısmında gösterilecektir.
                         </p>
@@ -707,12 +787,36 @@ export default function SettingsPage() {
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Instagram
                           </label>
-                          <input
-                            type="url"
-                            value={settings.basicInfo.instagram || ''}
-                            onChange={(e) => updateBasicInfo({ instagram: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          />
+                          <div className="flex gap-2">
+                            <input
+                              type="url"
+                              value={settings.basicInfo.instagram || ''}
+                              onChange={(e) => updateBasicInfo({ instagram: e.target.value })}
+                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                            <button
+                              onClick={() => handleSaveField('instagram', settings.basicInfo.instagram)}
+                              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                              title="Instagram Linkini Kaydet"
+                            >
+                              <FaSave size={14} />
+                            </button>
+                          </div>
+                          <div className="mt-2 flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id="showInstagramInMenu"
+                              checked={settings.basicInfo.showInstagramInMenu || false}
+                              onChange={(e) => {
+                                updateBasicInfo({ showInstagramInMenu: e.target.checked });
+                                handleSaveField('showInstagramInMenu', e.target.checked);
+                              }}
+                              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                            />
+                            <label htmlFor="showInstagramInMenu" className="text-sm text-gray-600">
+                              Menüde Instagram linkini göster
+                            </label>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">

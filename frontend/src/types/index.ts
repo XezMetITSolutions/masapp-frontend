@@ -192,11 +192,14 @@ export interface BusinessSettings {
     email: string;
     website?: string;
     wifiPassword?: string;
+    showWifiInMenu?: boolean;
     workingHours: string;
+    showHoursInMenu?: boolean;
     directionsLink?: string;
     googleReviewLink?: string;
     facebook?: string;
     instagram?: string;
+    showInstagramInMenu?: boolean;
     twitter?: string;
     status: 'active' | 'inactive';
   };

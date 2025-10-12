@@ -452,17 +452,19 @@ function MenuPageContent() {
           <div className="rounded-xl p-5 shadow-lg border bg-tone1">
             <div className="grid grid-cols-1 gap-3">
               {/* WiFi Info */}
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
-                <div className="flex items-center">
-                  <span className="text-lg mr-3">📶</span>
-                  <span className="text-sm font-medium text-gray-700">
-                    <TranslatedText>WiFi Şifresi</TranslatedText>
+              {settings.basicInfo.showWifiInMenu && (
+                <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
+                  <div className="flex items-center">
+                    <span className="text-lg mr-3">📶</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      <TranslatedText>WiFi Şifresi</TranslatedText>
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>
+                    {settings.basicInfo.wifiPassword || 'restoran2024'}
                   </span>
                 </div>
-                <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>
-                  {settings.basicInfo.wifiPassword || 'restoran2024'}
-                </span>
-              </div>
+              )}
               {/* Google Review Button */}
               <a
                 href="https://www.google.com/maps/place/restoranadi/reviews" // Change to actual Google review URL
@@ -482,35 +484,39 @@ function MenuPageContent() {
                 </button>
               </a>
               {/* Working Hours */}
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
-                <div className="flex items-center">
-                  <span className="text-lg mr-3">🕒</span>
-                  <span className="text-sm font-medium text-gray-700">
-                    <TranslatedText>Çalışma Saatleri</TranslatedText>
+              {settings.basicInfo.showHoursInMenu && (
+                <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
+                  <div className="flex items-center">
+                    <span className="text-lg mr-3">🕒</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      <TranslatedText>Çalışma Saatleri</TranslatedText>
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>
+                    {settings.basicInfo.workingHours || '09:00 - 23:00'}
                   </span>
                 </div>
-                <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>
-                  {settings.basicInfo.workingHours || '09:00 - 23:00'}
-                </span>
-              </div>
+              )}
               {/* Instagram Button */}
-              <a
-                href={settings.basicInfo.instagram || "https://instagram.com/restoranadi"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone3"
-                style={{ textDecoration: 'none' }}
-              >
-                <div className="flex items-center">
-                  <span className="text-lg mr-3">📱</span>
-                  <span className="text-sm font-medium text-gray-800">
-                    <TranslatedText>Instagram'da Takip Et</TranslatedText>
-                  </span>
-                </div>
-                <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
-                  @{settings.basicInfo.instagram?.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '') || 'restoranadi'}
-                </button>
-              </a>
+              {settings.basicInfo.showInstagramInMenu && (
+                <a
+                  href={settings.basicInfo.instagram || "https://instagram.com/restoranadi"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone3"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div className="flex items-center">
+                    <span className="text-lg mr-3">📱</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      <TranslatedText>Instagram'da Takip Et</TranslatedText>
+                    </span>
+                  </div>
+                  <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
+                    @{settings.basicInfo.instagram?.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '') || 'restoranadi'}
+                  </button>
+                </a>
+              )}
             </div>
           </div>
         </div>
