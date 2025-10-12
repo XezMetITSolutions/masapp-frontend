@@ -29,6 +29,9 @@ export default function Home() {
             <Link href="/menu" className="bg-white text-orange-600 px-8 py-4 rounded-2xl text-lg font-black flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
               <FaUtensils className="text-xl" /> <TranslatedText>Menüyü Görüntüle</TranslatedText>
             </Link>
+            <Link href="/panels" className="bg-white text-orange-600 px-8 py-4 rounded-2xl text-lg font-black flex items-center justify-center gap-3 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
+              <FaUsers className="text-xl" /> <TranslatedText>Panelleri Görüntüle</TranslatedText>
+            </Link>
             <Link href="#pricing" className="bg-orange-700 hover:bg-orange-800 text-white px-8 py-4 rounded-2xl text-lg font-black transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105">
               <FaRocket className="inline mr-3 text-xl" /> <TranslatedText>14 Gün Ücretsiz Deneyin</TranslatedText>
             </Link>
@@ -169,14 +172,20 @@ export default function Home() {
       {/* Demo Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">Menümüzü İnceleyin</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Sistemimizi İnceleyin</h2>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            MasApp'in nasıl çalıştığını görmek için menümüzü inceleyin. Gerçek restoran deneyimini yaşayın!
+            MasApp'in nasıl çalıştığını görmek için menümüzü ve panelleri inceleyin. Gerçek restoran deneyimini yaşayın!
           </p>
-          <Link href="/menu" className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
-            <FaUtensils className="inline mr-2" />
-            Menüyü İncele
+          <div className="flex flex-col sm:flex-row justify-center gap-6">
+            <Link href="/menu" className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
+              <FaUtensils className="inline mr-2" />
+              Menüyü İncele
             </Link>
+            <Link href="/panels" className="inline-block bg-gradient-to-r from-orange-600 to-red-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:from-orange-700 hover:to-red-700 transition-all duration-300 shadow-lg">
+              <FaUsers className="inline mr-2" />
+              Panelleri Görüntüle
+            </Link>
+          </div>
         </div>
       </section>
 
