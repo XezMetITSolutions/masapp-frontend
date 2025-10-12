@@ -223,6 +223,31 @@ class ApiService {
     });
   }
 
+  // Staff endpoints
+  async getStaff() {
+    return this.request<any>('/staff');
+  }
+
+  async createStaff(staffData: any) {
+    return this.request<any>('/staff', {
+      method: 'POST',
+      body: JSON.stringify(staffData),
+    });
+  }
+
+  async updateStaff(id: string, staffData: any) {
+    return this.request<any>(`/staff/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(staffData),
+    });
+  }
+
+  async deleteStaff(id: string) {
+    return this.request<any>(`/staff/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Admin endpoints
   async getAllRestaurantUsers() {
     return this.request<any>(`/restaurants/users/all`);
@@ -239,6 +264,31 @@ class ApiService {
         currentPassword,
         newPassword
       })
+    });
+  }
+
+  // Staff endpoints
+  async getStaff(restaurantId: string) {
+    return this.request<any>(`/staff/restaurant/${restaurantId}`);
+  }
+
+  async createStaff(restaurantId: string, staffData: any) {
+    return this.request<any>(`/staff/restaurant/${restaurantId}`, {
+      method: 'POST',
+      body: JSON.stringify(staffData)
+    });
+  }
+
+  async updateStaff(staffId: string, staffData: any) {
+    return this.request<any>(`/staff/${staffId}`, {
+      method: 'PUT',
+      body: JSON.stringify(staffData)
+    });
+  }
+
+  async deleteStaff(staffId: string) {
+    return this.request<any>(`/staff/${staffId}`, {
+      method: 'DELETE'
     });
   }
 }

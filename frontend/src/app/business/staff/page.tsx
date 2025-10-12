@@ -46,6 +46,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import BusinessSidebar from '@/components/BusinessSidebar';
+import { apiService } from '@/services/api';
 
 export default function StaffPage() {
   const router = useRouter();
@@ -89,15 +90,22 @@ export default function StaffPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Personel listesini backend'den yükle
+  // Personel listesini localStorage'dan yükle
   useEffect(() => {
-    // Backend'den personel listesini çek (gelecekte implement edilecek)
-    // TODO: API call to fetch staff from backend
-    console.log('👥 Staff will be loaded from backend');
-    // Şimdilik boş array
-    setStaff([]);
-    setFilteredStaff([]);
-  }, [authenticatedRestaurant]);
+    if (typeof window !== 'undefined') {
+      const savedStaff = localStorage.getItem('business_staff');
+      if (savedStaff) {
+        const parsedStaff = JSON.parse(savedStaff);
+        setStaff(parsedStaff);
+        setFilteredStaff(parsedStaff);
+        console.log('👥 Staff loaded from localStorage:', parsedStaff.length, 'members');
+      } else {
+        console.log('👥 No staff data found in localStorage');
+        setStaff([]);
+        setFilteredStaff([]);
+      }
+    }
+  }, []);
 
   // Filtreleme ve arama
   useEffect(() => {
@@ -194,7 +202,7 @@ export default function StaffPage() {
     avgRating: staff.length > 0 ? (staff.reduce((acc, s) => acc + s.rating, 0) / staff.length).toFixed(1) : 0
   };
 
-  const handleAddStaff = () => {
+  const handleAddStaff = async () => {
     const name = newStaff.name.trim();
     const email = newStaff.email.trim();
     if (!name) { alert('Ad Soyad zorunludur.'); return; }
@@ -217,7 +225,40 @@ export default function StaffPage() {
       avatar: null
     };
 
-    setStaff(prev => [newMember, ...prev]);
+    // Backend'e kaydet
+    try {
+      if (authenticatedRestaurant?.id) {
+        const staffData = {
+          name: newMember.name,
+          email: newMember.email,
+          phone: newMember.phone,
+          role: newMember.role,
+          department: newMember.department,
+          notes: newMember.notes
+        };
+        
+        const response = await apiService.createStaff(authenticatedRestaurant.id, staffData);
+        console.log('✅ Staff created in backend:', response);
+        
+        // Backend'den dönen ID'yi kullan
+        if (response?.data?.id) {
+          newMember.id = response.data.id;
+        }
+      }
+    } catch (error) {
+      console.error('❌ Backend staff creation failed:', error);
+      // Backend hatası olsa bile localStorage'a kaydet
+    }
+
+    const updatedStaff = [newMember, ...staff];
+    setStaff(updatedStaff);
+    setFilteredStaff(updatedStaff);
+    
+    // localStorage'a kaydet
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('business_staff', JSON.stringify(updatedStaff));
+    }
+    
     setShowAddModal(false);
     setNewStaff({
       name: '',
@@ -229,6 +270,18 @@ export default function StaffPage() {
       department: 'service',
       notes: ''
     });
+
+    // Rol bazlı yönlendirme bilgisi
+    const rolePanelMap: { [key: string]: string } = {
+      'waiter': 'Garson Paneli',
+      'cashier': 'Kasa Paneli', 
+      'chef': 'Mutfak Paneli',
+      'manager': 'Yönetim Paneli',
+      'admin': 'Admin Paneli'
+    };
+    
+    const panelName = rolePanelMap[newStaff.role] || 'Panel';
+    alert(`${name} personeli başarıyla eklendi! ${panelName} için giriş yapabilir.`);
   };
 
   const handleEditStaff = (staffMember: any) => {
