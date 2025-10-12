@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { FaBell, FaUtensils, FaDollarSign, FaBuilding, FaArrowLeft, FaCheckCircle, FaUsers, FaChartLine, FaClock, FaShieldAlt } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
-import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
 
 export default function PanelsPage() {
@@ -22,7 +21,6 @@ export default function PanelsPage() {
                 <h1 className="text-3xl font-bold text-gray-900">MasApp Panelleri</h1>
                 <p className="text-gray-600 mt-1">Restoran operasyonlarınızı yönetin</p>
               </div>
-              <LanguageSelector />
             </div>
           </div>
         </div>

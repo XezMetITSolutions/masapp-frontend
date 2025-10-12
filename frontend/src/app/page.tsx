@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { FaQrcode, FaUtensils, FaShoppingCart, FaBell, FaMagic, FaChartLine, FaUsers, FaClock, FaCheckCircle, FaRocket, FaShieldAlt, FaStar, FaPhone, FaWhatsapp } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
-import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
 
 export default function Home() {
@@ -551,10 +550,6 @@ export default function Home() {
         </div>
       </footer>
 
-        {/* Language Selector - Fixed Position */}
-        <div className="fixed top-1 right-6 z-50">
-          <LanguageSelector />
-        </div>
     </main>
     </LanguageProvider>
   );

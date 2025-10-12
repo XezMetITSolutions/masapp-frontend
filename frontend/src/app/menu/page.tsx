@@ -10,7 +10,6 @@ import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Toast from '@/components/Toast';
 import MenuItemModal from '@/components/MenuItemModal';
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
-import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
@@ -304,12 +303,6 @@ function MenuPageContent() {
               <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
                 <TranslatedText>Masa</TranslatedText> #{tableNumber}
               </div>
-            </div>
-          </div>
-          {/* Dil seçici sağ üstte, arama ve diğer içerikten tamamen ayrı */}
-          <div className="fixed top-4 right-4 z-30">
-            <div className="bg-white rounded-xl shadow border border-gray-200 p-1">
-              <LanguageSelector />
             </div>
           </div>
         </header>

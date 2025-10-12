@@ -21,7 +21,6 @@ import {
   FaQrcode
 } from 'react-icons/fa';
 import { LanguageProvider } from '@/context/LanguageContext';
-import LanguageSelector from '@/components/LanguageSelector';
 import TranslatedText from '@/components/TranslatedText';
 
 export default function DemoCashierPanel() {
@@ -552,10 +551,6 @@ export default function DemoCashierPanel() {
           </div>
         )}
 
-        {/* Language Selector - Fixed Position */}
-        <div className="fixed top-6 right-6 z-50">
-          <LanguageSelector />
-        </div>
       </div>
     </LanguageProvider>
   );
