@@ -2,14 +2,28 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function BusinessKitchenPage() {
   const router = useRouter();
+  const { isAuthenticated, authenticatedStaff, authenticatedRestaurant } = useAuthStore();
 
   useEffect(() => {
+    // Login kontrolü
+    if (!isAuthenticated()) {
+      router.replace('/business/login');
+      return;
+    }
+
+    // Sadece aşçı (chef) rolündeki personel mutfak paneline erişebilir
+    if (authenticatedStaff?.role !== 'chef' && authenticatedRestaurant?.role !== 'chef') {
+      router.replace('/business/login');
+      return;
+    }
+
     // Business kitchen sayfasından doğrudan mutfak paneline yönlendir
     router.replace('/kitchen');
-  }, [router]);
+  }, [router, isAuthenticated, authenticatedStaff, authenticatedRestaurant]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

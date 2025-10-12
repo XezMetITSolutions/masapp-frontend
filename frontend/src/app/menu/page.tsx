@@ -13,6 +13,7 @@ import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
+import { useRestaurantSettings } from '@/hooks/useRestaurantSettings';
 
 function MenuPageContent() {
   // Store states
@@ -42,6 +43,7 @@ function MenuPageContent() {
   const [isClient, setIsClient] = useState(false);
   const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
   const { settings } = useBusinessSettingsStore();
+  const { settings: restaurantSettings } = useRestaurantSettings();
   const [showSplash, setShowSplash] = useState(false);
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
@@ -459,7 +461,9 @@ function MenuPageContent() {
                     <TranslatedText>WiFi Şifresi</TranslatedText>
                   </span>
                 </div>
-                <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>restoran2024</span>
+                <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>
+                  {restaurantSettings.basicInfo.wifiPassword || 'restoran2024'}
+                </span>
               </div>
               {/* Google Review Button */}
               <a
@@ -487,11 +491,13 @@ function MenuPageContent() {
                     <TranslatedText>Çalışma Saatleri</TranslatedText>
                   </span>
                 </div>
-                <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>09:00 - 23:00</span>
+                <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>
+                  {restaurantSettings.basicInfo.workingHours || '09:00 - 23:00'}
+                </span>
               </div>
               {/* Instagram Button */}
               <a
-                href="https://instagram.com/restoranadi" // Change to actual Instagram URL
+                href={restaurantSettings.basicInfo.instagram || "https://instagram.com/restoranadi"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone3"
@@ -504,7 +510,7 @@ function MenuPageContent() {
                   </span>
                 </div>
                 <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
-                  @restoranadi
+                  @{restaurantSettings.basicInfo.instagram?.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '') || 'restoranadi'}
                 </button>
               </a>
             </div>

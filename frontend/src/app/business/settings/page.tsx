@@ -419,13 +419,6 @@ export default function SettingsPage() {
                 <span>📰</span>
                 Duyurular
               </button>
-              <button 
-                onClick={() => window.open('/menu', '_blank')}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                <FaEye />
-                Demo Menüyü Görüntüle
-              </button>
             </div>
           </div>
         </header>
@@ -568,7 +561,7 @@ export default function SettingsPage() {
                             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           />
                           <span className="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg font-medium">
-                            .masapp.com
+                            .guzellestir.com
                           </span>
                         </div>
                         <div className="mt-2 flex items-center gap-2">
@@ -588,7 +581,7 @@ export default function SettingsPage() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
-                          Menü adresiniz: <span className="text-purple-600 font-medium">{settings.basicInfo.subdomain}.masapp.com</span>
+                          Menü adresiniz: <span className="text-purple-600 font-medium">{settings.basicInfo.subdomain}.guzellestir.com</span>
                         </p>
                       </div>
 

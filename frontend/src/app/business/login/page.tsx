@@ -15,8 +15,10 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [subdomain, setSubdomain] = useState('');
+  const [restaurantInfo, setRestaurantInfo] = useState<any>(null);
 
-  // Sayfa yüklendiğinde kaydedilmiş bilgileri kontrol et
+  // Sayfa yüklendiğinde kaydedilmiş bilgileri kontrol et ve subdomain bilgisini al
   useEffect(() => {
     const savedUsername = localStorage.getItem('rememberedUsername');
     const savedRememberMe = localStorage.getItem('rememberMe') === 'true';
@@ -24,6 +26,52 @@ export default function LoginPage() {
     if (savedUsername && savedRememberMe) {
       setUsername(savedUsername);
       setRememberMe(true);
+    }
+
+    // Subdomain bilgisini al
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const currentSubdomain = hostname.split('.')[0];
+      const mainDomains = ['localhost', 'www'];
+      
+      if (!mainDomains.includes(currentSubdomain) && hostname.includes('.')) {
+        setSubdomain(currentSubdomain);
+        
+        // Subdomain'e göre restoran bilgilerini ayarla
+        const restaurantData = {
+          'aksaray': {
+            name: 'Aksaray Restaurant',
+            description: 'Geleneksel Türk Mutfağı',
+            logo: '🍽️'
+          },
+          'lezzet': {
+            name: 'Lezzet Restaurant',
+            description: 'Anadolu Lezzetleri',
+            logo: '🥘'
+          },
+          'kardesler': {
+            name: 'Kardeşler Lokantası',
+            description: 'Aile İşletmesi',
+            logo: '👨‍👩‍👧‍👦'
+          },
+          'pizza': {
+            name: 'Pizza Palace',
+            description: 'İtalyan Mutfağı',
+            logo: '🍕'
+          },
+          'cafe': {
+            name: 'Cafe Central',
+            description: 'Modern Kafe',
+            logo: '☕'
+          }
+        };
+        
+        setRestaurantInfo(restaurantData[currentSubdomain as keyof typeof restaurantData] || {
+          name: `${currentSubdomain.charAt(0).toUpperCase() + currentSubdomain.slice(1)} Restaurant`,
+          description: 'İşletme Paneli',
+          logo: '🍽️'
+        });
+      }
     }
   }, []);
 
@@ -83,10 +131,19 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-              <span className="text-white text-3xl">🍽️</span>
+              <span className="text-white text-3xl">{restaurantInfo?.logo || '🍽️'}</span>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">MasApp Business</h1>
-            <p className="text-purple-200">İşletme Paneli Giriş</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {restaurantInfo?.name || 'MasApp Business'}
+            </h1>
+            <p className="text-purple-200">
+              {restaurantInfo?.description || 'İşletme Paneli Giriş'}
+            </p>
+            {subdomain && (
+              <div className="mt-2 text-sm text-purple-300 bg-purple-500/20 px-3 py-1 rounded-full inline-block">
+                {subdomain}.guzellestir.com
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">

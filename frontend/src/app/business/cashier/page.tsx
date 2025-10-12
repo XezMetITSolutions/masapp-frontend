@@ -16,7 +16,7 @@ import { menuData, MenuItem } from '@/data/menu-data';
 
 export default function CashierDashboard() {
   const router = useRouter();
-  const { user, logout, authenticatedRestaurant, authenticatedStaff } = useAuthStore();
+  const { user, logout, authenticatedRestaurant, authenticatedStaff, isAuthenticated } = useAuthStore();
   
   // Restoran adını al - subdomain'e göre kişiselleştir
   const getRestaurantName = () => {
@@ -64,8 +64,20 @@ export default function CashierDashboard() {
   
   // Test için demo data initialize et
   useEffect(() => {
+    // Login kontrolü
+    if (!isAuthenticated()) {
+      router.replace('/business/login');
+      return;
+    }
+
+    // Sadece kasiyer (cashier) rolündeki personel kasa paneline erişebilir
+    if (authenticatedStaff?.role !== 'cashier' && authenticatedRestaurant?.role !== 'cashier') {
+      router.replace('/business/login');
+      return;
+    }
+
     initializeDemoData();
-  }, [initializeDemoData]);
+  }, [initializeDemoData, router, isAuthenticated, authenticatedStaff, authenticatedRestaurant]);
   
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
