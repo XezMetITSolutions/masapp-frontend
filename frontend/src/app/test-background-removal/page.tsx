@@ -84,15 +84,15 @@ export default function BackgroundRemovalTest() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
             <FaImage className="mr-3 text-blue-600" />
-            RemBG Arkaplan Silme Test
+            Sharp Arkaplan Silme Test
           </h1>
 
           {/* Test Status */}
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <h2 className="text-lg font-semibold text-blue-900 mb-2">Test Durumu</h2>
             <p className="text-blue-700">
-              Bu sayfa RemBG Python kütüphanesinin performansını test eder.
-              Render'da RemBG'nin çalışıp çalışmadığını kontrol edin.
+              Bu sayfa Sharp kütüphanesi ile arkaplan silme performansını test eder.
+              Threshold yöntemi ile beyaz arkaplanları şeffaf yapar.
             </p>
           </div>
 
@@ -233,12 +233,18 @@ export default function BackgroundRemovalTest() {
           <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-yellow-900 mb-2">Test Talimatları</h3>
             <ol className="list-decimal list-inside text-yellow-800 space-y-1">
-              <li>Bir yemek fotoğrafı yükleyin</li>
+              <li>Beyaz arkaplanlı bir yemek fotoğrafı yükleyin</li>
               <li>"Arkaplanı Sil" butonuna tıklayın</li>
+              <li>Threshold yöntemi ile beyaz arkaplan şeffaf olacak</li>
               <li>İşlem süresini not edin</li>
               <li>Sonuç kalitesini değerlendirin</li>
-              <li>Render'da RemBG'nin çalışıp çalışmadığını kontrol edin</li>
             </ol>
+            <div className="mt-3 p-3 bg-yellow-100 rounded">
+              <p className="text-sm text-yellow-800">
+                <strong>Not:</strong> Bu yöntem beyaz arkaplanlar için en iyi sonucu verir. 
+                Karmaşık arkaplanlar için Remove.bg API'si daha uygun olabilir.
+              </p>
+            </div>
           </div>
         </div>
       </div>
