@@ -13,6 +13,7 @@ export default function StaffDebugPage() {
   });
   const [loginResult, setLoginResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
 
   useEffect(() => {
     fetchData();
@@ -183,13 +184,19 @@ export default function StaffDebugPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Restaurant ID</label>
-              <input
-                type="text"
-                value="a23f9af0-0ab0-489a-b016-bc19332e6e01"
-                readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Restaurant</label>
+              <select
+                value={selectedRestaurantId}
+                onChange={(e) => setSelectedRestaurantId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Restaurant seçin</option>
+                {restaurants.map((restaurant) => (
+                  <option key={restaurant.id} value={restaurant.id}>
+                    {restaurant.name} ({restaurant.username})
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
@@ -240,6 +247,11 @@ export default function StaffDebugPage() {
 
           <button
             onClick={async () => {
+              if (!selectedRestaurantId) {
+                alert('Lütfen bir restaurant seçin!');
+                return;
+              }
+              
               try {
                 const staffData = {
                   name: "Kasa Hazal",
@@ -252,7 +264,10 @@ export default function StaffDebugPage() {
                   password: "123456"
                 };
                 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/a23f9af0-0ab0-489a-b016-bc19332e6e01`, {
+                console.log('Creating staff for restaurant:', selectedRestaurantId);
+                console.log('Staff data:', staffData);
+                
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/${selectedRestaurantId}`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -271,7 +286,8 @@ export default function StaffDebugPage() {
                 alert(`Error: ${error}`);
               }
             }}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            disabled={!selectedRestaurantId}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
             Create Staff
           </button>

@@ -1242,10 +1242,10 @@ export default function MenuManagement() {
                               const updateData = {
                                 name: formData.name,
                                 description: formData.description,
-                                price: Number(formData.price),
-                                categoryId: formData.category,
-                                isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular,
+                            price: Number(formData.price),
+                            categoryId: formData.category,
+                            isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
                                 imageUrl: capturedImage || editingItem.imageUrl,
                                 allergens: formData.allergens
                               };
@@ -1274,14 +1274,14 @@ export default function MenuManagement() {
                           try {
                             if (currentRestaurantId) {
                               const createData = {
-                                categoryId: formData.category,
+                            categoryId: formData.category,
                                 name: formData.name,
                                 description: formData.description,
-                                price: Number(formData.price),
+                            price: Number(formData.price),
                                 imageUrl: capturedImage || '/placeholder-food.jpg',
-                                order: items.length + 1,
-                                isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular,
+                            order: items.length + 1,
+                            isAvailable: formData.isAvailable,
+                            isPopular: formData.isPopular,
                                 allergens: formData.allergens
                               };
                               
