@@ -56,7 +56,7 @@ const useCartStore = create<CartState>()((set, get) => ({
       preparingItems: [], // Hazırlanan ürünler
       couponCode: null,
       tipPercentage: 10, // Default tip percentage
-      tableNumber: 5, // Default table number
+      tableNumber: 0, // Default table number - sadece QR kod ile geldiğinde ayarlanacak
       orderStatus: 'idle', // Default order status
       paid: false,
       restaurantId: null, // Restaurant ID
