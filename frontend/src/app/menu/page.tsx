@@ -365,9 +365,11 @@ function MenuPageContent() {
               <h1 className="text-dynamic-lg font-bold text-primary">
                 <TranslatedText>Menü</TranslatedText>
               </h1>
-              <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
-                <TranslatedText>Masa</TranslatedText> #{tableNumber}
-              </div>
+              {tableNumber && (
+                <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
+                  <TranslatedText>Masa</TranslatedText> #{tableNumber}
+                </div>
+              )}
             </div>
           </div>
         </header>
