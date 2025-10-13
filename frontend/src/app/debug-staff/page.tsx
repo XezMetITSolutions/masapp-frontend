@@ -121,6 +121,106 @@ export default function StaffDebugPage() {
           </div>
         </div>
 
+        {/* Staff Ekleme Test */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Staff Ekleme Test</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Restaurant ID</label>
+              <input
+                type="text"
+                value="a23f9af0-0ab0-489a-b016-bc19332e6e01"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+              <input
+                type="text"
+                value="Kasa Hazal"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <input
+                type="text"
+                value="kasa@hazal.com"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+              <input
+                type="text"
+                value="kasa_hazal"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <input
+                type="text"
+                value="123456"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <input
+                type="text"
+                value="cashier"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={async () => {
+              try {
+                const staffData = {
+                  name: "Kasa Hazal",
+                  email: "kasa@hazal.com",
+                  phone: "555-1234",
+                  role: "cashier",
+                  department: "service",
+                  notes: "Test staff member",
+                  username: "kasa_hazal",
+                  password: "123456"
+                };
+                
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/a23f9af0-0ab0-489a-b016-bc19332e6e01`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(staffData)
+                });
+                
+                const result = await response.json();
+                console.log('Staff creation result:', result);
+                alert(`Staff creation result: ${JSON.stringify(result, null, 2)}`);
+                
+                // Refresh data
+                fetchData();
+              } catch (error) {
+                console.error('Error creating staff:', error);
+                alert(`Error: ${error}`);
+              }
+            }}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            Create Staff
+          </button>
+        </div>
+
         {/* Login Test */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Login Test</h2>

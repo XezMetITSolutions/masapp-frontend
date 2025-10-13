@@ -279,25 +279,6 @@ class ApiService {
     return this.request<any>(`/staff/restaurant/${restaurantId}`);
   }
 
-  async createStaff(restaurantId: string, staffData: any) {
-    return this.request<any>(`/staff/restaurant/${restaurantId}`, {
-      method: 'POST',
-      body: JSON.stringify(staffData)
-    });
-  }
-
-  async updateStaff(staffId: string, staffData: any) {
-    return this.request<any>(`/staff/${staffId}`, {
-      method: 'PUT',
-      body: JSON.stringify(staffData)
-    });
-  }
-
-  async deleteStaff(staffId: string) {
-    return this.request<any>(`/staff/${staffId}`, {
-      method: 'DELETE'
-    });
-  }
 }
 
 export const apiService = new ApiService();
