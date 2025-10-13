@@ -10,9 +10,12 @@ import {
   FaSort,
   FaSearch,
   FaSignOutAlt,
-  FaChartLine
+  FaChartLine,
+  FaUser,
+  FaLock
 } from 'react-icons/fa';
 import useCentralOrderStore from '@/store/useCentralOrderStore';
+import apiService from '@/services/api';
 
 export default function StandaloneKitchenPage() {
   const router = useRouter();
@@ -31,9 +34,71 @@ export default function StandaloneKitchenPage() {
   const [readyConfirmations, setReadyConfirmations] = useState<Set<string>>(new Set());
   const [itemReadyConfirmations, setItemReadyConfirmations] = useState<Set<string>>(new Set());
   const [itemCompletedConfirmations, setItemCompletedConfirmations] = useState<Set<string>>(new Set());
+  
+  // Staff login states
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [staffInfo, setStaffInfo] = useState<any>(null);
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: ''
+  });
+  const [loginError, setLoginError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Giriş kontrolü
+  useEffect(() => {
+    const savedStaff = sessionStorage.getItem('kitchen_staff');
+    if (savedStaff) {
+      const staff = JSON.parse(savedStaff);
+      if (staff.role === 'chef') {
+        setIsLoggedIn(true);
+        setStaffInfo(staff);
+        initializeDemoData();
+      }
+    }
+  }, [initializeDemoData]);
+
+  // Staff login fonksiyonu
+  const handleStaffLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setLoginError('');
+
+    try {
+      const subdomain = window.location.hostname.split('.')[0];
+      const response = await apiService.staffLogin(loginForm.username, loginForm.password, subdomain);
+      
+      if (response.success && response.data) {
+        if (response.data.role === 'chef') {
+          setIsLoggedIn(true);
+          setStaffInfo(response.data);
+          sessionStorage.setItem('kitchen_staff', JSON.stringify(response.data));
+          initializeDemoData();
+        } else {
+          setLoginError('Bu panele erişim yetkiniz yok. Sadece aşçılar giriş yapabilir.');
+        }
+      } else {
+        setLoginError('Kullanıcı adı veya şifre hatalı');
+      }
+    } catch (error: any) {
+      console.error('Staff login error:', error);
+      setLoginError(error.message || 'Giriş yapılamadı');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Çıkış fonksiyonu
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setStaffInfo(null);
+    sessionStorage.removeItem('kitchen_staff');
+  };
 
   // Sadece değişiklik bildirimlerini dinle
   useEffect(() => {
+    if (!isLoggedIn) return;
+    
     const interval = setInterval(() => {
       const arr = JSON.parse(localStorage.getItem('kitchen_change_notifications') || '[]');
       const unread = arr.filter((n: any) => !n.read);
@@ -44,7 +109,7 @@ export default function StandaloneKitchenPage() {
       }
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isLoggedIn]);
 
   const dismissNotification = (tableNumber: number) => {
     setDismissedNotifs(prev => {
@@ -449,6 +514,89 @@ export default function StandaloneKitchenPage() {
     );
   }
 
+  // Login formu
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaUtensils className="text-2xl text-orange-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800">Mutfak Paneli</h1>
+            <p className="text-gray-600 mt-2">Aşçı girişi</p>
+          </div>
+
+          <form onSubmit={handleStaffLogin} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Kullanıcı Adı
+              </label>
+              <div className="relative">
+                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={loginForm.username}
+                  onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Kullanıcı adınızı girin"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Şifre
+              </label>
+              <div className="relative">
+                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Şifrenizi girin"
+                  required
+                />
+              </div>
+            </div>
+
+            {loginError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-sm">{loginError}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Giriş yapılıyor...
+                </>
+              ) : (
+                <>
+                  <FaUtensils />
+                  Mutfak Paneline Giriş
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Giriş bilgilerinizi personel yönetiminden alabilirsiniz.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -468,12 +616,12 @@ export default function StandaloneKitchenPage() {
             </div>
           <div>
               <h2 className="text-lg sm:text-2xl font-bold">Mutfak Paneli</h2>
-              <p className="text-orange-100 text-xs sm:text-sm hidden sm:block">Sipariş hazırlama ve takip</p>
+              <p className="text-orange-100 text-xs sm:text-sm hidden sm:block">Hoş geldiniz, {staffInfo?.name}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <button
-              onClick={() => { router.replace('/business/login'); }}
+              onClick={handleLogout}
               className="px-2 sm:px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
             >
               <FaSignOutAlt className="text-sm sm:text-base" />

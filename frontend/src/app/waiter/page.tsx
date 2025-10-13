@@ -1,311 +1,437 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
-  FaBell, 
-  FaArrowLeft, 
-  FaWater,
-  FaBroom,
-  FaReceipt,
-  FaUtensils,
-  FaShoppingCart,
+  FaUsers, 
+  FaBell,
+  FaSearch,
+  FaSignOutAlt,
   FaUser,
+  FaLock,
+  FaUtensils,
+  FaClock,
   FaCheckCircle,
-  FaComment
+  FaExclamationCircle
 } from 'react-icons/fa';
-import { useCartStore } from '@/store';
-import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
-import TranslatedText from '@/components/TranslatedText';
-import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
-import SetBrandColor from '@/components/SetBrandColor';
+import apiService from '@/services/api';
 
-function WaiterPageContent() {
-  const { currentLanguage, translate } = useLanguage();
-  const { tableNumber } = useCartStore();
-  const { settings } = useBusinessSettingsStore();
-  const [isClient, setIsClient] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
-  const [customMessage, setCustomMessage] = useState('');
-  const [showCustomModal, setShowCustomModal] = useState(false);
-  const [sentRequests, setSentRequests] = useState<string[]>([]);
+export default function StandaloneWaiterPage() {
+  const router = useRouter();
   
-  const primary = settings.branding.primaryColor;
+  // Staff login states
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [staffInfo, setStaffInfo] = useState<any>(null);
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: ''
+  });
+  const [loginError, setLoginError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Demo data states
+  const [orders, setOrders] = useState<any[]>([]);
+  const [calls, setCalls] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('orders');
+
+  // Giriş kontrolü
   useEffect(() => {
-    setIsClient(true);
+    const savedStaff = sessionStorage.getItem('waiter_staff');
+    if (savedStaff) {
+      const staff = JSON.parse(savedStaff);
+      if (staff.role === 'waiter') {
+        setIsLoggedIn(true);
+        setStaffInfo(staff);
+        initializeDemoData();
+      }
+    }
   }, []);
 
-  const quickRequests = [
-    {
-      id: 'water',
-      icon: FaWater,
-      title: 'Su Getir',
-      description: 'Masa için su isteği',
-      color: 'bg-blue-500'
-    },
-    {
-      id: 'clean',
-      icon: FaBroom,
-      title: 'Masayı Temizle',
-      description: 'Masa temizlik isteği',
-      color: 'bg-green-500'
-    },
-    {
-      id: 'bill',
-      icon: FaReceipt,
-      title: 'Hesap',
-      description: 'Hesap isteği',
-      color: 'bg-purple-500'
-    },
-    {
-      id: 'cutlery',
-      icon: FaUtensils,
-      title: 'Yeni Çatal Bıçak',
-      description: 'Çatal bıçak takımı isteği',
-      color: 'bg-orange-500'
-    },
-    {
-      id: 'custom',
-      icon: FaComment,
-      title: 'Kişisel Mesaj',
-      description: 'Özel istek gönder',
-      color: 'bg-gray-500'
-    }
-  ];
+  // Demo data initialize
+  const initializeDemoData = () => {
+    const demoOrders = [
+      {
+        id: 'demo_waiter_1',
+        tableNumber: 3,
+        guests: 2,
+        items: [
+          { id: '1', name: 'Adana Kebap', quantity: 2, price: 45, status: 'ready' },
+          { id: '2', name: 'Ayran', quantity: 2, price: 15, status: 'ready' }
+        ],
+        totalAmount: 120,
+        status: 'ready',
+        orderTime: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+        notes: 'Az acı olsun'
+      },
+      {
+        id: 'demo_waiter_2',
+        tableNumber: 7,
+        guests: 4,
+        items: [
+          { id: '3', name: 'Pizza Margherita', quantity: 1, price: 85, status: 'preparing' },
+          { id: '4', name: 'Kola', quantity: 4, price: 12, status: 'ready' }
+        ],
+        totalAmount: 133,
+        status: 'preparing',
+        orderTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        notes: ''
+      }
+    ];
 
-  const handleRequest = (requestId: string) => {
-    if (requestId === 'custom') {
-      setShowCustomModal(true);
-      return;
-    }
+    const demoCalls = [
+      {
+        id: 'demo_call_1',
+        tableNumber: 5,
+        type: 'service',
+        message: 'Garson çağırıyor',
+        timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        status: 'active'
+      },
+      {
+        id: 'demo_call_2',
+        tableNumber: 2,
+        type: 'bill',
+        message: 'Hesap istiyor',
+        timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+        status: 'active'
+      }
+    ];
 
-    // Send request logic here
-    console.log('Sending request:', requestId, 'for table:', tableNumber);
-    
-    // Add to sent requests
-    setSentRequests(prev => [...prev, requestId]);
-    
-    // Show success feedback
-    setTimeout(() => {
-      setSentRequests(prev => prev.filter(id => id !== requestId));
-    }, 3000);
+    setOrders(demoOrders);
+    setCalls(demoCalls);
   };
 
-  const handleCustomRequest = () => {
-    if (customMessage.trim()) {
-      console.log('Sending custom message:', customMessage, 'for table:', tableNumber);
-      setCustomMessage('');
-      setShowCustomModal(false);
+  // Staff login fonksiyonu
+  const handleStaffLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setLoginError('');
+
+    try {
+      const subdomain = window.location.hostname.split('.')[0];
+      const response = await apiService.staffLogin(loginForm.username, loginForm.password, subdomain);
       
-      // Show success feedback
-      setTimeout(() => {
-        // Success feedback could be shown here
-      }, 1000);
+      if (response.success && response.data) {
+        if (response.data.role === 'waiter') {
+          setIsLoggedIn(true);
+          setStaffInfo(response.data);
+          sessionStorage.setItem('waiter_staff', JSON.stringify(response.data));
+          initializeDemoData();
+        } else {
+          setLoginError('Bu panele erişim yetkiniz yok. Sadece garsonlar giriş yapabilir.');
+        }
+      } else {
+        setLoginError('Kullanıcı adı veya şifre hatalı');
+      }
+    } catch (error: any) {
+      console.error('Staff login error:', error);
+      setLoginError(error.message || 'Giriş yapılamadı');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (!isClient) {
+  // Çıkış fonksiyonu
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setStaffInfo(null);
+    sessionStorage.removeItem('waiter_staff');
+  };
+
+  // Sipariş servis etme
+  const handleServeOrder = (orderId: string) => {
+    setOrders(prev => prev.filter(order => order.id !== orderId));
+    alert('Sipariş servis edildi!');
+  };
+
+  // Çağrıyı çözme
+  const handleResolveCall = (callId: string) => {
+    setCalls(prev => prev.filter(call => call.id !== callId));
+    alert('Çağrı çözüldü!');
+  };
+
+  // Login formu
+  if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center p-4">
+        <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaUsers className="text-2xl text-blue-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800">Garson Paneli</h1>
+            <p className="text-gray-600 mt-2">Garson girişi</p>
+          </div>
+
+          <form onSubmit={handleStaffLogin} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Kullanıcı Adı
+              </label>
+              <div className="relative">
+                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={loginForm.username}
+                  onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Kullanıcı adınızı girin"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Şifre
+              </label>
+              <div className="relative">
+                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Şifrenizi girin"
+                  required
+                />
+              </div>
+            </div>
+
+            {loginError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-sm">{loginError}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Giriş yapılıyor...
+                </>
+              ) : (
+                <>
+                  <FaUsers />
+                  Garson Paneline Giriş
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Giriş bilgilerinizi personel yönetiminden alabilirsiniz.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-      <SetBrandColor />
-      <main className="min-h-screen pb-20">
-        {/* Header */}
-        <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
-          <div className="container mx-auto px-3 py-3 flex justify-between items-center">
-            <div className="flex items-center">
-              <Link href="/menu" className="mr-2">
-                <FaArrowLeft size={16} />
-              </Link>
-              <h1 className="text-dynamic-lg font-bold text-primary">
-                <TranslatedText>Garson Çağır</TranslatedText>
-              </h1>
-              <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
-                <TranslatedText>Masa #{tableNumber}</TranslatedText>
-              </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden sm:block bg-white bg-opacity-20 p-3 rounded-lg">
+              <FaUsers className="text-2xl" />
+            </div>
+            <div>
+              <h2 className="text-lg sm:text-2xl font-bold">Garson Paneli</h2>
+              <p className="text-blue-100 text-xs sm:text-sm hidden sm:block">Hoş geldiniz, {staffInfo?.name}</p>
             </div>
           </div>
-        </header>
-
-        {/* Content */}
-        <div className="pt-16 px-3 py-4">
-          {/* Info Card */}
-          <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--brand-surface)' }}>
-                <FaBell size={20} style={{ color: primary }} />
-              </div>
-              <div>
-                <h3 className="font-semibold text-dynamic-sm">
-                  <TranslatedText>Hızlı İstekler</TranslatedText>
-                </h3>
-                <p className="text-xs text-gray-600">
-                  <TranslatedText>Garsonunuzla iletişime geçmek için aşağıdaki seçenekleri kullanın</TranslatedText>
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button
+              onClick={handleLogout}
+              className="px-2 sm:px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
+            >
+              <FaSignOutAlt className="text-sm sm:text-base" />
+              <span className="hidden sm:inline">Çıkış</span>
+            </button>
           </div>
+        </div>
+      </header>
 
-          {/* Quick Requests */}
-          <div className="grid grid-cols-1 gap-4 mb-6">
-            {quickRequests.map((request) => {
-              const IconComponent = request.icon;
-              const isSent = sentRequests.includes(request.id);
-              
-              return (
-                <button
-                  key={request.id}
-                  onClick={() => handleRequest(request.id)}
-                  disabled={isSent}
-                  className={`relative bg-white rounded-lg shadow-sm border p-4 flex items-center gap-4 hover:shadow-md transition-all ${
-                    isSent ? 'opacity-75 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${request.color} text-white`}>
-                    <IconComponent size={20} />
-                  </div>
-                  <div className="flex-grow text-left">
-                    <h3 className="font-semibold text-dynamic-sm">
-                      <TranslatedText>{request.title}</TranslatedText>
-                    </h3>
-                    <p className="text-xs text-gray-600">
-                      <TranslatedText>{request.description}</TranslatedText>
-                    </p>
-                  </div>
-                  {isSent && (
-                    <div className="absolute inset-0 bg-green-50 rounded-lg flex items-center justify-center">
-                      <div className="text-center">
-                        <FaCheckCircle className="text-green-500 mx-auto mb-1" size={20} />
-                        <span className="text-xs text-green-600 font-medium">
-                          <TranslatedText>Gönderildi</TranslatedText>
-                        </span>
+      <div className="max-w-7xl mx-auto p-3 sm:p-6">
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          <div className="flex border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab('orders')}
+              className={`flex-1 px-4 py-3 text-sm font-medium ${
+                activeTab === 'orders'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <FaUtensils className="inline mr-2" />
+              Siparişler ({orders.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('calls')}
+              className={`flex-1 px-4 py-3 text-sm font-medium ${
+                activeTab === 'calls'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <FaBell className="inline mr-2" />
+              Çağrılar ({calls.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Siparişler Tab */}
+        {activeTab === 'orders' && (
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">Hazır Siparişler</h3>
+            </div>
+
+            <div className="divide-y divide-gray-200">
+              {orders.map(order => (
+                <div key={order.id} className="p-4 sm:p-6 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                          Masa {order.tableNumber}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {order.guests} kişi
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(order.orderTime).toLocaleTimeString('tr-TR')}
+                        </div>
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          order.status === 'ready' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {order.status === 'ready' ? 'Hazır' : 'Hazırlanıyor'}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1 mb-3">
+                        {order.items.map((item: any) => (
+                          <div key={item.id} className="flex justify-between text-sm">
+                            <span className="flex items-center gap-2">
+                              {item.name} x{item.quantity}
+                              {item.status === 'ready' && (
+                                <FaCheckCircle className="text-green-500 text-xs" />
+                              )}
+                              {item.status === 'preparing' && (
+                                <FaClock className="text-orange-500 text-xs" />
+                              )}
+                            </span>
+                            <span>₺{item.price * item.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {order.notes && (
+                        <div className="text-sm text-gray-600 italic mb-2">
+                          Not: {order.notes}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-lg font-semibold text-gray-900">
+                          Toplam: ₺{order.totalAmount}
+                        </div>
+                        {order.status === 'ready' && (
+                          <button
+                            onClick={() => handleServeOrder(order.id)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                          >
+                            <FaUtensils />
+                            Servis Et
+                          </button>
+                        )}
                       </div>
                     </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Additional Options */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h3 className="font-semibold text-dynamic-sm mb-3">
-              <TranslatedText>Diğer Seçenekler</TranslatedText>
-            </h3>
-            
-            <div className="space-y-3">
-              <Link
-                href="/cart"
-                className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
-              >
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <FaShoppingCart className="text-blue-500" size={16} />
+                  </div>
                 </div>
-                <div className="flex-grow">
-                  <p className="font-medium text-sm">
-                    <TranslatedText>Siparişi Görüntüle</TranslatedText>
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    <TranslatedText>Sepetinizdeki ürünleri kontrol edin</TranslatedText>
-                  </p>
-                </div>
-              </Link>
-
-              <Link
-                href="/menu"
-                className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
-              >
-                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                  <FaUtensils className="text-green-500" size={16} />
-                </div>
-                <div className="flex-grow">
-                  <p className="font-medium text-sm">
-                    <TranslatedText>Menüye Dön</TranslatedText>
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    <TranslatedText>Yeni ürünler ekleyin</TranslatedText>
-                  </p>
-                </div>
-              </Link>
+              ))}
             </div>
-          </div>
-        </div>
 
-        {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 shadow-lg">
-          <div className="container mx-auto flex justify-around">
-            <Link href="/menu" className="flex flex-col items-center" style={{ color: primary }}>
-              <FaUtensils className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Menü</TranslatedText></span>
-            </Link>
-            <Link href="/cart" className="flex flex-col items-center" style={{ color: primary }}>
-              <FaShoppingCart className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Sepet</TranslatedText></span>
-            </Link>
-            <Link href="/waiter" className="flex flex-col items-center" style={{ color: primary }}>
-              <FaBell className="mb-0.5" size={16} />
-              <span className="text-[10px]"><TranslatedText>Garson Çağır</TranslatedText></span>
-            </Link>
+            {orders.length === 0 && (
+              <div className="text-center py-12">
+                <FaUtensils className="text-4xl text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">Hazır sipariş yok</p>
+              </div>
+            )}
           </div>
-        </nav>
-      </main>
+        )}
 
-      {/* Custom Message Modal */}
-      {showCustomModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 m-4 max-w-sm w-full">
-            <h3 className="text-lg font-semibold mb-4">
-              <TranslatedText>Kişisel Mesaj</TranslatedText>
-            </h3>
-            <div className="mb-4">
-              <textarea
-                value={customMessage}
-                onChange={(e) => setCustomMessage(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none"
-                rows={4}
-                placeholder="Mesajınızı yazın..."
-                maxLength={200}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                <TranslatedText>{customMessage.length}/200 karakter</TranslatedText>
-              </p>
+        {/* Çağrılar Tab */}
+        {activeTab === 'calls' && (
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800">Müşteri Çağrıları</h3>
             </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowCustomModal(false);
-                  setCustomMessage('');
-                }}
-                className="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                <TranslatedText>İptal</TranslatedText>
-              </button>
-              <button
-                onClick={handleCustomRequest}
-                disabled={!customMessage.trim()}
-                className="flex-1 py-2 px-4 btn btn-primary rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <TranslatedText>Gönder</TranslatedText>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
 
-export default function WaiterPage() {
-  return (
-    <LanguageProvider>
-      <WaiterPageContent />
-    </LanguageProvider>
+            <div className="divide-y divide-gray-200">
+              {calls.map(call => (
+                <div key={call.id} className="p-4 sm:p-6 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                          Masa {call.tableNumber}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(call.timestamp).toLocaleTimeString('tr-TR')}
+                        </div>
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          call.type === 'service' 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {call.type === 'service' ? 'Servis' : 'Hesap'}
+                        </div>
+                      </div>
+                      
+                      <div className="text-sm text-gray-700 mb-3">
+                        {call.message}
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                          {Math.floor((Date.now() - new Date(call.timestamp).getTime()) / (1000 * 60))} dakika önce
+                        </div>
+                        <button
+                          onClick={() => handleResolveCall(call.id)}
+                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                        >
+                          <FaCheckCircle />
+                          Çözüldü
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {calls.length === 0 && (
+              <div className="text-center py-12">
+                <FaBell className="text-4xl text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">Aktif çağrı yok</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
