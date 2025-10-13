@@ -13,6 +13,7 @@ import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
+import apiService from '@/services/api';
 
 function MenuPageContent() {
   // Store states
@@ -43,6 +44,8 @@ function MenuPageContent() {
   const [searchPlaceholder, setSearchPlaceholder] = useState('Menüde ara...');
   const { settings } = useBusinessSettingsStore();
   const [showSplash, setShowSplash] = useState(false);
+  const [tokenValid, setTokenValid] = useState<boolean | null>(null);
+  const [tokenMessage, setTokenMessage] = useState('');
   const primary = settings.branding.primaryColor;
   const secondary = settings.branding.secondaryColor || settings.branding.primaryColor;
   
@@ -69,12 +72,39 @@ function MenuPageContent() {
 
   // QR Table Number Detection - Sabit QR ile çalışır
   useEffect(() => {
-    const detectTableNumber = async () => {
+    const detectTableAndToken = async () => {
       if (typeof window === 'undefined') return;
       
       const urlParams = new URLSearchParams(window.location.search);
       const tableParam = urlParams.get('table');
+      const tokenParam = urlParams.get('token');
       
+      // Token varsa doğrula
+      if (tokenParam) {
+        try {
+          const response = await apiService.verifyQRToken(tokenParam);
+          
+          if (response.success && response.data?.isActive) {
+            setTokenValid(true);
+            setTokenMessage('QR kod geçerli. Menüye erişebilirsiniz.');
+            
+            // Token'ı sessionStorage'a kaydet
+            sessionStorage.setItem('qr_token', tokenParam);
+            console.log('✅ Token doğrulandı:', tokenParam);
+          } else {
+            setTokenValid(false);
+            setTokenMessage('QR kod geçersiz veya süresi dolmuş. Lütfen yeni bir QR kod tarayın.');
+            return; // Token geçersizse devam etme
+          }
+        } catch (error) {
+          console.error('❌ Token doğrulama hatası:', error);
+          setTokenValid(false);
+          setTokenMessage('QR kod doğrulanamadı. Lütfen yeni bir QR kod tarayın.');
+          return;
+        }
+      }
+      
+      // Masa numarası kontrolü
       if (tableParam) {
         const tableNum = parseInt(tableParam);
         
@@ -82,22 +112,23 @@ function MenuPageContent() {
           // Masa numarasını ayarla
           setTableNumber(tableNum);
           
-          // Backend'de bu masa için session token oluştur
-          try {
-            if (currentRestaurant?.id) {
-              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/qr/generate`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  restaurantId: currentRestaurant.id,
-                  tableNumber: tableNum,
-                  duration: 2 // 2 saat
-                })
-              });
-              
-              const data = await response.json();
-              
-              if (data.success) {
+          // Token yoksa yeni QR token oluştur (eski sistem için)
+          if (!tokenParam) {
+            try {
+              if (currentRestaurant?.id) {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/qr/generate`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    restaurantId: currentRestaurant.id,
+                    tableNumber: tableNum,
+                    duration: 2 // 2 saat
+                  })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
                 console.log('Masa oturumu başlatıldı:', {
                   masa: tableNum,
                   token: data.data.token,
@@ -115,8 +146,8 @@ function MenuPageContent() {
       }
     };
     
-    detectTableNumber();
-  }, [setTableNumber, currentRestaurant?.id]);
+    detectTableAndToken();
+  }, [setTableNumber, currentRestaurant]);
 
   // Fetch data on mount
   useEffect(() => {
@@ -251,6 +282,39 @@ function MenuPageContent() {
     setSelectedItem(null);
   };
 
+  // Token geçersizse menüyü gizle
+  if (tokenValid === false) {
+    return (
+      <>
+        <SetBrandColor />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="mb-4">
+              <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">QR Kod Geçersiz</h2>
+              <p className="text-gray-600 mb-4">{tokenMessage}</p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-yellow-800">
+                  Bu QR kod ödeme tamamlandıktan sonra geçersiz hale gelir. 
+                  Yeni bir QR kod tarayarak menüye erişebilirsiniz.
+                </p>
+              </div>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Tekrar Dene
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

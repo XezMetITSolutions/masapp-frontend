@@ -145,6 +145,23 @@ const useCartStore = create<CartState>()((set, get) => ({
 
       // Ödeme alındıktan sonra sepeti sıfırla ve paid=true kaydet
       markPaidAndClear: () => {
+        // Ödeme tamamlandığında QR token'ı geçersizleştir
+        const qrToken = sessionStorage.getItem('qr_token');
+        if (qrToken) {
+          // Backend'e token geçersizleştirme isteği gönder
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/qr/deactivate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tokenId: qrToken })
+          }).catch(error => {
+            console.error('Token geçersizleştirme hatası:', error);
+          });
+          
+          // Local storage'dan token'ı kaldır
+          sessionStorage.removeItem('qr_token');
+          console.log('✅ Ödeme tamamlandı, QR token geçersizleştirildi');
+        }
+        
         set({ items: [], preparingItems: [], couponCode: null, tipPercentage: 10, orderStatus: 'completed', paid: true });
       },
 

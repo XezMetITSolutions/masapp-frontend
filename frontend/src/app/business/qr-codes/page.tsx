@@ -42,6 +42,7 @@ export default function QRCodesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [bulkCount, setBulkCount] = useState(5);
   const [selectedTheme, setSelectedTheme] = useState('default');
+  const [qrType, setQrType] = useState<'permanent' | 'token'>('permanent');
   const [toast, setToast] = useState({ message: '', visible: false });
 
   // Authentication check
@@ -77,23 +78,58 @@ export default function QRCodesPage() {
   };
 
   // Toplu QR kod oluşturma - Sabit QR kodları (basılabilir)
-  const handleCreateBulkQRCodes = () => {
+  const handleCreateBulkQRCodes = async () => {
     if (!authenticatedRestaurant) {
       showToast('Restoran bilgisi bulunamadı!');
       return;
     }
 
-    const newQRCodes = createBulkTableQRCodes(
-      1, // Masa 1'den başla
-      bulkCount,
-      authenticatedRestaurant.id,
-      selectedTheme,
-      authenticatedRestaurant
-    );
+    try {
+      let tokens: string[] | undefined;
+      
+      // Token'lı QR kod isteniyorsa backend'den token al
+      if (qrType === 'token') {
+        tokens = [];
+        for (let i = 1; i <= bulkCount; i++) {
+          try {
+            const response = await apiService.generateQRToken({
+              restaurantId: authenticatedRestaurant.id,
+              tableNumber: i,
+              duration: 24 // 24 saat geçerli
+            });
+            if (response.success && response.data?.token) {
+              tokens.push(response.data.token);
+            } else {
+              throw new Error('Token oluşturulamadı');
+            }
+          } catch (error) {
+            console.error('Token oluşturma hatası:', error);
+            showToast('Token oluşturulurken hata oluştu!');
+            return;
+          }
+        }
+      }
 
-    setQrCodes(prev => [...prev, ...newQRCodes]);
-    setShowCreateModal(false);
-    showToast(`${bulkCount} adet kalıcı QR kod oluşturuldu! (Basılabilir)`);
+      const newQRCodes = createBulkTableQRCodes(
+        1, // Masa 1'den başla
+        bulkCount,
+        authenticatedRestaurant.id,
+        selectedTheme,
+        authenticatedRestaurant,
+        tokens
+      );
+
+      setQrCodes(prev => [...prev, ...newQRCodes]);
+      setShowCreateModal(false);
+      
+      const message = qrType === 'token' 
+        ? `${bulkCount} adet token'lı QR kod oluşturuldu! (Ödeme sonrası yeniden scan gerekli)`
+        : `${bulkCount} adet kalıcı QR kod oluşturuldu! (Basılabilir)`;
+      showToast(message);
+    } catch (error) {
+      console.error('QR kod oluşturma hatası:', error);
+      showToast('QR kod oluşturulurken hata oluştu!');
+    }
   };
 
   // Tek QR kod oluşturma
@@ -296,6 +332,42 @@ export default function QRCodesPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">QR Kod Oluştur</h2>
             
             <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  QR Kod Tipi
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="qrType"
+                      value="permanent"
+                      checked={qrType === 'permanent'}
+                      onChange={(e) => setQrType(e.target.value as 'permanent' | 'token')}
+                      className="mr-2"
+                    />
+                    <div>
+                      <span className="font-medium">Kalıcı QR Kod</span>
+                      <p className="text-sm text-gray-500">Basılabilir, sürekli çalışan QR kod</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="qrType"
+                      value="token"
+                      checked={qrType === 'token'}
+                      onChange={(e) => setQrType(e.target.value as 'permanent' | 'token')}
+                      className="mr-2"
+                    />
+                    <div>
+                      <span className="font-medium">Token'lı QR Kod</span>
+                      <p className="text-sm text-gray-500">Ödeme sonrası yeniden scan gerekli</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Masa Sayısı
