@@ -224,12 +224,12 @@ class ApiService {
   }
 
   // Staff endpoints
-  async getStaff() {
-    return this.request<any>('/staff');
+  async getStaff(restaurantId: string) {
+    return this.request<any>(`/staff/restaurant/${restaurantId}`);
   }
 
-  async createStaff(staffData: any) {
-    return this.request<any>('/staff', {
+  async createStaff(restaurantId: string, staffData: any) {
+    return this.request<any>(`/staff/restaurant/${restaurantId}`, {
       method: 'POST',
       body: JSON.stringify(staffData),
     });
@@ -245,6 +245,13 @@ class ApiService {
   async deleteStaff(id: string) {
     return this.request<any>(`/staff/${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  async staffLogin(username: string, password: string, subdomain: string) {
+    return this.request<any>('/staff/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password, subdomain }),
     });
   }
 

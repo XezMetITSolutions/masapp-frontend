@@ -234,7 +234,9 @@ export default function StaffPage() {
           phone: newMember.phone,
           role: newMember.role,
           department: newMember.department,
-          notes: newMember.notes
+          notes: newMember.notes,
+          username: newStaff.username,
+          password: newStaff.password
         };
         
         const response = await apiService.createStaff(authenticatedRestaurant.id, staffData);
@@ -289,15 +291,46 @@ export default function StaffPage() {
     setShowEditModal(true);
   };
  
-  const handleUpdateStaff = () => {
+  const handleUpdateStaff = async () => {
     if (!selectedStaff) { return; }
     const name = (selectedStaff.name || '').trim();
     const email = (selectedStaff.email || '').trim();
     if (!name) { alert('Ad Soyad zorunludur.'); return; }
     if (!email) { alert('E-posta zorunludur.'); return; }
 
+    // Backend'e güncelleme gönder
+    try {
+      if (authenticatedRestaurant?.id) {
+        const updateData = {
+          name: selectedStaff.name,
+          email: selectedStaff.email,
+          phone: selectedStaff.phone,
+          role: selectedStaff.role,
+          department: selectedStaff.department,
+          notes: selectedStaff.notes,
+          status: selectedStaff.status,
+          username: selectedStaff.username,
+          password: selectedStaff.password
+        };
+        
+        const response = await apiService.updateStaff(selectedStaff.id, updateData);
+        console.log('✅ Staff updated in backend:', response);
+      }
+    } catch (error) {
+      console.error('❌ Backend staff update failed:', error);
+      alert('Güncelleme sırasında hata oluştu!');
+      return;
+    }
+
     setStaff(prev => prev.map(s => s.id === selectedStaff.id ? selectedStaff : s));
+    
+    // localStorage'a kaydet
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('business_staff', JSON.stringify(staff.map(s => s.id === selectedStaff.id ? selectedStaff : s)));
+    }
+    
     setShowEditModal(false);
+    alert('Personel bilgileri başarıyla güncellendi!');
   };
 
   const handleDeleteStaff = (staffId: number) => {
@@ -1209,6 +1242,36 @@ export default function StaffPage() {
                     rows={3}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                   />
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Giriş Bilgileri</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Kullanıcı Adı
+                      </label>
+                      <input
+                        type="text"
+                        value={selectedStaff.username || ''}
+                        onChange={(e) => setSelectedStaff({...selectedStaff, username: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        placeholder="Kullanıcı adı"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Şifre
+                      </label>
+                      <input
+                        type="password"
+                        value={selectedStaff.password || ''}
+                        onChange={(e) => setSelectedStaff({...selectedStaff, password: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        placeholder="Yeni şifre"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex gap-3">
