@@ -483,13 +483,20 @@ function MenuPageContent() {
                   </p>
                   
                   {/* Allergens */}
-                  {item.allergens && Array.isArray(item.allergens) && item.allergens.length > 0 && (
+                  {item.allergens && item.allergens.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-2">
                       {item.allergens.slice(0, 3).map((allergen: any, i: number) => (
                         <span key={i} className="bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full">
                           {typeof allergen === 'string' ? allergen : (allergen[language as keyof typeof allergen] || allergen.tr || allergen.en)}
                         </span>
                       ))}
+                    </div>
+                  )}
+                  
+                  {/* Debug: Allergens */}
+                  {process.env.NODE_ENV === 'development' && item.allergens && (
+                    <div className="text-xs text-gray-400">
+                      Debug: {JSON.stringify(item.allergens)}
                     </div>
                   )}
                   
