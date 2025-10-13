@@ -357,7 +357,38 @@ function CartPageContent() {
             <h3 className="text-lg font-semibold mb-4">
               <TranslatedText>Bahşiş Miktarı</TranslatedText>
             </h3>
+            
+            {/* Yüzde Butonları */}
             <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                <TranslatedText>Hızlı Seçim</TranslatedText>
+              </p>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <button
+                  onClick={() => setTipAmount(subtotal * 0.03)}
+                  className="py-2 px-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                >
+                  3% - ₺{(subtotal * 0.03).toFixed(2)}
+                </button>
+                <button
+                  onClick={() => setTipAmount(subtotal * 0.05)}
+                  className="py-2 px-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                >
+                  5% - ₺{(subtotal * 0.05).toFixed(2)}
+                </button>
+                <button
+                  onClick={() => setTipAmount(subtotal * 0.10)}
+                  className="py-2 px-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium"
+                >
+                  10% - ₺{(subtotal * 0.10).toFixed(2)}
+                </button>
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <TranslatedText>Manuel Miktar</TranslatedText>
+              </label>
               <input
                 type="number"
                 value={tipAmount}
@@ -367,6 +398,7 @@ function CartPageContent() {
                 step="0.01"
               />
             </div>
+            
             <div className="flex gap-3">
               <button
                 onClick={() => setShowTipModal(false)}
@@ -392,7 +424,38 @@ function CartPageContent() {
             <h3 className="text-lg font-semibold mb-4">
               <TranslatedText>Bağış Miktarı</TranslatedText>
             </h3>
+            
+            {/* Yüzde Butonları */}
             <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                <TranslatedText>Hızlı Seçim</TranslatedText>
+              </p>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <button
+                  onClick={() => setDonationAmount(subtotal * 0.03)}
+                  className="py-2 px-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                >
+                  3% - ₺{(subtotal * 0.03).toFixed(2)}
+                </button>
+                <button
+                  onClick={() => setDonationAmount(subtotal * 0.05)}
+                  className="py-2 px-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                >
+                  5% - ₺{(subtotal * 0.05).toFixed(2)}
+                </button>
+                <button
+                  onClick={() => setDonationAmount(subtotal * 0.10)}
+                  className="py-2 px-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm font-medium"
+                >
+                  10% - ₺{(subtotal * 0.10).toFixed(2)}
+                </button>
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <TranslatedText>Manuel Miktar</TranslatedText>
+              </label>
               <input
                 type="number"
                 value={donationAmount}
