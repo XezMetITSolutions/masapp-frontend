@@ -129,20 +129,20 @@ function MenuPageContent() {
                 const data = await response.json();
                 
                 if (data.success) {
-                console.log('Masa oturumu başlatıldı:', {
-                  masa: tableNum,
-                  token: data.data.token,
-                  süre: '2 saat'
-                });
-                
-                // Token'ı sessionStorage'a kaydet (sayfa yenilenirse tekrar oluşturma)
-                sessionStorage.setItem('qr-session-token', data.data.token);
+                  console.log('Masa oturumu başlatıldı:', {
+                    masa: tableNum,
+                    token: data.data.token,
+                    süre: '2 saat'
+                  });
+                  
+                  // Token'ı sessionStorage'a kaydet (sayfa yenilenirse tekrar oluşturma)
+                  sessionStorage.setItem('qr-session-token', data.data.token);
+                }
               }
+            } catch (error) {
+              console.error('Session token oluşturma hatası:', error);
             }
-          } catch (error) {
-            console.error('Session token oluşturma hatası:', error);
           }
-        }
       }
     };
     
