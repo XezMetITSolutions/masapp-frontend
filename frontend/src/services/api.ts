@@ -189,10 +189,10 @@ class ApiService {
   }
 
   // QR Token Management
-  async generateQRToken(restaurantId: string, tableNumber: number, duration: number = 2) {
+  async generateQRToken(data: { restaurantId: string; tableNumber: number; duration?: number }) {
     return this.request<any>(`/qr/generate`, {
       method: 'POST',
-      body: JSON.stringify({ restaurantId, tableNumber, duration, createdBy: 'waiter' }),
+      body: JSON.stringify(data),
     });
   }
 
