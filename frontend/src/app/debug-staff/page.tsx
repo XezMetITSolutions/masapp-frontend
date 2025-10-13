@@ -121,6 +121,37 @@ export default function StaffDebugPage() {
           </div>
         </div>
 
+        {/* Staff Test */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Staff Test</h2>
+          
+          <div className="mb-4">
+            <button
+              onClick={async () => {
+                try {
+                  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/test`);
+                  const result = await response.json();
+                  console.log('Staff test result:', result);
+                  alert(`Staff Test Result: ${JSON.stringify(result, null, 2)}`);
+                } catch (error) {
+                  console.error('Error testing staff:', error);
+                  alert(`Error: ${error}`);
+                }
+              }}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mr-4"
+            >
+              Test Staff Model
+            </button>
+            
+            <button
+              onClick={fetchData}
+              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            >
+              Refresh Data
+            </button>
+          </div>
+        </div>
+
         {/* Staff Ekleme Test */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Staff Ekleme Test</h2>
