@@ -1237,18 +1237,12 @@ export default function MenuManagement() {
                               const updateData = {
                                 name: formData.name,
                                 description: formData.description,
-                            price: Number(formData.price),
-                            categoryId: formData.category,
-                            isAvailable: formData.isAvailable,
-                            isPopular: formData.isPopular,
-                                imageUrl: capturedImage || editingItem.imageUrl
-                                // Yeni alanları geçici olarak kaldırdık
-                                // preparationTime: Number(formData.preparationTime) || 0,
-                                // calories: Number(formData.calories) || 0,
-                                // subcategory: formData.subcategory,
-                                // ingredients: formData.ingredients,
-                                // allergens: formData.allergens,
-                                // portion: formData.portion
+                                price: Number(formData.price),
+                                categoryId: formData.category,
+                                isAvailable: formData.isAvailable,
+                                isPopular: formData.isPopular,
+                                imageUrl: capturedImage || editingItem.imageUrl,
+                                allergens: formData.allergens
                               };
                               
                               console.log('Update Data gönderiliyor:', updateData);
@@ -1274,21 +1268,15 @@ export default function MenuManagement() {
                           try {
                             if (currentRestaurantId) {
                               const createData = {
-                            categoryId: formData.category,
+                                categoryId: formData.category,
                                 name: formData.name,
                                 description: formData.description,
-                            price: Number(formData.price),
+                                price: Number(formData.price),
                                 imageUrl: capturedImage || '/placeholder-food.jpg',
-                            order: items.length + 1,
-                            isAvailable: formData.isAvailable,
-                                isPopular: formData.isPopular
-                                // Yeni alanları geçici olarak kaldırdık
-                                // preparationTime: Number(formData.preparationTime) || 0,
-                                // calories: Number(formData.calories) || 0,
-                                // subcategory: formData.subcategory,
-                                // ingredients: formData.ingredients,
-                                // allergens: formData.allergens,
-                                // portion: formData.portion
+                                order: items.length + 1,
+                                isAvailable: formData.isAvailable,
+                                isPopular: formData.isPopular,
+                                allergens: formData.allergens
                               };
                               
                               console.log('Create Data gönderiliyor:', createData);
