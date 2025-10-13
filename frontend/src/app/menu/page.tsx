@@ -143,6 +143,7 @@ function MenuPageContent() {
               console.error('Session token oluşturma hatası:', error);
             }
           }
+        }
       }
     };
     
