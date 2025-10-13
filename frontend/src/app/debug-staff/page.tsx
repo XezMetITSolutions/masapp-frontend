@@ -16,17 +16,21 @@ export default function StaffDebugPage() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>('');
 
   useEffect(() => {
-    fetchData();
+    // İlk açılışta sadece restoranları çek; staff listesi isteğe bağlı
+    (async () => {
+      try {
+        const restaurantsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurants`);
+        const restaurantsData = await restaurantsResponse.json();
+        setRestaurants(restaurantsData.data || []);
+      } catch (e) {
+        console.error('Restaurant fetch error:', e);
+      }
+    })();
   }, []);
 
   const fetchData = async () => {
     try {
-      // Restaurant'ları getir
-      const restaurantsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurants`);
-      const restaurantsData = await restaurantsResponse.json();
-      setRestaurants(restaurantsData.data || []);
-
-      // Staff'ları getir
+      // Staff'ları getir (isteğe bağlı buton ile)
       const staffResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/all`);
       const staffData = await staffResponse.json();
       setStaff(staffData.data || []);
@@ -91,7 +95,10 @@ export default function StaffDebugPage() {
 
         {/* Staff Listesi */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Staff Listesi</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Staff Listesi</h2>
+            <button onClick={fetchData} className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800">Staff Yükle</button>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -253,14 +260,16 @@ export default function StaffDebugPage() {
               }
               
               try {
+                // Çakışmaları önlemek için unique email/username üret
+                const suffix = Date.now().toString().slice(-6);
                 const staffData = {
                   name: "Kasa Hazal",
-                  email: "kasa@hazal.com",
+                  email: `kasa+${suffix}@hazal.com`,
                   phone: "555-1234",
                   role: "cashier",
                   department: "service",
                   notes: "Test staff member",
-                  username: "kasa_hazal",
+                  username: `kasa_hazal_${suffix}`,
                   password: "123456"
                 };
                 
