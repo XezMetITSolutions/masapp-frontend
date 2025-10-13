@@ -144,6 +144,31 @@ export default function StaffDebugPage() {
             </button>
             
             <button
+              onClick={async () => {
+                try {
+                  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restore-restaurants`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    }
+                  });
+                  const result = await response.json();
+                  console.log('Restaurant restore result:', result);
+                  alert(`Restaurant Restore Result: ${JSON.stringify(result, null, 2)}`);
+                  
+                  // Refresh data
+                  fetchData();
+                } catch (error) {
+                  console.error('Error restoring restaurants:', error);
+                  alert(`Error: ${error}`);
+                }
+              }}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mr-4"
+            >
+              Restore Restaurants
+            </button>
+            
+            <button
               onClick={fetchData}
               className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
             >
