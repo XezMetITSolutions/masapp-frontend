@@ -265,7 +265,8 @@ function MenuPageContent() {
         name: item.name,
         price: item.price,
         quantity: 1,
-        image: item.image
+        image: item.image,
+        preparationTime: item.preparationTime // hazırlık süresini ekle
       });
       setToastVisible(true);
       // Auto hide toast after 3 seconds

@@ -15,6 +15,7 @@ export interface CartItem {
   quantity: number;
   image?: string;
   notes?: string; // müşteri özel istek notu
+  preparationTime?: number; // hazırlık süresi (dakika)
 }
 
 interface CartState {
@@ -49,6 +50,7 @@ interface CartState {
   getDiscount: () => number;
   getTipAmount: () => number;
   getTotal: () => number;
+  getMaxPreparationTime: () => number; // En uzun hazırlık süresi
 }
 
 const useCartStore = create<CartState>()((set, get) => ({
@@ -219,6 +221,14 @@ const useCartStore = create<CartState>()((set, get) => ({
         const tipAmount = get().getTipAmount();
         
         return subtotal - discount + tipAmount;
+      },
+      
+      getMaxPreparationTime: () => {
+        const items = get().items;
+        if (items.length === 0) return 0;
+        
+        const maxTime = Math.max(...items.map(item => item.preparationTime || 0));
+        return maxTime;
       },
 }));
 

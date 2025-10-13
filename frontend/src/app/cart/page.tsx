@@ -24,7 +24,7 @@ import SetBrandColor from '@/components/SetBrandColor';
 
 function CartPageContent() {
   const { currentLanguage, translate } = useLanguage();
-  const { items, tableNumber, removeItem, updateQuantity, clearCart } = useCartStore();
+  const { items, tableNumber, removeItem, updateQuantity, clearCart, getMaxPreparationTime } = useCartStore();
   const { settings } = useBusinessSettingsStore();
   const [isClient, setIsClient] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash' | 'donation' | 'tip'>('card');
@@ -67,11 +67,21 @@ function CartPageContent() {
     console.log('Tip:', tipAmount);
     console.log('Donation:', donationAmount);
     
+    // En uzun hazırlık süresini hesapla
+    const maxPrepTime = getMaxPreparationTime();
+    
     // Clear cart after payment
     clearCart();
     setShowPaymentModal(false);
     setTipAmount(0);
     setDonationAmount(0);
+    
+    // Sipariş onay mesajı göster
+    if (maxPrepTime > 0) {
+      alert(`✅ Siparişiniz alınmıştır!\n\nSiparişiniz ${maxPrepTime} dakika içinde masanıza getirilecektir.`);
+    } else {
+      alert('✅ Siparişiniz alınmıştır!\n\nSiparişiniz kısa sürede masanıza getirilecektir.');
+    }
   };
 
   const handleTip = () => {
