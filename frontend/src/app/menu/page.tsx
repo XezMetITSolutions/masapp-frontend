@@ -109,8 +109,10 @@ function MenuPageContent() {
         const tableNum = parseInt(tableParam);
         
         if (!isNaN(tableNum) && tableNum > 0) {
-          // Masa numarasını ayarla
-          setTableNumber(tableNum);
+          // Token varsa masa numarasını ayarla (QR kod ile geldiğinde)
+          if (tokenParam) {
+            setTableNumber(tableNum);
+          }
           
           // Token yoksa yeni QR token oluştur (eski sistem için)
           if (!tokenParam) {
