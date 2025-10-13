@@ -1006,10 +1006,15 @@ export default function MenuManagement() {
                               checked={Array.isArray(formData.allergens) && formData.allergens.includes(allergen)}
                               onChange={(e) => {
                                 const currentAllergens = Array.isArray(formData.allergens) ? formData.allergens : [];
+                                console.log('Alerjen değişikliği:', { allergen, checked: e.target.checked, currentAllergens });
                                 if (e.target.checked) {
-                                  setFormData({...formData, allergens: [...currentAllergens, allergen]});
+                                  const newAllergens = [...currentAllergens, allergen];
+                                  console.log('Yeni alerjenler:', newAllergens);
+                                  setFormData({...formData, allergens: newAllergens});
                                 } else {
-                                  setFormData({...formData, allergens: currentAllergens.filter(a => a !== allergen)});
+                                  const newAllergens = currentAllergens.filter(a => a !== allergen);
+                                  console.log('Kaldırılan alerjenler:', newAllergens);
+                                  setFormData({...formData, allergens: newAllergens});
                                 }
                               }}
                               className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
@@ -1246,6 +1251,7 @@ export default function MenuManagement() {
                               };
                               
                               console.log('Update Data gönderiliyor:', updateData);
+                              console.log('Alerjenler:', formData.allergens);
                               console.log('Resim URL uzunluğu:', updateData.imageUrl.length);
                               
                               await updateMenuItem(currentRestaurantId, editingItem.id, updateData);
@@ -1280,6 +1286,7 @@ export default function MenuManagement() {
                               };
                               
                               console.log('Create Data gönderiliyor:', createData);
+                              console.log('Alerjenler:', formData.allergens);
                               console.log('Resim URL uzunluğu:', createData.imageUrl.length);
                               
                               await createMenuItem(currentRestaurantId, createData);
