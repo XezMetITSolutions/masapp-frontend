@@ -50,7 +50,7 @@ import { apiService } from '@/services/api';
 
 export default function StaffPage() {
   const router = useRouter();
-  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout } = useAuthStore();
+  const { authenticatedRestaurant, authenticatedStaff, isAuthenticated, logout, initializeAuth } = useAuthStore();
   const { 
     settings, 
     updateStaffCredentials, 
@@ -85,11 +85,13 @@ export default function StaffPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Geçici olarak authentication kontrolünü devre dışı bırak
-    // if (!isAuthenticated()) {
-    //   router.push('/login');
-    // }
-  }, [isAuthenticated, router]);
+    // Auth'u initialize et
+    initializeAuth();
+    
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router, initializeAuth]);
 
   // Personel listesini localStorage'dan yükle
   useEffect(() => {

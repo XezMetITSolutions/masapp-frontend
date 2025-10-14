@@ -10,6 +10,8 @@ interface AuthState {
   isAuthenticated: () => boolean;
   getRole: () => string | null;
   initializeAuth: () => void;
+  getCurrentSubdomain: () => string | null;
+  getRestaurantFromSubdomain: () => Promise<Restaurant | null>;
 }
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
@@ -60,11 +62,54 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
             } else if (savedStaff) {
               const staff = JSON.parse(savedStaff);
               set({ authenticatedStaff: staff, authenticatedRestaurant: null });
+            } else {
+              // Eğer localStorage'da kayıt yoksa, subdomain'den restaurant bilgisini al
+              get().getRestaurantFromSubdomain();
             }
           } catch (error) {
             console.error('Error initializing auth:', error);
           }
         }
+      },
+      getCurrentSubdomain: () => {
+        if (typeof window === 'undefined') return null;
+        
+        const hostname = window.location.hostname;
+        const parts = hostname.split('.');
+        
+        // hazal.guzellestir.com -> hazal
+        if (parts.length >= 3) {
+          return parts[0];
+        }
+        
+        return null;
+      },
+      getRestaurantFromSubdomain: async () => {
+        const subdomain = get().getCurrentSubdomain();
+        if (!subdomain) return null;
+        
+        try {
+          // Backend'den subdomain'e göre restaurant bilgisini al
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/restaurants/username/${subdomain}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data) {
+              const restaurant = data.data;
+              set({ authenticatedRestaurant: restaurant, authenticatedStaff: null });
+              
+              // localStorage'a kaydet
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('currentRestaurant', JSON.stringify(restaurant));
+              }
+              
+              return restaurant;
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching restaurant from subdomain:', error);
+        }
+        
+        return null;
       },
 }));
 
