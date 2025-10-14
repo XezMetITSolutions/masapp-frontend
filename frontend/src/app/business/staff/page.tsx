@@ -93,22 +93,35 @@ export default function StaffPage() {
     }
   }, [isAuthenticated, router, initializeAuth]);
 
-  // Personel listesini localStorage'dan yükle
+  // Personel listesini backend'den yükle
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedStaff = localStorage.getItem('business_staff');
-      if (savedStaff) {
-        const parsedStaff = JSON.parse(savedStaff);
-        setStaff(parsedStaff);
-        setFilteredStaff(parsedStaff);
-        console.log('👥 Staff loaded from localStorage:', parsedStaff.length, 'members');
-      } else {
-        console.log('👥 No staff data found in localStorage');
-        setStaff([]);
-        setFilteredStaff([]);
+    const loadStaffFromBackend = async () => {
+      if (authenticatedRestaurant?.id) {
+        try {
+          console.log('📡 Loading staff from backend for restaurant:', authenticatedRestaurant.id);
+          const response = await apiService.getStaff(authenticatedRestaurant.id);
+          if (response?.data) {
+            console.log('✅ Staff loaded from backend:', response.data.length, 'members');
+            setStaff(response.data);
+            setFilteredStaff(response.data);
+          }
+        } catch (error) {
+          console.error('❌ Error loading staff from backend:', error);
+          // Fallback: localStorage'dan yükle
+          if (typeof window !== 'undefined') {
+            const savedStaff = localStorage.getItem('business_staff');
+            if (savedStaff) {
+              const parsedStaff = JSON.parse(savedStaff);
+              setStaff(parsedStaff);
+              setFilteredStaff(parsedStaff);
+            }
+          }
+        }
       }
-    }
-  }, []);
+    };
+
+    loadStaffFromBackend();
+  }, [authenticatedRestaurant?.id]);
 
   // Filtreleme ve arama
   useEffect(() => {
