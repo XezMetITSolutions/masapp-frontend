@@ -9,10 +9,11 @@ export default function DebugLoginPage() {
   const [hostname, setHostname] = useState<string>('');
   const [subdomain, setSubdomain] = useState<string>('');
 
-  const API_URL = useMemo(
-    () => process.env.NEXT_PUBLIC_API_URL || 'https://masapp-backend.onrender.com/api',
-    []
-  );
+  const API_URL = useMemo(() => {
+    const base = process.env.NEXT_PUBLIC_API_URL || 'https://masapp-backend.onrender.com/api';
+    // Env yanlışlıkla '/api' olmadan gelirse otomatik ekle
+    return base.endsWith('/api') ? base : `${base.replace(/\/$/, '')}/api`;
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
