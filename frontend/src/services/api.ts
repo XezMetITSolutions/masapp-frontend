@@ -24,15 +24,19 @@ class ApiService {
         ? window.location.hostname.split('.')[0]
         : null;
       
+      // Subdomain'i her zaman gönder (test için)
       const headers = {
         'Content-Type': 'application/json',
-        ...(subdomain && subdomain !== 'localhost' && subdomain !== 'www' && subdomain !== 'guzellestir' 
-          ? { 'X-Subdomain': subdomain }
-          : {}),
+        'X-Subdomain': subdomain || 'hazal', // Fallback olarak hazal kullan
         ...options.headers,
       };
       
-      console.log('🌐 API Request:', { url, subdomain, headers });
+      console.log('🌐 API Request:', { 
+        url, 
+        subdomain, 
+        hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+        headers 
+      });
       
       const response = await fetch(url, {
         headers,
