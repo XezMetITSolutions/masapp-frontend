@@ -429,8 +429,8 @@ export default function DebugPage() {
               <FaTrash />
               Temizle
             </button>
-            </div>
-              </div>
+          </div>
+        </div>
 
         {/* Test Results */}
         {testResults && (

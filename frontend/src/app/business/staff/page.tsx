@@ -333,10 +333,20 @@ export default function StaffPage() {
     alert('Personel bilgileri başarıyla güncellendi!');
   };
 
-  const handleDeleteStaff = (staffId: number) => {
+  const handleDeleteStaff = async (staffId: number) => {
     if (confirm('Bu personeli silmek istediğinizden emin misiniz?')) {
-      setStaff(staff.filter(s => s.id !== staffId));
-      console.log('Personel silindi:', staffId);
+      try {
+        // Backend'den sil
+        await apiService.deleteStaff(staffId);
+        console.log('✅ Staff deleted from backend:', staffId);
+        
+        // Frontend state'den sil
+        setStaff(staff.filter(s => s.id !== staffId));
+        console.log('✅ Staff removed from frontend state');
+      } catch (error) {
+        console.error('❌ Error deleting staff:', error);
+        alert('Personel silinirken hata oluştu!');
+      }
     }
   };
 

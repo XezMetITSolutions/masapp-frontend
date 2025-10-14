@@ -172,7 +172,7 @@ function MenuPageContent() {
       }
     } catch {}
   }, [restaurants.length, currentRestaurant?.id, fetchRestaurants, fetchRestaurantMenu]);
-  
+
   // Update search placeholder based on language
   useEffect(() => {
     if (currentLanguage === 'Turkish') {
@@ -190,36 +190,36 @@ function MenuPageContent() {
       translatePlaceholder();
     }
   }, [currentLanguage, translate]);
-  
+
   // Helper functions - defined inside component to avoid dependency issues
   const getPopularItems = () => {
     return items.filter((item: any) => item.isPopular);
   };
-  
+
   const getItemsByCategory = (categoryId: string) => {
     return items.filter((item: any) => item.categoryId === categoryId);
   };
-  
+
   const getItemsBySubcategory = (subcategoryId: string) => {
     return items.filter((item: any) => item.subcategory === subcategoryId);
   };
-  
+
   const getSubcategoriesByParent = (parentId: string) => {
     return []; // Backend'de subcategory yok
   };
-  
+
   // Get cart count - only calculate on client side to avoid hydration mismatch
   const [cartCount, setCartCount] = useState(0);
-  
+
   useEffect(() => {
     if (isClient) {
       setCartCount(cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0));
     }
   }, [isClient, cartItems]);
-  
+
   // Get language code for menu data
   const language = currentLanguage === 'Turkish' ? 'tr' : 'en';
-
+  
   // Get menu categories (backend format)
   const menuCategories = [
     { id: 'popular', name: currentLanguage === 'Turkish' ? 'Popüler' : 'Popular' },
@@ -231,14 +231,14 @@ function MenuPageContent() {
 
   // Get subcategories for active category
   const activeSubcategories = activeCategory === 'popular' ? [] : getSubcategoriesByParent(activeCategory);
-
+  
   // Get filtered items
-  let filteredItems = activeCategory === 'popular' 
+  let filteredItems = activeCategory === 'popular'
     ? getPopularItems()
-    : activeSubcategory 
+    : activeSubcategory
       ? getItemsBySubcategory(activeSubcategory)
       : getItemsByCategory(activeCategory);
-      
+
   if (search.trim() !== '') {
     filteredItems = filteredItems.filter((item: any) => {
       const itemName = typeof item.name === 'string' ? item.name : (item.name?.tr || item.name?.en || '');
@@ -369,9 +369,9 @@ function MenuPageContent() {
                 <TranslatedText>Menü</TranslatedText>
               </h1>
               {tableNumber && (
-                <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
-                  <TranslatedText>Masa</TranslatedText> #{tableNumber}
-                </div>
+              <div className="ml-2 px-2 py-1 rounded-lg text-xs" style={{ backgroundColor: 'var(--tone1-bg)', color: 'var(--tone1-text)', border: '1px solid var(--tone1-border)' }}>
+                <TranslatedText>Masa</TranslatedText> #{tableNumber}
+              </div>
               )}
             </div>
           </div>
@@ -451,7 +451,7 @@ function MenuPageContent() {
             ))}
           </div>
         </div>
-        
+
         {/* Subcategories - Backend'de subcategory yok, bu kısım kaldırıldı */}
 
         {/* Menu Items */}
@@ -460,11 +460,11 @@ function MenuPageContent() {
             {filteredItems.map((item: any) => (
               <div key={item.id} className="bg-white rounded-lg shadow-sm border p-3 flex">
                 <div className="relative h-20 w-20 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
-                  <Image 
+                  <Image
                     src={item.imageUrl || '/placeholder-food.jpg'} 
                     alt={typeof item.name === 'string' ? item.name : (item.name?.tr || item.name?.en || 'Menu item')} 
-                    width={80} 
-                    height={80} 
+                    width={80}
+                    height={80}
                     className="object-cover w-full h-full rounded-lg"
                   />
                   {item.isPopular && (
@@ -482,7 +482,7 @@ function MenuPageContent() {
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
                     {typeof item.description === 'string' ? item.description : (item.description?.tr || item.description?.en || '')}
                   </p>
-                  
+
                   {/* Allergens */}
                   {item.allergens && item.allergens.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -500,9 +500,9 @@ function MenuPageContent() {
                       Debug: {JSON.stringify(item.allergens)}
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-center">
-                    <button 
+                    <button
                       onClick={() => openModal(item)}
                       className="text-xs flex items-center"
                       style={{ color: primary }}
@@ -510,7 +510,7 @@ function MenuPageContent() {
                       <FaInfo className="mr-1" size={10} />
                       <TranslatedText>Detayları Gör</TranslatedText>
                     </button>
-                    <button 
+                    <button
                       className="btn btn-secondary py-1 px-3 text-xs rounded flex items-center"
                       onClick={() => addToCart(item)}
                     >
@@ -530,17 +530,17 @@ function MenuPageContent() {
             <div className="grid grid-cols-1 gap-3">
               {/* WiFi Info */}
               {settings.basicInfo.showWifiInMenu && (
-                <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
-                  <div className="flex items-center">
-                    <span className="text-lg mr-3">📶</span>
-                    <span className="text-sm font-medium text-gray-700">
-                      <TranslatedText>WiFi Şifresi</TranslatedText>
-                    </span>
-                  </div>
+              <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">📶</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    <TranslatedText>WiFi Şifresi</TranslatedText>
+                  </span>
+                </div>
                   <span className="text-sm font-bold px-2 py-1 rounded" style={{ color: 'var(--brand-strong)', backgroundColor: 'var(--brand-surface)' }}>
                     {settings.basicInfo.wifiPassword || 'restoran2024'}
                   </span>
-                </div>
+              </div>
               )}
               {/* Google Review Button */}
               <a
@@ -562,37 +562,37 @@ function MenuPageContent() {
               </a>
               {/* Working Hours */}
               {settings.basicInfo.showHoursInMenu && (
-                <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
-                  <div className="flex items-center">
-                    <span className="text-lg mr-3">🕒</span>
-                    <span className="text-sm font-medium text-gray-700">
-                      <TranslatedText>Çalışma Saatleri</TranslatedText>
-                    </span>
-                  </div>
+              <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border-l-4" style={{ borderLeftColor: 'var(--brand-subtle)' }}>
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">🕒</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    <TranslatedText>Çalışma Saatleri</TranslatedText>
+                  </span>
+                </div>
                   <span className="text-sm font-bold" style={{ color: 'var(--brand-strong)' }}>
                     {settings.basicInfo.workingHours || '09:00 - 23:00'}
                   </span>
-                </div>
+              </div>
               )}
               {/* Instagram Button */}
               {settings.basicInfo.showInstagramInMenu && (
-                <a
+              <a
                   href={settings.basicInfo.instagram || "https://instagram.com/restoranadi"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone3"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <div className="flex items-center">
-                    <span className="text-lg mr-3">📱</span>
-                    <span className="text-sm font-medium text-gray-800">
-                      <TranslatedText>Instagram'da Takip Et</TranslatedText>
-                    </span>
-                  </div>
-                  <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 rounded-lg shadow-sm border-l-4 transition group bg-tone3"
+                style={{ textDecoration: 'none' }}
+              >
+                <div className="flex items-center">
+                  <span className="text-lg mr-3">📱</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    <TranslatedText>Instagram'da Takip Et</TranslatedText>
+                  </span>
+                </div>
+                <button className="text-sm font-bold px-3 py-1 rounded-lg shadow group-hover:scale-105 transition btn-primary">
                     @{settings.basicInfo.instagram?.replace('https://instagram.com/', '').replace('https://www.instagram.com/', '') || 'restoranadi'}
-                  </button>
-                </a>
+                </button>
+              </a>
               )}
             </div>
           </div>

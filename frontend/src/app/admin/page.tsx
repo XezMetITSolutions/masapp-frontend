@@ -52,13 +52,13 @@ export default function SuperAdminDashboard() {
     <AdminLayout title="Süper Yönetici Paneli" description="Sistem genel durumu ve yönetim paneli">
       {/* System Status */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center">
+          <div className="flex items-center">
           <div className="h-3 w-3 bg-green-500 rounded-full mr-3"></div>
           <span className="text-green-800 font-medium">Sistem: Online</span>
         </div>
       </div>
 
-      {/* Dashboard Content */}
+        {/* Dashboard Content */}
       <main>
           {/* İstatistikler */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

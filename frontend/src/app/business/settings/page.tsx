@@ -312,10 +312,10 @@ export default function SettingsPage() {
     
     try {
       // Zustand persist otomatik olarak localStorage'a kaydedecek
-      // Simulate API call
+    // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log(`✅ ${section} ayarları kaydedildi`);
+    
+    console.log(`✅ ${section} ayarları kaydedildi`);
     } catch (error) {
       console.error('❌ Kaydetme hatası:', error);
     } finally {
@@ -687,10 +687,10 @@ export default function SettingsPage() {
                           WiFi Şifresi
                         </label>
                         <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={settings.basicInfo.wifiPassword || ''}
-                            onChange={(e) => updateBasicInfo({ wifiPassword: e.target.value })}
+                        <input
+                          type="text"
+                          value={settings.basicInfo.wifiPassword || ''}
+                          onChange={(e) => updateBasicInfo({ wifiPassword: e.target.value })}
                             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           />
                           <button
@@ -724,11 +724,11 @@ export default function SettingsPage() {
                           Çalışma Saatleri
                         </label>
                         <div className="flex gap-2">
-                          <textarea
-                            value={settings.basicInfo.workingHours}
-                            onChange={(e) => updateBasicInfo({ workingHours: e.target.value })}
-                            rows={3}
-                            placeholder="Pazartesi - Cuma: 08:00 - 22:00&#10;Cumartesi - Pazar: 09:00 - 23:00"
+                        <textarea
+                          value={settings.basicInfo.workingHours}
+                          onChange={(e) => updateBasicInfo({ workingHours: e.target.value })}
+                          rows={3}
+                          placeholder="Pazartesi - Cuma: 08:00 - 22:00&#10;Cumartesi - Pazar: 09:00 - 23:00"
                             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           />
                           <button
@@ -777,10 +777,10 @@ export default function SettingsPage() {
                             Instagram
                           </label>
                           <div className="flex gap-2">
-                            <input
-                              type="url"
-                              value={settings.basicInfo.instagram || ''}
-                              onChange={(e) => updateBasicInfo({ instagram: e.target.value })}
+                          <input
+                            type="url"
+                            value={settings.basicInfo.instagram || ''}
+                            onChange={(e) => updateBasicInfo({ instagram: e.target.value })}
                               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                             <button
