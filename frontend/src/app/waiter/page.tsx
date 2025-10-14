@@ -47,60 +47,10 @@ export default function StandaloneWaiterPage() {
     }
   }, []);
 
-  // Demo data initialize
+  // Demo data initialize (artık boş - gerçek veriler eklene kadar)
   const initializeDemoData = () => {
-    const demoOrders = [
-      {
-        id: 'demo_waiter_1',
-        tableNumber: 3,
-        guests: 2,
-        items: [
-          { id: '1', name: 'Adana Kebap', quantity: 2, price: 45, status: 'ready' },
-          { id: '2', name: 'Ayran', quantity: 2, price: 15, status: 'ready' }
-        ],
-        totalAmount: 120,
-        status: 'ready',
-        orderTime: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-        notes: 'Az acı olsun'
-      },
-      {
-        id: 'demo_waiter_2',
-        tableNumber: 7,
-        guests: 4,
-        items: [
-          { id: '3', name: 'Pizza Margherita', quantity: 1, price: 85, status: 'preparing' },
-          { id: '4', name: 'Kola', quantity: 4, price: 12, status: 'ready' }
-        ],
-        totalAmount: 133,
-        status: 'preparing',
-        orderTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        notes: ''
-      }
-    ];
-
-    const demoCalls = [
-      {
-        id: 'demo_call_1',
-        tableNumber: 5,
-        type: 'service',
-        message: 'Garson çağırıyor',
-        timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-        status: 'active'
-      },
-      {
-        id: 'demo_call_2',
-        tableNumber: 2,
-        type: 'bill',
-        message: 'Hesap istiyor',
-        timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-        status: 'active'
-      }
-    ];
-
-    setOrders(demoOrders);
-    setCalls(demoCalls);
+    setOrders([]);
+    setCalls([]);
   };
 
   // Staff login fonksiyonu
