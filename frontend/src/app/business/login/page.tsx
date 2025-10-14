@@ -83,17 +83,12 @@ export default function LoginPage() {
     console.log('🔐 Attempting login:', { username });
     
     try {
+      // 1) Önce restaurant (business) login dene
       const response = await apiService.login({ username, password });
-      
-      console.log('✅ Login successful:', response);
-      
+
       if (response.success && response.data) {
-        // Backend'den gelen GERÇEK restaurant datası
         loginRestaurant(response.data);
-        
-        console.log('🏪 Restaurant logged in:', response.data);
-        
-        // Beni Hatırla özelliği
+
         if (rememberMe) {
           localStorage.setItem('rememberedUsername', username);
           localStorage.setItem('rememberMe', 'true');
@@ -101,15 +96,53 @@ export default function LoginPage() {
           localStorage.removeItem('rememberedUsername');
           localStorage.removeItem('rememberMe');
         }
-        
-        // Dashboard'a yönlendir
+
         router.push('/business/dashboard');
-      } else {
-        setError('Giriş başarısız');
+        return;
       }
+
+      // response.success değilse personel fallback dene
+      throw new Error('Restaurant login failed');
     } catch (error: any) {
-      console.error('❌ Login error:', error);
-      setError(error.message || 'Kullanıcı adı veya şifre hatalı');
+      console.warn('⚠️ Business login failed, trying staff login...', error?.message);
+      // 2) Personel (staff) login fallback
+      try {
+        const currentSubdomain = subdomain || (typeof window !== 'undefined' ? window.location.hostname.split('.')[0] : '');
+        const staffResp = await apiService.staffLogin(username, password, currentSubdomain);
+        
+        if (staffResp.success && staffResp.data) {
+          const staff = staffResp.data as any;
+          // Role'e göre panel yönlendirmesi
+          const role = (staff.role || '').toLowerCase();
+          const roleToPath: Record<string, string> = {
+            cashier: '/cashier/',
+            kasiyer: '/cashier/',
+            waiter: '/waiter/',
+            garson: '/waiter/',
+            chef: '/kitchen/',
+            kitchen: '/kitchen/',
+            aşçı: '/kitchen/',
+            asci: '/kitchen/',
+            manager: '/business/',
+            admin: '/business/'
+          };
+
+          // Oturumu sakla (rol tabanlı anahtar)
+          try {
+            const storageKey = `${role || 'staff'}_staff`;
+            sessionStorage.setItem(storageKey, JSON.stringify(staff));
+          } catch {}
+
+          const target = roleToPath[role] || '/business/';
+          router.push(target);
+          return;
+        }
+
+        setError('Kullanıcı adı veya şifre hatalı');
+      } catch (staffErr: any) {
+        console.error('❌ Staff login also failed:', staffErr);
+        setError(staffErr?.message || 'Giriş başarısız');
+      }
     } finally {
       setLoading(false);
     }
