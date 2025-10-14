@@ -8,19 +8,21 @@ type Staff = { id: string; name: string; email: string; username: string; role: 
 export default function DebugStaffPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState('');
-  const [form, setForm] = useState({
-    name: 'Test Kasa',
-    email: 'kasa@test.com',
-    username: 'hazal_kasa',
-    password: '123456',
-    role: 'cashier',
-    phone: ''
-  });
+  const [hazalRestaurant, setHazalRestaurant] = useState<Restaurant | null>(null);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // Restoranları getir
+  // Hazal restoranı için önceden dolu form
+  const [form, setForm] = useState({
+    name: 'Hazal Kasa',
+    email: 'kasa@hazal.com',
+    username: 'hazal_kasa',
+    password: '123456',
+    role: 'cashier',
+    phone: '5551234567'
+  });
+
+  // Restoranları getir ve Hazal'ı bul
   useEffect(() => {
     (async () => {
       try {
@@ -30,8 +32,13 @@ export default function DebugStaffPage() {
         console.log('📊 Restaurants response:', data);
         setRestaurants(data?.data || []);
 
-        if (data?.data?.length) {
-          setSelectedRestaurantId(data.data[0].id);
+        // Hazal restoranını bul
+        const hazal = data?.data?.find((r: Restaurant) => r.username === 'hazal');
+        if (hazal) {
+          setHazalRestaurant(hazal);
+          console.log('✅ Hazal restaurant found:', hazal);
+        } else {
+          console.log('❌ Hazal restaurant not found');
         }
       } catch (e) {
         console.error('❌ Restaurant fetch error:', e);
@@ -40,13 +47,13 @@ export default function DebugStaffPage() {
     })();
   }, []);
 
-  // Staff listesini getir
-  const loadStaff = async () => {
-    if (!selectedRestaurantId) return;
+  // Hazal restoranı için staff listesini getir
+  const loadHazalStaff = async () => {
+    if (!hazalRestaurant?.id) return;
     
     try {
-      console.log('📡 Loading staff for restaurant:', selectedRestaurantId);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/${selectedRestaurantId}`);
+      console.log('📡 Loading staff for Hazal restaurant:', hazalRestaurant.id);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/${hazalRestaurant.id}`);
       const data = await res.json();
       console.log('📊 Staff response:', data);
       setStaff(data?.data || []);
@@ -56,10 +63,12 @@ export default function DebugStaffPage() {
     }
   };
 
-  // Restaurant değiştiğinde staff'ı yükle
+  // Hazal restoranı bulunduğunda staff'ı yükle
   useEffect(() => {
-    loadStaff();
-  }, [selectedRestaurantId]);
+    if (hazalRestaurant) {
+      loadHazalStaff();
+    }
+  }, [hazalRestaurant]);
 
   // Restaurant restore
   const restoreRestaurants = async () => {
@@ -74,10 +83,8 @@ export default function DebugStaffPage() {
       console.log('📊 Restore response:', data);
       setResult(data);
       
-      // Restoranları yeniden yükle
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurants`);
-      const restaurantData = await res.json();
-      setRestaurants(restaurantData?.data || []);
+      // Sayfayı yenile
+      window.location.reload();
     } catch (e: any) {
       console.error('❌ Restore error:', e);
       setResult({ success: false, message: e?.message || 'Restore failed' });
@@ -86,22 +93,18 @@ export default function DebugStaffPage() {
     }
   };
 
-  // Staff ekle
-  const createStaff = async () => {
-    if (!selectedRestaurantId) {
-      alert('Lütfen bir restoran seçin');
-      return;
-    }
-    if (!form.name.trim() || !form.email.trim() || !form.username.trim() || !form.password.trim()) {
-      alert('Ad, e-posta, kullanıcı adı ve şifre zorunludur');
+  // Hazal için staff ekle
+  const createHazalStaff = async () => {
+    if (!hazalRestaurant?.id) {
+      alert('Hazal restoranı bulunamadı! Önce restaurant restore yapın.');
       return;
     }
 
     setLoading(true);
     setResult(null);
     try {
-      console.log('📡 Creating staff...', { restaurantId: selectedRestaurantId, ...form });
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/${selectedRestaurantId}`, {
+      console.log('📡 Creating staff for Hazal...', { restaurantId: hazalRestaurant.id, ...form });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/restaurant/${hazalRestaurant.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -118,7 +121,7 @@ export default function DebugStaffPage() {
       setResult(data);
       
       // Staff listesini yeniden yükle
-      await loadStaff();
+      await loadHazalStaff();
     } catch (e: any) {
       console.error('❌ Create staff error:', e);
       setResult({ success: false, message: e?.message || 'Create staff failed' });
@@ -143,7 +146,7 @@ export default function DebugStaffPage() {
       setResult(data);
       
       // Staff listesini yeniden yükle
-      await loadStaff();
+      await loadHazalStaff();
     } catch (e: any) {
       console.error('❌ Delete staff error:', e);
       setResult({ success: false, message: e?.message || 'Delete staff failed' });
@@ -157,7 +160,7 @@ export default function DebugStaffPage() {
     setLoading(true);
     setResult(null);
     try {
-      console.log('🔐 Testing staff login...', { username, password });
+      console.log('🔐 Testing staff login...', { username, password, subdomain: 'hazal' });
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/staff/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -178,47 +181,57 @@ export default function DebugStaffPage() {
     }
   };
 
+  // Panel test fonksiyonları
+  const testPanelAccess = (role: string) => {
+    const panelUrls = {
+      waiter: 'https://hazal.guzellestir.com/waiter/',
+      cashier: 'https://hazal.guzellestir.com/cashier/',
+      chef: 'https://hazal.guzellestir.com/kitchen/',
+      manager: 'https://hazal.guzellestir.com/business/'
+    };
+    
+    const url = panelUrls[role as keyof typeof panelUrls];
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">🔧 Staff Debug Sayfası</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">🔧 Hazal Restaurant Debug</h1>
 
-        {/* Restaurant Restore */}
+        {/* Restaurant Status */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">🏪 Restaurant Restore</h2>
+          <h2 className="text-xl font-semibold mb-4">🏪 Restaurant Durumu</h2>
+          {hazalRestaurant ? (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-medium text-green-800">✅ Hazal Restaurant Bulundu</h3>
+              <p className="text-sm text-green-600">
+                ID: {hazalRestaurant.id}<br/>
+                Ad: {hazalRestaurant.name}<br/>
+                Username: {hazalRestaurant.username}<br/>
+                Email: {hazalRestaurant.email}
+              </p>
+            </div>
+          ) : (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <h3 className="font-medium text-red-800">❌ Hazal Restaurant Bulunamadı</h3>
+              <p className="text-sm text-red-600">Restaurant restore yapmanız gerekiyor.</p>
+            </div>
+          )}
           <button
             onClick={restoreRestaurants}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Restoring...' : 'Restore Restaurants'}
           </button>
         </div>
 
-        {/* Restaurant Selection */}
+        {/* Staff Creation for Hazal */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">🏪 Restaurant Seçimi</h2>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Restoran</label>
-            <select
-              value={selectedRestaurantId}
-              onChange={(e) => setSelectedRestaurantId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">Seçiniz</option>
-              {restaurants.map(r => (
-                <option key={r.id} value={r.id}>{r.name} ({r.username})</option>
-              ))}
-            </select>
-          </div>
-          <p className="text-sm text-gray-600">
-            Toplam {restaurants.length} restoran bulundu
-          </p>
-        </div>
-
-        {/* Staff Creation */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">👤 Staff Ekleme</h2>
+          <h2 className="text-xl font-semibold mb-4">👤 Hazal için Staff Ekleme</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Ad Soyad</label>
@@ -272,7 +285,7 @@ export default function DebugStaffPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Telefon (opsiyonel)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
               <input
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -282,17 +295,17 @@ export default function DebugStaffPage() {
             </div>
           </div>
           <button
-            onClick={createStaff}
-            disabled={loading}
+            onClick={createHazalStaff}
+            disabled={loading || !hazalRestaurant}
             className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
-            {loading ? 'Kaydediliyor...' : 'Staff Oluştur'}
+            {loading ? 'Kaydediliyor...' : 'Hazal için Staff Oluştur'}
           </button>
         </div>
 
         {/* Staff List */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">👥 Staff Listesi ({staff.length})</h2>
+          <h2 className="text-xl font-semibold mb-4">👥 Hazal Staff Listesi ({staff.length})</h2>
           {staff.length === 0 ? (
             <p className="text-gray-500">Henüz staff bulunmuyor</p>
           ) : (
@@ -313,6 +326,12 @@ export default function DebugStaffPage() {
                       Login Test
                     </button>
                     <button
+                      onClick={() => testPanelAccess(s.role)}
+                      className="px-3 py-1 bg-purple-500 text-white text-sm rounded hover:bg-purple-600"
+                    >
+                      Panel Test
+                    </button>
+                    <button
                       onClick={() => deleteStaff(s.id)}
                       className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
                     >
@@ -323,6 +342,37 @@ export default function DebugStaffPage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Panel Test Buttons */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">🎯 Panel Test</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button
+              onClick={() => testPanelAccess('cashier')}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              💰 Kasa Paneli
+            </button>
+            <button
+              onClick={() => testPanelAccess('chef')}
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+            >
+              👨‍🍳 Mutfak Paneli
+            </button>
+            <button
+              onClick={() => testPanelAccess('waiter')}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              🍽️ Garson Paneli
+            </button>
+            <button
+              onClick={() => testPanelAccess('manager')}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            >
+              🏢 Yönetim Paneli
+            </button>
+          </div>
         </div>
 
         {/* Result Display */}
