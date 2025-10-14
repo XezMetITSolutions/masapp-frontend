@@ -12,7 +12,8 @@ import {
   FaUser,
   FaLock,
   FaMoneyBillWave,
-  FaChartBar
+  FaChartBar,
+  FaClock
 } from 'react-icons/fa';
 import apiService from '@/services/api';
 
