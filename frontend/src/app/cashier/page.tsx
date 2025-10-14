@@ -52,39 +52,9 @@ export default function StandaloneCashierPage() {
     }
   }, []);
 
-  // Demo data initialize
+  // Demo data initialize (artık boş - gerçek veriler eklene kadar)
   const initializeDemoData = () => {
-    const demoOrders = [
-      {
-        id: 'demo_cashier_1',
-        tableNumber: 3,
-        guests: 2,
-        items: [
-          { id: '1', name: 'Adana Kebap', quantity: 2, price: 45 },
-          { id: '2', name: 'Ayran', quantity: 2, price: 15 }
-        ],
-        totalAmount: 120,
-        status: 'ready_for_payment',
-        orderTime: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-        notes: 'Az acı olsun'
-      },
-      {
-        id: 'demo_cashier_2',
-        tableNumber: 7,
-        guests: 4,
-        items: [
-          { id: '3', name: 'Pizza Margherita', quantity: 1, price: 85 },
-          { id: '4', name: 'Kola', quantity: 4, price: 12 }
-        ],
-        totalAmount: 133,
-        status: 'ready_for_payment',
-        orderTime: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        notes: ''
-      }
-    ];
-    setOrders(demoOrders);
+    setOrders([]);
   };
 
   // Staff login fonksiyonu
