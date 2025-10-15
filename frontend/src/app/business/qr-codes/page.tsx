@@ -77,6 +77,33 @@ export default function QRCodesPage() {
     setTimeout(() => setToast({ message: '', visible: false }), 3000);
   };
 
+  // Load existing QR codes from backend on mount/login
+  useEffect(() => {
+    const loadQRCodes = async () => {
+      try {
+        if (!authenticatedRestaurant?.id) return;
+        const res = await apiService.getRestaurantQRTokens(authenticatedRestaurant.id);
+        if (res?.success && Array.isArray(res.data)) {
+          // Map backend tokens into QRCodeData-like entries
+          const mapped: QRCodeData[] = res.data.map((t: any) => ({
+            id: t.id,
+            name: `Masa ${t.tableNumber} - QR Menü`,
+            tableNumber: t.tableNumber,
+            token: t.token,
+            qrCode: t.qrUrl,
+            url: t.qrUrl,
+            createdAt: t.createdAt || new Date().toISOString(),
+            theme: selectedTheme,
+          }));
+          setQrCodes(mapped);
+        }
+      } catch (e) {
+        console.error('Load QR tokens error:', e);
+      }
+    };
+    loadQRCodes();
+  }, [authenticatedRestaurant?.id]);
+
   // Toplu QR kod oluşturma - Sabit QR kodları (basılabilir)
   const handleCreateBulkQRCodes = async () => {
     if (!authenticatedRestaurant) {
