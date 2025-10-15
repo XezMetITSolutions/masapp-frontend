@@ -65,13 +65,33 @@ function CartPageContent() {
   };
 
   const handlePayment = async () => {
-    if (isSubmitting || !currentRestaurant?.id) return;
+    if (isSubmitting) return;
     
     setIsSubmitting(true);
     try {
+      // Resolve restaurantId (fallback to subdomain lookup if not in store)
+      let restaurantId = currentRestaurant?.id as string | undefined;
+      if (!restaurantId && typeof window !== 'undefined') {
+        try {
+          const sub = window.location.hostname.split('.')[0];
+          const base = process.env.NEXT_PUBLIC_API_URL || 'https://masapp-backend.onrender.com';
+          const API = base.endsWith('/api') ? base : `${base.replace(/\/$/, '')}/api`;
+          const res = await fetch(`${API}/staff/restaurants`);
+          const data = await res.json();
+          const found = Array.isArray(data?.data) ? data.data.find((r: any) => r.username === sub) : null;
+          restaurantId = found?.id;
+        } catch (e) {
+          console.error('Restaurant resolve failed:', e);
+        }
+      }
+
+      if (!restaurantId) {
+        alert('Restoran bilgisi alınamadı. Lütfen sayfayı yenileyip tekrar deneyin.');
+        return;
+      }
       // Backend'e sipariş gönder
       const orderData = {
-        restaurantId: currentRestaurant.id,
+        restaurantId,
         tableNumber: tableNumber || undefined,
         items: items.map(item => ({
           menuItemId: item.itemId || item.id,
