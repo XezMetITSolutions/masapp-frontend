@@ -77,31 +77,32 @@ export default function QRCodesPage() {
     setTimeout(() => setToast({ message: '', visible: false }), 3000);
   };
 
+  // Helper: reload from backend
+  const reloadQRCodes = async () => {
+    try {
+      if (!authenticatedRestaurant?.id) return;
+      const res = await apiService.getRestaurantQRTokens(authenticatedRestaurant.id);
+      if (res?.success && Array.isArray(res.data)) {
+        const mapped: QRCodeData[] = res.data.map((t: any) => ({
+          id: t.id,
+          name: `Masa ${t.tableNumber} - QR Menü`,
+          tableNumber: t.tableNumber,
+          token: t.token,
+          qrCode: t.qrUrl,
+          url: t.qrUrl,
+          createdAt: t.createdAt || new Date().toISOString(),
+          theme: selectedTheme,
+        }));
+        setQrCodes(mapped);
+      }
+    } catch (e) {
+      console.error('Load QR tokens error:', e);
+    }
+  };
+
   // Load existing QR codes from backend on mount/login
   useEffect(() => {
-    const loadQRCodes = async () => {
-      try {
-        if (!authenticatedRestaurant?.id) return;
-        const res = await apiService.getRestaurantQRTokens(authenticatedRestaurant.id);
-        if (res?.success && Array.isArray(res.data)) {
-          // Map backend tokens into QRCodeData-like entries
-          const mapped: QRCodeData[] = res.data.map((t: any) => ({
-            id: t.id,
-            name: `Masa ${t.tableNumber} - QR Menü`,
-            tableNumber: t.tableNumber,
-            token: t.token,
-            qrCode: t.qrUrl,
-            url: t.qrUrl,
-            createdAt: t.createdAt || new Date().toISOString(),
-            theme: selectedTheme,
-          }));
-          setQrCodes(mapped);
-        }
-      } catch (e) {
-        console.error('Load QR tokens error:', e);
-      }
-    };
-    loadQRCodes();
+    reloadQRCodes();
   }, [authenticatedRestaurant?.id]);
 
   // Toplu QR kod oluşturma - Sabit QR kodları (basılabilir)
@@ -188,10 +189,17 @@ export default function QRCodesPage() {
     }
   };
 
-  // QR kod silme (sadece listeden)
-  const handleDeleteQRCode = (id: string) => {
-    setQrCodes(prev => prev.filter(qr => qr.id !== id));
-    showToast('QR kod listeden kaldırıldı!');
+  // QR kod silme (backend deactivate + listeyi yenile)
+  const handleDeleteQRCode = async (id: string, token?: string) => {
+    try {
+      if (token) {
+        await apiService.deactivateQRToken(token);
+      }
+    } catch (e) {
+      console.error('Deactivate QR error:', e);
+    }
+    await reloadQRCodes();
+    showToast('QR kod silindi.');
   };
 
   // URL kopyalama - backend'in ürettiği qrUrl varsa onu kullan
@@ -355,7 +363,7 @@ export default function QRCodesPage() {
                           Yazdır
                         </button>
                         <button
-                          onClick={() => handleDeleteQRCode(qrCode.id)}
+                          onClick={() => handleDeleteQRCode(qrCode.id, qrCode.token)}
                           className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100"
                         >
                           <FaTrash />
