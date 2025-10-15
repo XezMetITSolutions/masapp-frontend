@@ -74,7 +74,7 @@ function CartPageContent() {
         restaurantId: currentRestaurant.id,
         tableNumber: tableNumber || undefined,
         items: items.map(item => ({
-          menuItemId: item.id,
+          menuItemId: item.itemId || item.id,
           name: item.name,
           quantity: item.quantity,
           unitPrice: item.price,
