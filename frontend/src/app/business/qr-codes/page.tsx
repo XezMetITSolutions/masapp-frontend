@@ -167,10 +167,18 @@ export default function QRCodesPage() {
     showToast('QR kod listeden kaldırıldı!');
   };
 
-  // URL kopyalama
-  const handleCopyURL = (url: string) => {
-    navigator.clipboard.writeText(url);
-    showToast('URL kopyalandı!');
+  // URL kopyalama - backend'in ürettiği qrUrl varsa onu kullan
+  const handleCopyURL = (fallbackUrl: string, tableNumber?: number) => {
+    try {
+      const sub = authenticatedRestaurant?.username || 'guzellestir';
+      const base = `https://${sub}.guzellestir.com`;
+      // fallbackUrl öncelik, yoksa subdomain + table paramı ile kur
+      const url = fallbackUrl || `${base}/menu/?table=${tableNumber || ''}`;
+      navigator.clipboard.writeText(url);
+      showToast('URL kopyalandı!');
+    } catch {
+      showToast('URL kopyalanamadı');
+    }
   };
 
   // QR kod indirme
