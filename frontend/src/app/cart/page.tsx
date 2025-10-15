@@ -325,7 +325,11 @@ function CartPageContent() {
                 onClick={handleCheckout}
                 className="w-full btn btn-primary py-4 rounded-lg font-semibold text-dynamic-sm"
               >
-                <TranslatedText>Ödemeyi Tamamla</TranslatedText>
+                {paymentMethod === 'cash' ? (
+                  <span>Siparişi Ver</span>
+                ) : (
+                  <TranslatedText>Ödemeyi Tamamla</TranslatedText>
+                )}
               </button>
             </>
           )}
@@ -383,7 +387,7 @@ function CartPageContent() {
                 onClick={handlePayment}
                 className="flex-1 py-2 px-4 btn btn-primary rounded-lg"
               >
-                <TranslatedText>Öde</TranslatedText>
+                {paymentMethod === 'cash' ? <span>Siparişi Ver</span> : <TranslatedText>Öde</TranslatedText>}
               </button>
             </div>
           </div>
