@@ -30,9 +30,24 @@ export default function DebugOrdersPage() {
   }, []);
 
   useEffect(() => {
-    // try resolve restaurant by subdomain
+    // try resolve restaurant by subdomain from store first
     const r = restaurants.find((x: any) => x.username === subdomain);
-    if (r?.id) setRestaurantId(r.id);
+    if (r?.id) {
+      setRestaurantId(r.id);
+      return;
+    }
+    // fallback: resolve from backend list
+    const resolveFromBackend = async () => {
+      try {
+        const res = await fetch(`${API_URL}/staff/restaurants`);
+        const data = await res.json();
+        const found = Array.isArray(data?.data) ? data.data.find((x: any) => x.username === subdomain) : null;
+        if (found?.id) setRestaurantId(found.id);
+      } catch (e) {
+        // ignore
+      }
+    };
+    resolveFromBackend();
   }, [restaurants, subdomain]);
 
   const doCreateOrder = async () => {
@@ -80,7 +95,18 @@ export default function DebugOrdersPage() {
 
         <div className="bg-white p-4 rounded border space-y-3">
           <h2 className="font-semibold">Parametreler</h2>
-          <input className="border rounded px-3 py-2 w-full" placeholder="restaurantId" value={restaurantId} onChange={e=>setRestaurantId(e.target.value)} />
+          <div className="flex gap-2">
+            <input className="border rounded px-3 py-2 w-full" placeholder="restaurantId" value={restaurantId} onChange={e=>setRestaurantId(e.target.value)} />
+            <button onClick={async ()=>{
+              // manual resolve
+              try {
+                const res = await fetch(`${API_URL}/staff/restaurants`);
+                const data = await res.json();
+                const found = Array.isArray(data?.data) ? data.data.find((x: any) => x.username === subdomain) : null;
+                if (found?.id) setRestaurantId(found.id);
+              } catch {}
+            }} className="px-3 py-2 bg-gray-800 text-white rounded">Bul</button>
+          </div>
           <input className="border rounded px-3 py-2 w-full" placeholder="table" value={tableNumber} onChange={e=>setTableNumber(e.target.value)} />
           <div className="flex gap-2">
             <button onClick={doCreateOrder} className="bg-green-600 text-white rounded px-4 py-2">Sipariş Oluştur (POST)</button>
