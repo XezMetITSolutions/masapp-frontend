@@ -92,9 +92,38 @@ function MenuPageContent() {
             sessionStorage.setItem('qr_token', tokenParam);
             console.log('✅ Token doğrulandı:', tokenParam);
           } else {
-            setTokenValid(false);
-            setTokenMessage('QR kod geçersiz veya süresi dolmuş. Lütfen yeni bir QR kod tarayın.');
-            return; // Token geçersizse devam etme
+            // Oturum devamlılığı için, masa parametresi varsa yeni token üretelim
+            if (currentRestaurant?.id && tableParam) {
+              try {
+                const gen = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/qr/generate`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    restaurantId: currentRestaurant.id,
+                    tableNumber: parseInt(tableParam),
+                    duration: 2
+                  })
+                });
+                const genData = await gen.json();
+                if (genData.success) {
+                  sessionStorage.setItem('qr-session-token', genData.data.token);
+                  setTokenValid(true);
+                  setTokenMessage('Yeni QR oturumu oluşturuldu. Menüye erişebilirsiniz.');
+                } else {
+                  setTokenValid(false);
+                  setTokenMessage('QR kod geçersiz veya süresi dolmuş. Lütfen yeni bir QR kod tarayın.');
+                  return;
+                }
+              } catch (e) {
+                setTokenValid(false);
+                setTokenMessage('QR kod doğrulanamadı. Lütfen yeni bir QR kod tarayın.');
+                return;
+              }
+            } else {
+              setTokenValid(false);
+              setTokenMessage('QR kod geçersiz veya süresi dolmuş. Lütfen yeni bir QR kod tarayın.');
+              return; // Token geçersizse devam etme
+            }
           }
         } catch (error) {
           console.error('❌ Token doğrulama hatası:', error);
