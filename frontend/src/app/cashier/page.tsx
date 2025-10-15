@@ -16,9 +16,11 @@ import {
   FaClock
 } from 'react-icons/fa';
 import apiService from '@/services/api';
+import useRestaurantStore from '@/store/useRestaurantStore';
 
 export default function StandaloneCashierPage() {
   const router = useRouter();
+  const { currentRestaurant } = useRestaurantStore();
   
   // Staff login states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -52,10 +54,32 @@ export default function StandaloneCashierPage() {
     }
   }, []);
 
-  // Demo data initialize (artık boş - gerçek veriler eklene kadar)
-  const initializeDemoData = () => {
-    setOrders([]);
+  // Fetch orders from backend
+  const fetchOrders = async () => {
+    if (!currentRestaurant?.id) return;
+    try {
+      const response = await apiService.getOrders(currentRestaurant.id, 'ready'); // Sadece ödeme bekleyen siparişler
+      if (response.success && Array.isArray(response.data)) {
+        setOrders(response.data);
+      }
+    } catch (error) {
+      console.error('Fetch orders error:', error);
+    }
   };
+
+  // Demo data initialize (gerçek verilerle değiştirildi)
+  const initializeDemoData = () => {
+    fetchOrders();
+  };
+
+  // Periyodik sipariş çekme (5 saniye)
+  useEffect(() => {
+    if (!isLoggedIn || !currentRestaurant?.id) return;
+    
+    fetchOrders(); // İlk çekim
+    const interval = setInterval(fetchOrders, 5000);
+    return () => clearInterval(interval);
+  }, [isLoggedIn, currentRestaurant?.id]);
 
   // Staff login fonksiyonu
   const handleStaffLogin = async (e: React.FormEvent) => {

@@ -283,6 +283,42 @@ class ApiService {
     return this.request<any>(`/staff/restaurant/${restaurantId}`);
   }
 
+  // Order endpoints
+  async getOrders(restaurantId: string, status?: string) {
+    const params = new URLSearchParams({ restaurantId });
+    if (status) params.append('status', status);
+    return this.request<any>(`/orders?${params.toString()}`);
+  }
+
+  async createOrder(orderData: {
+    restaurantId: string;
+    tableNumber?: number;
+    customerName?: string;
+    items: Array<{
+      menuItemId?: string;
+      id?: string;
+      name?: string;
+      quantity: number;
+      unitPrice?: number;
+      price?: number;
+      notes?: string;
+    }>;
+    notes?: string;
+    orderType?: string;
+  }) {
+    return this.request<any>('/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  async updateOrderStatus(orderId: string, status: string) {
+    return this.request<any>(`/orders/${orderId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  }
+
 }
 
 export const apiService = new ApiService();

@@ -16,9 +16,11 @@ import {
 } from 'react-icons/fa';
 import useCentralOrderStore from '@/store/useCentralOrderStore';
 import apiService from '@/services/api';
+import useRestaurantStore from '@/store/useRestaurantStore';
 
 export default function StandaloneKitchenPage() {
   const router = useRouter();
+  const { currentRestaurant } = useRestaurantStore();
   const { 
     getKitchenOrders, 
     updateOrderStatus, 

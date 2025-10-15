@@ -21,11 +21,14 @@ import { LanguageProvider, useLanguage } from '@/context/LanguageContext';
 import TranslatedText from '@/components/TranslatedText';
 import useBusinessSettingsStore from '@/store/useBusinessSettingsStore';
 import SetBrandColor from '@/components/SetBrandColor';
+import apiService from '@/services/api';
+import useRestaurantStore from '@/store/useRestaurantStore';
 
 function CartPageContent() {
   const { currentLanguage, translate } = useLanguage();
   const { items, tableNumber, removeItem, updateQuantity, clearCart, getMaxPreparationTime } = useCartStore();
   const { settings } = useBusinessSettingsStore();
+  const { currentRestaurant } = useRestaurantStore();
   const [isClient, setIsClient] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash' | 'donation' | 'tip'>('card');
   const [tipAmount, setTipAmount] = useState(0);
@@ -33,6 +36,7 @@ function CartPageContent() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showTipModal, setShowTipModal] = useState(false);
   const [showDonationModal, setShowDonationModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const primary = settings.branding.primaryColor;
 
@@ -60,27 +64,53 @@ function CartPageContent() {
     setShowPaymentModal(true);
   };
 
-  const handlePayment = () => {
-    // Payment logic here
-    console.log('Payment method:', paymentMethod);
-    console.log('Total:', total);
-    console.log('Tip:', tipAmount);
-    console.log('Donation:', donationAmount);
+  const handlePayment = async () => {
+    if (isSubmitting || !currentRestaurant?.id) return;
     
-    // En uzun hazırlık süresini hesapla
-    const maxPrepTime = getMaxPreparationTime();
-    
-    // Clear cart after payment
-    clearCart();
-    setShowPaymentModal(false);
-    setTipAmount(0);
-    setDonationAmount(0);
-    
-    // Sipariş onay mesajı göster
-    if (maxPrepTime > 0) {
-      alert(`✅ Siparişiniz alınmıştır!\n\nSiparişiniz ${maxPrepTime} dakika içinde masanıza getirilecektir.`);
-    } else {
-      alert('✅ Siparişiniz alınmıştır!\n\nSiparişiniz kısa sürede masanıza getirilecektir.');
+    setIsSubmitting(true);
+    try {
+      // Backend'e sipariş gönder
+      const orderData = {
+        restaurantId: currentRestaurant.id,
+        tableNumber: tableNumber || undefined,
+        items: items.map(item => ({
+          menuItemId: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          price: item.price,
+          notes: item.notes || ''
+        })),
+        notes: `Ödeme yöntemi: ${paymentMethod}, Bahşiş: ${tipAmount}₺, Bağış: ${donationAmount}₺`,
+        orderType: 'dine_in'
+      };
+
+      const response = await apiService.createOrder(orderData);
+      
+      if (response.success) {
+        // En uzun hazırlık süresini hesapla
+        const maxPrepTime = getMaxPreparationTime();
+        
+        // Clear cart after successful order
+        clearCart();
+        setShowPaymentModal(false);
+        setTipAmount(0);
+        setDonationAmount(0);
+        
+        // Sipariş onay mesajı göster
+        if (maxPrepTime > 0) {
+          alert(`✅ Siparişiniz alınmıştır!\n\nSiparişiniz ${maxPrepTime} dakika içinde masanıza getirilecektir.`);
+        } else {
+          alert('✅ Siparişiniz alınmıştır!\n\nSiparişiniz kısa sürede masanıza getirilecektir.');
+        }
+      } else {
+        alert('❌ Sipariş gönderilemedi. Lütfen tekrar deneyin.');
+      }
+    } catch (error) {
+      console.error('Order creation error:', error);
+      alert('❌ Sipariş gönderilemedi. Lütfen tekrar deneyin.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
